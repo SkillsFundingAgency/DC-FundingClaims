@@ -1,0 +1,14 @@
+﻿
+CREATE TABLE [Draft].[FundingClaim](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Ukprn] [bigint] NOT NULL,
+	[FieldId] [nvarchar](max) NOT NULL,
+	[Value] [decimal](18, 0) NOT NULL,
+	
+ CONSTRAINT [PK_Draft.FundingClaim] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
