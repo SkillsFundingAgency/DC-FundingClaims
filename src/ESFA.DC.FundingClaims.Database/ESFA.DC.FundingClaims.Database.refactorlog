@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <Operation Name="Rename Refactor" Key="7b3d4cfe-bfb1-4e77-8a61-54f9a5494ae7" ChangeDateTime="04/11/2019 13:31:09">
+    <Property Name="ElementName" Value="[dbo].[FundingClaimsFieldRule].[CollectionKey]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FundingClaimsFieldRule]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DataCollectionKey" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="1a928e51-a639-4f88-925f-bf8260cb833c" ChangeDateTime="09/20/2019 10:52:04">
+    <Property Name="ElementName" Value="[dbo].[FundingClaimDetails].[DataCollectionKey]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FundingClaimDetails]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CollectionName" />
+  </Operation>
+</Operations>

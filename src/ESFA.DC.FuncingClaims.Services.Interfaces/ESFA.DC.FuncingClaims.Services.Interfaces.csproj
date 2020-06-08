@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ESFA.DC.Data.Organisations.Model" Version="0.2.0-alpha0014" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ESFA.DC.FundingClaims.Message\ESFA.DC.FundingClaims.Message.csproj" />
+    <ProjectReference Include="..\ESFA.DC.FundingClaims.Model\ESFA.DC.FundingClaims.Model.csproj" />
+  </ItemGroup>
+
+</Project>
