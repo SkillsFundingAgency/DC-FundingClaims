@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ESFA.DC.FundingClaims\ESFA.DC.FundingClaims.csproj" />
+    <ProjectReference Include="..\ESFA.DC.FundingClaims.Services\ESFA.DC.FundingClaims.Services.csproj" />
   </ItemGroup>
 
 </Project>

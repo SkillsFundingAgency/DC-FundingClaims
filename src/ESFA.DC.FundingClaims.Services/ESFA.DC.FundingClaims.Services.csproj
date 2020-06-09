@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="4.8.1" />
+    <PackageReference Include="Autofac" Version="5.2.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="ESFA.DC.Data.Organisations.Model" Version="0.2.0-alpha0014" />
     <PackageReference Include="ESFA.DC.DateTimeProvider.Interface" Version="0.1.6-beta0001" />
