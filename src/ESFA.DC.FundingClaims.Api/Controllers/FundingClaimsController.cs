@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ESFA.DC.DateTimeProvider.Interface;
 using ESFA.DC.FuncingClaims.Services.Interfaces;
 using ESFA.DC.FundingClaims.Model;
 using ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces;
@@ -15,15 +16,18 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
     public class FundingClaimsController : ControllerBase
     {
         private readonly IFundingClaimsService _fundingClaimsService;
+        private readonly IDateTimeProvider _dateTimeProvider;
         private readonly ILogger _logger;
         private readonly IFundingClaimsReferenceDataService _fundingClaimsReferenceDataService;
 
         public FundingClaimsController(
             IFundingClaimsService fundingClaimsService,
+            IDateTimeProvider dateTimeProvider,
             ILogger logger,
             IFundingClaimsReferenceDataService fundingClaimsReferenceDataService)
         {
             _fundingClaimsService = fundingClaimsService;
+            _dateTimeProvider = dateTimeProvider;
             _logger = logger;
             _fundingClaimsReferenceDataService = fundingClaimsReferenceDataService;
         }
@@ -278,6 +282,19 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
                 _logger.LogError($"error occured to GetSubmissionContractValues  data for ukprn : {ukprn}, submission Id : {submissionId}", e);
                 return BadRequest();
             }
+        }
+
+        [HttpGet("collection/{dateTimeUtc?}")]
+        public async Task<FundingClaimsCollection> GetFundingClaimsCollection(DateTime? dateTimeUtc = null)
+        {
+            dateTimeUtc = dateTimeUtc ?? _dateTimeProvider.GetNowUtc();
+            return await _fundingClaimsReferenceDataService.GetFundingClaimsCollection(dateTimeUtc);
+        }
+
+        [HttpGet("collection/code/{collectionCode}")]
+        public async Task<FundingClaimsCollection> GetFundingClaimsCollection(string collectionCode)
+        {
+            return await _fundingClaimsReferenceDataService.GetFundingClaimsCollection(collectionCode);
         }
     }
 }
