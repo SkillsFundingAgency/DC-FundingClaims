@@ -1,22 +1,26 @@
-﻿using System;
+﻿using ESFA.DC.FundingClaims.Model;
+using ESFA.DC.ReferenceData.Organisations.Model;
+using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
-using Autofac.Features.Indexed;
-using ESFA.DC.FuncingClaims.Services.Interfaces;
-using ESFA.DC.FundingClaims.Data;
-using ESFA.DC.FundingClaims.Model;
 using ESFA.DC.FundingClaims.Model.Interfaces;
-using ESFA.DC.ILR1819.DataStore.EF;
 using ESFA.DC.ILR1819.DataStore.EF.Interface;
 using ESFA.DC.Logging.Interfaces;
 using ESFA.DC.ReferenceData.FCS.Model.Interface;
-using ESFA.DC.ReferenceData.Organisations.Model;
 using ESFA.DC.ReferenceData.Organisations.Model.Interface;
 using ESFA.DC.Summarisation.Model.Interface;
 using Microsoft.EntityFrameworkCore;
+using ESFA.DC.FundingClaims.Data;
+using Autofac.Features.Indexed;
+using ESFA.DC.DateTimeProvider.Interface;
+using ESFA.DC.ILR1819.DataStore.EF;
+using ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces;
+using ESFA.DC.JobQueueManager.Data;
+using ESFA.DC.JobQueueManager.Data.Entities;
 
-namespace ESFA.DC.FundingClaims.Services
+namespace ESFA.DC.FundingClaims.ReferenceData.Services
 {
     public class FundingClaimsReferenceDataService : IFundingClaimsReferenceDataService
     {
@@ -26,6 +30,8 @@ namespace ESFA.DC.FundingClaims.Services
         private readonly Func<IFundingClaimsDataContext> _fundingClaimsContextFactory;
         private readonly IIndex<int, IFundingStreamPeriodCodes> _fundingStreamPeriodCodes;
         private readonly Func<ISummarisationContext> _summarisedActualsContextFactory;
+        private readonly Func<IJobQueueDataContext> _jobQueueDataContextFactory;
+        private readonly IDateTimeProvider _dateTimeProvider;
         private readonly ILogger _logger;
 
         public FundingClaimsReferenceDataService(
@@ -35,6 +41,8 @@ namespace ESFA.DC.FundingClaims.Services
             Func<IFundingClaimsDataContext> fundingClaimsContextFactory,
             IIndex<int, IFundingStreamPeriodCodes> IFundingStreamPeriodCodes,
             Func<ISummarisationContext> summarisedActualsContextFactory,
+            Func<IJobQueueDataContext> jobQueueDataContextFactory,
+            IDateTimeProvider dateTimeProvider,  
             ILogger logger)
         {
             _fcsContextFactory = fcsContextFactory;
@@ -43,6 +51,8 @@ namespace ESFA.DC.FundingClaims.Services
             _fundingClaimsContextFactory = fundingClaimsContextFactory;
             _fundingStreamPeriodCodes = IFundingStreamPeriodCodes;
             _summarisedActualsContextFactory = summarisedActualsContextFactory;
+            _jobQueueDataContextFactory = jobQueueDataContextFactory;
+            _dateTimeProvider = dateTimeProvider;
             _logger = logger;
         }
 
@@ -173,18 +183,18 @@ namespace ESFA.DC.FundingClaims.Services
             }
         }
 
-        public async Task<OrgDetail> GetorganisationDetails(long ukprn)
+        public async Task<ProviderDetails> GetorganisationDetails(long ukprn)
         {
             try
             {
                 using (var context = _organisationContextFactory())
                 {
                     var orgEntity = await context.OrgDetails.FirstOrDefaultAsync(x => x.Ukprn == ukprn);
-                    return new OrgDetail()
+                    return new ProviderDetails()
                     {
                         Ukprn = ukprn,
                         Name = orgEntity.Name,
-                        Hesaprovider = orgEntity.Hesaprovider
+                        IsHesaProvider = orgEntity.Hesaprovider.GetValueOrDefault()
                     };
                 }
             }
@@ -269,7 +279,7 @@ namespace ESFA.DC.FundingClaims.Services
             }
         }
 
-        private ContractAllocation ConvertContractAllocation(ReferenceData.FCS.Model.ContractAllocation contractAllocation, decimal? allocationValue)
+        private ContractAllocation ConvertContractAllocation(ESFA.DC.ReferenceData.FCS.Model.ContractAllocation contractAllocation, decimal? allocationValue)
         {
             return new ContractAllocation()
             {
@@ -336,6 +346,82 @@ namespace ESFA.DC.FundingClaims.Services
             }
 
             return 7;
+        }
+
+        public async Task<FundingClaimsCollection> GetFundingClaimsCollection(string collectionCode)
+        {
+            var nowUtcDateTime = _dateTimeProvider.GetNowUtc();
+            using (var context = _jobQueueDataContextFactory())
+            {
+                var result = await context.FundingClaimsCollectionMetaData.Include(x => x.Collection)
+                    .Where(x => x.CollectionCode == collectionCode)
+                    .Select(x => Convert(x))
+                    .FirstOrDefaultAsync();
+                return result;
+            }
+        }
+
+        public async Task<List<FundingClaimsCollection>> GetAllFundingClaimsCollections()
+        {
+            using (var context = _jobQueueDataContextFactory())
+            {
+                var result = await context.FundingClaimsCollectionMetaData.Include(x => x.Collection)
+                    .Select(x => Convert(x))
+                    .ToListAsync();
+                return result;
+            }
+        }
+
+        public async Task<FundingClaimsCollection> GetFundingClaimsCollection(DateTime? dateTimeUtc = null)
+        {
+            dateTimeUtc = dateTimeUtc ?? _dateTimeProvider.GetNowUtc();
+
+            using (var context = _jobQueueDataContextFactory())
+            {
+                var data = await context.FundingClaimsCollectionMetaData.Include(x => x.Collection)
+                    .SingleOrDefaultAsync(x => dateTimeUtc >= x.SubmissionOpenDateUtc && dateTimeUtc <= x.SubmissionCloseDateUtc);
+
+                if (data == null)
+                {
+                    return null;
+                }
+
+                return Convert(data);
+            }
+        }
+
+        public async Task<string> GetEmailTemplate(int collectionId)
+        {
+            using (IJobQueueDataContext context = _jobQueueDataContextFactory())
+            {
+                var emailTemplate = await
+                    context.JobEmailTemplate.SingleOrDefaultAsync(x => x.CollectionId == collectionId
+                                                                       && x.Active.Value);
+
+                return emailTemplate?.TemplateOpenPeriod ?? string.Empty;
+            }
+        }
+
+        private FundingClaimsCollection Convert(FundingClaimsCollectionMetaData data)
+        {
+            var nowUtcDateTime = _dateTimeProvider.GetNowUtc();
+
+            return new FundingClaimsCollection()
+            {
+                CollectionId = data.CollectionId,
+                CollectionYear = data.Collection.CollectionYear.GetValueOrDefault(),
+                CollectionCode = data.CollectionCode,
+                RequiresSignature = data.RequiresSignature.GetValueOrDefault(),
+                SignatureCloseDateUtc = data.SignatureCloseDateUtc,
+                SubmissionOpenDateUtc = data.SubmissionOpenDateUtc,
+                SubmissionCloseDateUtc = data.SubmissionCloseDateUtc,
+                CollectionName = data.Collection.Name,
+                SummarisedPeriodFrom = data.SummarisedPeriodFrom,
+                SummarisedPeriodTo = data.SummarisedPeriodTo,
+                SummarisedReturnPeriod = data.SummarisedReturnPeriod,
+                DisplayName = data.Collection.Description,
+                IsOpenForSubmission = nowUtcDateTime >= data.SubmissionOpenDateUtc && nowUtcDateTime <= data.SubmissionCloseDateUtc
+            };
         }
     }
 }

@@ -9,7 +9,7 @@ using ESFA.DC.FundingClaims.Data;
 using ESFA.DC.FundingClaims.Message;
 using ESFA.DC.FundingClaims.Model;
 using ESFA.DC.FundingClaims.Model.Interfaces;
-using ESFA.DC.JobQueueManager.Data;
+using ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces;
 using ESFA.DC.Logging.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +18,6 @@ namespace ESFA.DC.FundingClaims.Services
     public class FundingClaimsService : IFundingClaimsService
     {
         private readonly Func<IFundingClaimsDataContext> _fundingClaimsContextFactory;
-        private readonly Func<IJobQueueDataContext> _jobQueueDataContextFactory;
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IFundingClaimsMessagingService _fundingClaimsMessagingService;
         private readonly IIndex<int, IFundingStreamPeriodCodes> _fundingStreamPeriodCodes;
@@ -27,7 +26,6 @@ namespace ESFA.DC.FundingClaims.Services
 
         public FundingClaimsService(
             Func<IFundingClaimsDataContext> fundingClaimsContextFactory,
-            Func<IJobQueueDataContext> jobQueueDataContextFactory,
             IDateTimeProvider dateTimeProvider,
             IFundingClaimsMessagingService fundingClaimsMessagingService,
             IIndex<int, IFundingStreamPeriodCodes> IFundingStreamPeriodCodes,
@@ -35,7 +33,6 @@ namespace ESFA.DC.FundingClaims.Services
             ILogger logger)
         {
             _fundingClaimsContextFactory = fundingClaimsContextFactory;
-            _jobQueueDataContextFactory = jobQueueDataContextFactory;
             _dateTimeProvider = dateTimeProvider;
             _fundingClaimsMessagingService = fundingClaimsMessagingService;
             _fundingStreamPeriodCodes = IFundingStreamPeriodCodes;
@@ -261,7 +258,7 @@ namespace ESFA.DC.FundingClaims.Services
                                 PeriodTypeCode = contract.PeriodTypeCode,
                                 OrganisationIdentifier = contract.OrganisationIdentifier,
                                 CollectionPeriod = collectionCode,
-                                IsHeProvider = orgDetails.Hesaprovider.GetValueOrDefault(),
+                                IsHeProvider = orgDetails.IsHesaProvider,
                                 Declaration = true,
                                 SubmissionType = 2,
                                 ProviderName = orgDetails.Name,
@@ -321,27 +318,23 @@ namespace ESFA.DC.FundingClaims.Services
             {
                 using (var context = _fundingClaimsContextFactory())
                 {
-                    using (var jobContext = _jobQueueDataContextFactory())
+                    var collections = await _fundingClaimsReferenceDataService.GetAllFundingClaimsCollections();
+
+                    var data = await context.FundingClaimsSubmissionFile.Where(x => x.Ukprn == ukprn.ToString())
+                        .OrderByDescending(x => x.UpdatedOn)
+                        .ToListAsync();
+
+                    foreach (var item in data)
                     {
-                        var collections = await jobContext.FundingClaimsCollectionMetaData.Include(x => x.Collection)
-                            .Select(x => new { x.CollectionCode, x.Collection.Description }).ToListAsync();
-
-                        var data = await context.FundingClaimsSubmissionFile.Where(x => x.Ukprn == ukprn.ToString())
-                            .OrderByDescending(x => x.UpdatedOn)
-                            .ToListAsync();
-
-                        foreach (var item in data)
+                        result.Add(new FundingClaimsSubmission()
                         {
-                            result.Add(new FundingClaimsSubmission()
-                            {
-                                Ukprn = ukprn,
-                                SubmissionId = item.SubmissionId.ToString(),
-                                CollectionCode = item.CollectionPeriod,
-                                SubmittedDateTime = item.UpdatedOn,
-                                IsSigned = item.IsSigned,
-                                CollectionDisplayName = collections.SingleOrDefault(x => x.CollectionCode.Equals(item.CollectionPeriod))?.Description,
-                            });
-                        }
+                            Ukprn = ukprn,
+                            SubmissionId = item.SubmissionId.ToString(),
+                            CollectionCode = item.CollectionPeriod,
+                            SubmittedDateTime = item.UpdatedOn,
+                            IsSigned = item.IsSigned,
+                            CollectionDisplayName = collections.SingleOrDefault(x => x.CollectionCode.Equals(item.CollectionPeriod))?.DisplayName,
+                        });
                     }
                 }
 

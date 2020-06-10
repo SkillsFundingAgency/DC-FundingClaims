@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using Autofac;
 using ESFA.DC.DateTimeProvider.Interface;
+using ESFA.DC.FuncingClaims.Services.Interfaces;
 using ESFA.DC.FundingClaims.Data;
-using ESFA.DC.FundingClaims.Interfaces;
+using ESFA.DC.FundingClaims.EmailNotification.Services;
 using ESFA.DC.FundingClaims.ReminderService.Configuration;
 using ESFA.DC.FundingClaims.ReminderService.Interfaces;
-using ESFA.DC.JobNotifications;
-using ESFA.DC.JobNotifications.Interfaces;
-using ESFA.DC.JobQueueManager;
+using ESFA.DC.FundingClaims.Services;
 using ESFA.DC.JobQueueManager.Data;
-using ESFA.DC.JobQueueManager.Interfaces;
 using ESFA.DC.Logging;
 using ESFA.DC.Logging.Config;
 using ESFA.DC.Logging.Config.Interfaces;
@@ -27,8 +25,6 @@ namespace ESFA.DC.FundingClaims.ReminderService.Ioc
             builder.RegisterType<JobQueueDataContext>().As<IJobQueueDataContext>().ExternallyOwned();
             builder.RegisterType<FundingClaimsDataContext>().As<IFundingClaimsDataContext>().ExternallyOwned();
             builder.RegisterType<EmailNotifier>().As<IEmailNotifier>().InstancePerLifetimeScope();
-            builder.RegisterType<CollectionEmailTemplateManager>().As<ICollectionEmailTemplateManager>().InstancePerLifetimeScope();
-            builder.RegisterType<CollectionService>().As<ICollectionService>().InstancePerLifetimeScope();
             builder.RegisterType<FundingClaimsReminderService>().As<IFundingClaimsReminderService>().InstancePerLifetimeScope();
             builder.RegisterType<FundingClaimsEmailService>().As<IFundingClaimsEmailService>().InstancePerLifetimeScope();
             builder.RegisterType<DateTimeProvider.DateTimeProvider>().As<IDateTimeProvider>().InstancePerLifetimeScope();

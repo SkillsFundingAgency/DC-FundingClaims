@@ -23,6 +23,20 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ESFA.DC.FuncingClaims.Servi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ESFA.DC.FundingClaims.Services", "ESFA.DC.FundingClaims.Services\ESFA.DC.FundingClaims.Services.csproj", "{855CE4CA-297A-44AE-87C6-BBC8BB8E4AF0}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ESFA.DC.FunidngClaims.Signing.Services", "ESFA.DC.FunidngClaims.Signing.Services\ESFA.DC.FunidngClaims.Signing.Services.csproj", "{AE5D4D7C-D80D-4318-8A49-ACFC1B8F03FE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Signing", "Signing", "{7E18A1AA-DD6D-415D-A6D6-C42149A410F8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESFA.DC.FundingClaims.ReferenceData.Services", "ESFA.DC.FundingClaims.ReferenceData.Services\ESFA.DC.FundingClaims.ReferenceData.Services.csproj", "{F6FBD31D-D559-48E9-AAAD-918676606884}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RefernceData", "RefernceData", "{68856463-E8A1-48DB-B242-7DC89A01B5FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces", "ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces\ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces.csproj", "{13E199C0-F459-4339-9F01-FFEDB19C4AA2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebJobs", "WebJobs", "{1BB52596-424B-4344-857A-B493E5243E0B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESFA.DC.FundingClaims.EmailNotification.Services", "ESFA.DC.FundingClaims.EmailNotification.Services\ESFA.DC.FundingClaims.EmailNotification.Services.csproj", "{BA6BF686-3EC3-471A-AC2F-A8DABB0C64AE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,9 +85,32 @@ Global
 		{855CE4CA-297A-44AE-87C6-BBC8BB8E4AF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{855CE4CA-297A-44AE-87C6-BBC8BB8E4AF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{855CE4CA-297A-44AE-87C6-BBC8BB8E4AF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE5D4D7C-D80D-4318-8A49-ACFC1B8F03FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE5D4D7C-D80D-4318-8A49-ACFC1B8F03FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE5D4D7C-D80D-4318-8A49-ACFC1B8F03FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE5D4D7C-D80D-4318-8A49-ACFC1B8F03FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6FBD31D-D559-48E9-AAAD-918676606884}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6FBD31D-D559-48E9-AAAD-918676606884}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6FBD31D-D559-48E9-AAAD-918676606884}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6FBD31D-D559-48E9-AAAD-918676606884}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13E199C0-F459-4339-9F01-FFEDB19C4AA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13E199C0-F459-4339-9F01-FFEDB19C4AA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13E199C0-F459-4339-9F01-FFEDB19C4AA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13E199C0-F459-4339-9F01-FFEDB19C4AA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA6BF686-3EC3-471A-AC2F-A8DABB0C64AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA6BF686-3EC3-471A-AC2F-A8DABB0C64AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA6BF686-3EC3-471A-AC2F-A8DABB0C64AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA6BF686-3EC3-471A-AC2F-A8DABB0C64AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CE2225DE-6A88-46A8-A9C8-51F58D4A9835} = {1BB52596-424B-4344-857A-B493E5243E0B}
+		{5740665E-A69C-4990-B54B-8CC582964B24} = {1BB52596-424B-4344-857A-B493E5243E0B}
+		{AE5D4D7C-D80D-4318-8A49-ACFC1B8F03FE} = {7E18A1AA-DD6D-415D-A6D6-C42149A410F8}
+		{F6FBD31D-D559-48E9-AAAD-918676606884} = {68856463-E8A1-48DB-B242-7DC89A01B5FB}
+		{13E199C0-F459-4339-9F01-FFEDB19C4AA2} = {68856463-E8A1-48DB-B242-7DC89A01B5FB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AC60D59F-F5FA-42CB-91E4-F2564EEF8F0C}

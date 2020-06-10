@@ -1,4 +1,4 @@
-﻿using ESFA.DC.JobNotifications;
+﻿using ESFA.DC.FundingClaims.EmailNotification.Services;
 
 namespace ESFA.DC.FundingClaims.ReminderService.Interfaces
 {

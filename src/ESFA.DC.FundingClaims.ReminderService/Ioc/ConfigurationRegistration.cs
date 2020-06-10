@@ -1,7 +1,6 @@
 ﻿using Autofac;
+using ESFA.DC.FundingClaims.EmailNotification.Services;
 using ESFA.DC.FundingClaims.ReminderService.Configuration;
-using ESFA.DC.JobManagement.Common;
-using ESFA.DC.JobNotifications;
 using Microsoft.Extensions.Configuration;
 
 namespace ESFA.DC.FundingClaims.ReminderService.Ioc

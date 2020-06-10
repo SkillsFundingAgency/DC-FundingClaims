@@ -10,6 +10,8 @@ using ESFA.DC.FundingClaims.Data;
 using ESFA.DC.FundingClaims.Message;
 using ESFA.DC.FundingClaims.Model;
 using ESFA.DC.FundingClaims.Model.Interfaces;
+using ESFA.DC.FundingClaims.ReferenceData.Services;
+using ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces;
 using ESFA.DC.FundingClaims.Services;
 using ESFA.DC.ILR1819.DataStore.EF;
 using ESFA.DC.ILR1819.DataStore.EF.Interface;

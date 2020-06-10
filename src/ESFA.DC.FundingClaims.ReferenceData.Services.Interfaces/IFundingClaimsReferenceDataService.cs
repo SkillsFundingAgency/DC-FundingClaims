@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ESFA.DC.FundingClaims.Model;
-using ESFA.DC.ReferenceData.Organisations.Model;
 
-namespace ESFA.DC.FuncingClaims.Services.Interfaces
+namespace ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces
 {
     public interface IFundingClaimsReferenceDataService
     {
@@ -11,7 +11,7 @@ namespace ESFA.DC.FuncingClaims.Services.Interfaces
 
         Task<List<Ilr16To19FundingClaim>> Get1619FundingClaimDetailsAsync(long ukprn);
 
-        Task<OrgDetail> GetorganisationDetails(long ukprn);
+        Task<ProviderDetails> GetorganisationDetails(long ukprn);
 
         Task<ProviderReferenceData> GetProviderRefernceDataAsync(long ukprn);
 
@@ -20,5 +20,14 @@ namespace ESFA.DC.FuncingClaims.Services.Interfaces
         Task<IEnumerable<SummarisedActualDeliveryToDate>> GetDeliveryToDateValues(long ukprn, int periodFrom, int periodTo, string collectionReturnCode, int collectionYear);
 
         Task<decimal?> GetCofRemovalValue(long ukprn);
+
+        Task<FundingClaimsCollection> GetFundingClaimsCollection(string collectionCode);
+
+        Task<FundingClaimsCollection> GetFundingClaimsCollection(DateTime? dateTimeUtc = null);
+
+
+        Task<List<FundingClaimsCollection>> GetAllFundingClaimsCollections();
+
+        Task<string> GetEmailTemplate(int collectionId);
     }
 }

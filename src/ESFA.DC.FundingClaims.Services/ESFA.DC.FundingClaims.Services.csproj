@@ -15,15 +15,10 @@
   <ItemGroup>
     <PackageReference Include="Autofac" Version="5.2.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
-    <PackageReference Include="ESFA.DC.Data.Organisations.Model" Version="0.2.0-alpha0014" />
     <PackageReference Include="ESFA.DC.DateTimeProvider.Interface" Version="0.1.6-beta0001" />
-    <PackageReference Include="ESFA.DC.ILR1819.Database.EF" Version="0.1.381" />
-    <PackageReference Include="ESFA.DC.JobQueueManager.Data" Version="0.2.75-beta0001" />
     <PackageReference Include="ESFA.DC.Logging" Version="0.1.4-beta0001" />
     <PackageReference Include="ESFA.DC.Queueing" Version="0.1.18-beta0001" />
     <PackageReference Include="ESFA.DC.Queueing.Interface" Version="0.1.14-beta0001" />
-    <PackageReference Include="ESFA.DC.ReferenceData.FCS.Model" Version="0.2.159" />
-    <PackageReference Include="ESFA.DC.Summarisation.Model" Version="0.0.686" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
@@ -34,6 +29,7 @@
     <ProjectReference Include="..\ESFA.DC.FuncingClaims.Services.Interfaces\ESFA.DC.FuncingClaims.Services.Interfaces.csproj" />
     <ProjectReference Include="..\ESFA.DC.FundingClaims.Data\ESFA.DC.FundingClaims.Data.csproj" />
     <ProjectReference Include="..\ESFA.DC.FundingClaims.Message\ESFA.DC.FundingClaims.Message.csproj" />
+    <ProjectReference Include="..\ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces\ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces.csproj" />
   </ItemGroup>
 
 </Project>

@@ -69,7 +69,6 @@
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\FundingClaimsSubmissionValues.sql" />
-    <Build Include="dbo\Tables\FundingClaimsFieldRule.sql" />
     <Build Include="dbo\Tables\FundingClaimMaxContractValues.sql" />
     <Build Include="dbo\Tables\FundingClaimDetails.sql" />
     <Build Include="Reference\FundingClaimsProviderReferenceData.sql" />
