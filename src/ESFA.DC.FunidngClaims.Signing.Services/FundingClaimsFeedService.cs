@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using ESFA.DC.FundingClaims.AtomFeed.Services.Config;
 using ESFA.DC.FundingClaims.AtomFeed.Services.Interfaces;
 using ESFA.DC.FundingClaims.Signing.Models;
-using ESFA.DC.FunidngClaims.Signing.Services.Config.Interfaces;
+using ESFA.DC.FunidngClaims.Signing.Services.Interfaces;
 using ESFA.DC.Logging.Interfaces;
 using Polly;
 using Polly.Retry;
@@ -47,9 +47,9 @@ namespace ESFA.DC.ReferenceData.FCS.Service
         {
             try
             {
-                var existingItemIds = await _feedDataStorageService.GetExistingFeedItemIds(cancellationToken);
+                var existingItemIds = await _feedDataStorageService.GetExistingFeedItemIdsAsync(cancellationToken);
 
-                var newItems = await GetNewDataFromFeedAsync(_atomFeedSettings.FeedUri + "/api/fundingClaims/notifications", existingItemIds, cancellationToken);
+                var newItems = await GetNewDataFromFeedAsync(_atomFeedSettings.FeedUri, existingItemIds, cancellationToken);
 
                 await _feedDataStorageService.SaveFeedItems(cancellationToken, newItems);
             }
@@ -60,14 +60,14 @@ namespace ESFA.DC.ReferenceData.FCS.Service
             }
         }
 
-        public async Task<IEnumerable<FundingClaimDto>> GetNewDataFromFeedAsync(string uri, IEnumerable<Guid> existingItemIds, CancellationToken cancellationToken)
+        public async Task<IEnumerable<FundingClaimSigningDto>> GetNewDataFromFeedAsync(string uri, IEnumerable<string> existingItemIds, CancellationToken cancellationToken)
         {
             
             string previousPageUri = uri;
-            var contractorCache = new Dictionary<string, FundingClaimDto>();
+            var contractorCache = new Dictionary<string, FundingClaimSigningDto>();
             IEnumerable<string> newCurrentPageItemIds;
 
-            var existingSyndicationItemIdsHashSet = new HashSet<Guid>(existingItemIds.Distinct());
+            var existingSyndicationItemIdsHashSet = new HashSet<string>(existingItemIds);
 
 
             do
@@ -77,11 +77,13 @@ namespace ESFA.DC.ReferenceData.FCS.Service
 
                 var feed = await _retryPolicy.ExecuteAsync(async () => await _syndicationFeedService.LoadSyndicationFeedFromUriAsync(previousPageUri, cancellationToken));
 
+                _syndicationFeedParserService.RetrieveDataFromSyndicationItem(feed);
+
                 var feedItems = feed
                     .Items
                     .Reverse()
                     .Select(_syndicationFeedParserService.RetrieveDataFromSyndicationItem)
-                    .Where(m => !existingSyndicationItemIdsHashSet.Contains(m.syndicationItemId))
+                    .Where(m => !existingSyndicationItemIdsHashSet.Contains(m.model.FundingClaimId))
                     .Select(m => _feedItemMappingService.Map(m.model))
                     .ToList();
 

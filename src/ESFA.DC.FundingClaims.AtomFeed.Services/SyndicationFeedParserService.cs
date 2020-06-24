@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.ServiceModel.Syndication;
 using System.Xml;
 using System.Xml.Linq;
+using System.Xml.Serialization;
 using ESFA.DC.FundingClaims.AtomFeed.Services.Config;
 using ESFA.DC.FundingClaims.AtomFeed.Services.Interfaces;
 using ESFA.DC.Serialization.Interfaces;
@@ -48,7 +50,7 @@ namespace ESFA.DC.FundingClaims.AtomFeed.Services
                     syndicationItem.Content.WriteTo(xmlWriter, "temp", "temp");
                 }
 
-                var contract = XDocument.Parse(stringWriter.ToString()).Descendants().Where(x => x.Name.LocalName == _atomFeedSettings.ParentEntityName).ToList();
+                var contract = XDocument.Parse(stringWriter.ToString()).Descendants().ToList();
 
                 using (var memoryStream = new MemoryStream())
                 {
@@ -62,6 +64,29 @@ namespace ESFA.DC.FundingClaims.AtomFeed.Services
                     var model = _xmlserializationService.Deserialize<T>(memoryStream);
 
                     return (Guid.Parse(syndicationItem.Id.Remove(0, 5)), model);
+                }
+            }
+        }
+
+        public void RetrieveDataFromSyndicationItem(SyndicationFeed feed)
+        {
+            //XmlSerializer serializer = new XmlSerializer(typeof(SyndicationFeed), "http://www.w3.org/2005/Atom");
+
+            foreach (var feedItem in feed.Items)
+            {
+                XDocument docOData = new XDocument();
+                using (XmlWriter writer = docOData.CreateWriter())
+                {
+                    feedItem.Content.WriteTo(writer, "content", "w");
+
+                    IEnumerable<XElement> childList =
+                        from el in docOData.Elements()
+                        select el;
+
+                    foreach (XElement e in childList)
+                    {
+                        var child = e.Value;
+                    }
                 }
             }
         }

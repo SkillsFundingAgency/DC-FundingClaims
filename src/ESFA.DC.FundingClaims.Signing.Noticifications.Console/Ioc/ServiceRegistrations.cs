@@ -9,7 +9,7 @@ using ESFA.DC.FundingClaims.Data.Entities;
 using ESFA.DC.FundingClaims.Signing.Models;
 using ESFA.DC.FundingClaims.Signing.Noticifications.Console.Configuration;
 using ESFA.DC.FunidngClaims.Signing.Services;
-using ESFA.DC.FunidngClaims.Signing.Services.Config.Interfaces;
+using ESFA.DC.FunidngClaims.Signing.Services.Interfaces;
 using ESFA.DC.Logging;
 using ESFA.DC.Logging.Config;
 using ESFA.DC.Logging.Config.Interfaces;

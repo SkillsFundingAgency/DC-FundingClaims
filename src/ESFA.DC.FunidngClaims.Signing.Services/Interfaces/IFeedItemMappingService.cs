@@ -1,11 +1,10 @@
-﻿using System;
-using ESFA.DC.FundingClaims.Signing.Models;
+﻿using ESFA.DC.FundingClaims.Signing.Models;
 
-namespace ESFA.DC.FunidngClaims.Signing.Services.Config.Interfaces
+namespace ESFA.DC.FunidngClaims.Signing.Services.Interfaces
 {
     public interface IFeedItemMappingService
     {
-        FundingClaimDto Map(FundingClaimsFeedItem feedItem);
+        FundingClaimSigningDto Map(FundingClaimsFeedItem feedItem);
 
     }
 }

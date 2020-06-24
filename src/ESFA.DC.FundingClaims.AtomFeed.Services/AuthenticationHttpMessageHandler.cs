@@ -15,23 +15,23 @@ namespace ESFA.DC.FundingClaims.AtomFeed.Services
     {
         private readonly AtomFeedSettings _atomFeedSettings;
 
-        public AuthenticationHttpMessageHandler(AtomFeedSettings atomFeedSettings)
+        public AuthenticationHttpMessageHandler(AtomFeedSettings atomFeedSettings) 
         {
             _atomFeedSettings = atomFeedSettings;
+            InnerHandler = new HttpClientHandler();
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var token =  await ProvideAsync();
-
+            var token = await GetToken();
+          
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/atom+xml"));
-
 
             return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<string> ProvideAsync()
+        public async Task<string> GetToken()
         {
             var policy = Policy
                 .Handle<AdalException>(ex => ex.ErrorCode == "temporarily_unavailable")
@@ -43,11 +43,11 @@ namespace ESFA.DC.FundingClaims.AtomFeed.Services
         private async Task<string> AcquireTokenAsync()
         {
             var authContext = new AuthenticationContext(_atomFeedSettings.Authority);
-            var clientCredential = new ClientCredential(_atomFeedSettings.ClientId, _atomFeedSettings.AppKey);
+            var clientCredential = new ClientCredential(_atomFeedSettings.ClientId, _atomFeedSettings.Secret);
 
             var authResult = await authContext.AcquireTokenAsync(_atomFeedSettings.ResourceId, clientCredential);
 
-            if (authResult == null)
+            if (authResult == null) 
             {
                 throw new AuthenticationException("Could not authenticate with the OAUTH2 claims provider after several attempts");
             }

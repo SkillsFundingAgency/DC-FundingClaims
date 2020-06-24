@@ -4,9 +4,9 @@ using System.Text;
 
 namespace ESFA.DC.FundingClaims.Signing.Models
 {
-    public class FundingClaimDto
+    public class FundingClaimSigningDto
     {
-        public FundingClaimDto(string fundingClaimId)
+        public FundingClaimSigningDto(string fundingClaimId)
         {
             FeedItemId = fundingClaimId;
 
@@ -27,6 +27,6 @@ namespace ESFA.DC.FundingClaims.Signing.Models
 
         public int Version { get; }
 
-        public string FeedItemId { get; set; }
+        public string FeedItemId { get; }
     }
 }

@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using ESFA.DC.FundingClaims.Signing.Noticifications.Console.Ioc;
-using ESFA.DC.FunidngClaims.Signing.Services.Config.Interfaces;
+using ESFA.DC.FunidngClaims.Signing.Services.Interfaces;
 using ESFA.DC.Logging.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;

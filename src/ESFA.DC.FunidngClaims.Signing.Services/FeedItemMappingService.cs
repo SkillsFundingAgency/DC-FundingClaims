@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using ESFA.DC.FundingClaims.Signing.Models;
-using ESFA.DC.FunidngClaims.Signing.Services.Config.Interfaces;
+using ESFA.DC.FunidngClaims.Signing.Services.Interfaces;
 
 namespace ESFA.DC.ReferenceData.FCS.Service
 {
     public class FeedItemMappingService : IFeedItemMappingService
     {
-        public FundingClaimDto Map(FundingClaimsFeedItem feedItem)
+        public FundingClaimSigningDto Map(FundingClaimsFeedItem feedItem)
         {
             if (string.IsNullOrEmpty(feedItem.FundingClaimId))
             {
@@ -21,7 +21,7 @@ namespace ESFA.DC.ReferenceData.FCS.Service
                 throw new Exception($"invalid funding claim id : {feedItem.FundingClaimId}");
             }
 
-            var dto = new FundingClaimDto(feedItem.FundingClaimId)
+            var dto = new FundingClaimSigningDto(feedItem.FundingClaimId)
             {
                 IsSigned = feedItem.HasBeenSigned,
             };

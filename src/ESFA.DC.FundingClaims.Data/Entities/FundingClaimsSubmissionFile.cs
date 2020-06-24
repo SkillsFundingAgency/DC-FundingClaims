@@ -42,6 +42,6 @@ namespace ESFA.DC.FundingClaims.Data.Entities
 
         public DateTime? SignedOn { get; set; }
 
-        public SubmissionTypes SubmissionTypeNavigation { get; set; }
+        public virtual SubmissionTypes SubmissionTypeNavigation { get; set; }
     }
 }

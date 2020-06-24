@@ -18,8 +18,6 @@ namespace ESFA.DC.FundingClaims.Data
 
         DbSet<FundingClaimsData> FundingClaimsData { get; set; }
 
-        DbSet<FundingClaimsFieldRule> FundingClaimsFieldRule { get; set; }
-
         DbSet<FundingClaimsProviderReferenceData> FundingClaimsProviderReferenceData { get; set; }
 
         DbSet<FundingClaimsSubmissionFile> FundingClaimsSubmissionFile { get; set; }
@@ -29,6 +27,8 @@ namespace ESFA.DC.FundingClaims.Data
         DbSet<SubmissionTypes> SubmissionTypes { get; set; }
 
         DbSet<FundingClaimsSupportingData> FundingClaimsSupportingData { get; set; }
+
+        DbSet<SigningNotificationFeed> SigningNotificationFeed { get; set; }
 
         int SaveChanges();
 

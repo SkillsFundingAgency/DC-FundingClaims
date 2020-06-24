@@ -10,7 +10,7 @@
 
         public string ClientId { get; set; }
 
-        public string AppKey { get; set; }
+        public string Secret { get; set; }
 
         public string ParentEntityName { get; set; }
 

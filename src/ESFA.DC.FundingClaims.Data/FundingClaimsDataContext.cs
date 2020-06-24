@@ -20,29 +20,31 @@ namespace ESFA.DC.FundingClaims.Data
 
         public virtual DbSet<FundingClaimsData> FundingClaimsData { get; set; }
 
-        public virtual DbSet<FundingClaimsFieldRule> FundingClaimsFieldRule { get; set; }
-
         public virtual DbSet<FundingClaimsProviderReferenceData> FundingClaimsProviderReferenceData { get; set; }
 
         public virtual DbSet<FundingClaimsSubmissionFile> FundingClaimsSubmissionFile { get; set; }
 
         public virtual DbSet<FundingClaimsSubmissionValues> FundingClaimsSubmissionValues { get; set; }
 
-        public virtual DbSet<SubmissionTypes> SubmissionTypes { get; set; }
-
         public virtual DbSet<FundingClaimsSupportingData> FundingClaimsSupportingData { get; set; }
+
+        public virtual DbSet<SigningNotificationFeed> SigningNotificationFeed { get; set; }
+
+        public virtual DbSet<SubmissionTypes> SubmissionTypes { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=(localdb)\\MSSQLLOCALDB;Database=FundingClaims;Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer("Server=.;Database=FundingClaims_Live;Trusted_Connection=True;");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+
             modelBuilder.Entity<FundingClaimDetails>(entity =>
             {
                 entity.HasKey(e => e.DataCollectionKey);
@@ -92,44 +94,6 @@ namespace ESFA.DC.FundingClaims.Data
                 entity.Property(e => e.TotalDelivery).HasColumnType("decimal(12, 2)");
             });
 
-            modelBuilder.Entity<FundingClaimsSupportingData>(entity =>
-            {
-                entity.HasKey(e => new { e.Ukprn, e.CollectionCode });
-
-                entity.ToTable("FundingClaimsSupportingData", "Draft");
-
-                entity.Property(e => e.CollectionCode)
-                    .IsRequired()
-                    .HasMaxLength(50);
-
-                entity.Property(e => e.Ukprn)
-                    .IsRequired()
-                    .HasColumnName("UKPRN");
-
-                entity.Property(e => e.UserEmailAddress)
-                    .IsRequired()
-                    .HasColumnType("nvarchar(320)");
-
-                entity.Property(e => e.LastUpdatedDateTimeUtc)
-                    .IsRequired()
-                    .HasColumnType("datetime");
-            });
-
-            modelBuilder.Entity<FundingClaimsFieldRule>(entity =>
-            {
-                entity.Property(e => e.DataCollectionKey)
-                    .IsRequired()
-                    .HasMaxLength(50);
-
-                entity.Property(e => e.FundingStreamPeriodCode)
-                    .IsRequired()
-                    .HasMaxLength(50);
-
-                entity.Property(e => e.MappedColumnName)
-                    .IsRequired()
-                    .HasMaxLength(100);
-            });
-
             modelBuilder.Entity<FundingClaimsProviderReferenceData>(entity =>
             {
                 entity.HasKey(e => e.Ukprn);
@@ -147,7 +111,11 @@ namespace ESFA.DC.FundingClaims.Data
 
             modelBuilder.Entity<FundingClaimsSubmissionFile>(entity =>
             {
-                entity.HasKey(e => new { e.SubmissionId, e.CollectionPeriod, e.SubmissionType });
+                entity.HasKey(e => new { e.SubmissionId, e.CollectionPeriod, e.SubmissionType })
+                    .HasName("PK_SubmissionID");
+
+                entity.HasIndex(e => new { e.Ukprn, e.CollectionPeriod })
+                    .HasName("IX_Ukprn_CollectionPeriod");
 
                 entity.Property(e => e.CollectionPeriod).HasMaxLength(50);
 
@@ -209,15 +177,50 @@ namespace ESFA.DC.FundingClaims.Data
                     .IsRequired()
                     .HasMaxLength(1000);
 
-                entity.Property(e => e.DeliveryToDate).HasColumnType("decimal(10, 2)");
+                entity.Property(e => e.DeliveryToDate)
+                    .HasColumnType("decimal(10, 2)")
+                    .HasDefaultValueSql("((0))");
 
-                entity.Property(e => e.ExceptionalAdjustments).HasColumnType("decimal(10, 2)");
+                entity.Property(e => e.ExceptionalAdjustments)
+                    .HasColumnType("decimal(10, 2)")
+                    .HasDefaultValueSql("((0))");
 
-                entity.Property(e => e.ForecastedDelivery).HasColumnType("decimal(10, 2)");
+                entity.Property(e => e.ForecastedDelivery)
+                    .HasColumnType("decimal(10, 2)")
+                    .HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.FundingStreamPeriodCode).HasMaxLength(50);
 
-                entity.Property(e => e.TotalDelivery).HasColumnType("decimal(12, 2)");
+                entity.Property(e => e.StudentNumbers).HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.TotalDelivery)
+                    .HasColumnType("decimal(12, 2)")
+                    .HasDefaultValueSql("((0))");
+            });
+
+            modelBuilder.Entity<FundingClaimsSupportingData>(entity =>
+            {
+                entity.HasKey(e => new { e.Ukprn, e.CollectionCode })
+                    .HasName("PK_DraftFundingClaimsSupportingData");
+
+                entity.ToTable("FundingClaimsSupportingData", "Draft");
+
+                entity.Property(e => e.CollectionCode).HasMaxLength(50);
+
+                entity.Property(e => e.LastUpdatedDateTimeUtc)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.UserEmailAddress)
+                    .IsRequired()
+                    .HasMaxLength(320);
+            });
+
+            modelBuilder.Entity<SigningNotificationFeed>(entity =>
+            {
+                entity.Property(e => e.DateTimeRecievedUtc).HasColumnType("datetime");
+
+                entity.Property(e => e.FundingClaimId).IsRequired();
             });
 
             modelBuilder.Entity<SubmissionTypes>(entity =>

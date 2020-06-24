@@ -13,6 +13,6 @@ namespace ESFA.DC.FundingClaims.Data.Entities
 
         public string Name { get; set; }
 
-        public ICollection<FundingClaimsSubmissionFile> FundingClaimsSubmissionFile { get; set; }
+        public virtual ICollection<FundingClaimsSubmissionFile> FundingClaimsSubmissionFile { get; set; }
     }
 }

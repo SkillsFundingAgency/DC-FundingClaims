@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ESFA.DC.FundingClaims.Signing.Models;
 
-namespace ESFA.DC.FunidngClaims.Signing.Services.Config.Interfaces
+namespace ESFA.DC.FunidngClaims.Signing.Services.Interfaces
 {
     public interface IFeedDataStorageService
     {
-        Task<IEnumerable<Guid>> GetExistingFeedItemIds(CancellationToken cancellationToken);
+        Task<IEnumerable<string>> GetExistingFeedItemIdsAsync(CancellationToken cancellationToken);
 
-        Task<IEnumerable<Guid>> SaveFeedItems(CancellationToken cancellationToken,  IEnumerable<FundingClaimDto> feedItems);
-
-
+        Task<IEnumerable<string>> SaveFeedItems(CancellationToken cancellationToken,  IEnumerable<FundingClaimSigningDto> feedItems);
     }
 }
