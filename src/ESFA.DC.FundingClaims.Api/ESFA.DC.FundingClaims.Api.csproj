@@ -7,7 +7,7 @@
   <ItemGroup>
     <PackageReference Include="Autofac" Version="5.2.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
-    <PackageReference Include="ESFA.DC.Api.Common" Version="0.1.7" />
+    <PackageReference Include="ESFA.DC.Api.Common" Version="0.1.21" />
     <PackageReference Include="ESFA.DC.DateTimeProvider" Version="0.1.6-beta0001" />
     <PackageReference Include="ESFA.DC.ILR1819.Database.EF" Version="0.1.381" />
     <PackageReference Include="ESFA.DC.ILR1920.Database.EF" Version="0.0.566" />

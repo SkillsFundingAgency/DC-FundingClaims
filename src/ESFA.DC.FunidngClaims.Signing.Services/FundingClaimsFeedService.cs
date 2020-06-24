@@ -1,84 +1,110 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using ESFA.DC.FundingClaims.AtomFeed.Services.Config;
+using ESFA.DC.FundingClaims.AtomFeed.Services.Interfaces;
+using ESFA.DC.FundingClaims.Signing.Models;
+using ESFA.DC.FunidngClaims.Signing.Services.Config.Interfaces;
 using ESFA.DC.Logging.Interfaces;
-using ESFA.DC.ReferenceData.FCS.Model;
-using ESFA.DC.ReferenceData.FCS.Service.Interface;
-
+using Polly;
+using Polly.Retry;
 
 namespace ESFA.DC.ReferenceData.FCS.Service
 {
-    public class FundingClaimsFeedService : IFcsFeedService
+    public class FundingClaimsFeedService : IFundingClaimsFeedService
     {
         private readonly ISyndicationFeedService _syndicationFeedService;
-        private readonly IFcsSyndicationFeedParserService _fcsSyndicationFeedParserService;
-        private readonly IContractMappingService _contractMappingService;
+        private readonly ISyndicationFeedParserService<FundingClaimsFeedItem> _syndicationFeedParserService;
+        private readonly IFeedItemMappingService _feedItemMappingService;
+        private readonly IFeedDataStorageService _feedDataStorageService;
+        private readonly AtomFeedSettings _atomFeedSettings;
         private readonly ILogger _logger;
 
-        private readonly RetryPolicy _retryPolicy =
-            Policy
+        private readonly AsyncRetryPolicy _retryPolicy = Policy
             .Handle<Exception>()
-            .WaitAndRetryAsync(3, a => TimeSpan.FromSeconds(3));
+            .WaitAndRetryAsync(3, i => TimeSpan.FromSeconds(5));
 
         public FundingClaimsFeedService(
             ISyndicationFeedService syndicationFeedService,
-            IFcsSyndicationFeedParserService fcsSyndicationFeedParserService,
-            IContractMappingService contractMappingService,
+            ISyndicationFeedParserService<FundingClaimsFeedItem> syndicationFeedParserService,
+            IFeedItemMappingService feedItemMappingService,
+            IFeedDataStorageService feedDataStorageService,
+            AtomFeedSettings atomFeedSettings,
             ILogger logger)
         {
             _syndicationFeedService = syndicationFeedService;
-            _fcsSyndicationFeedParserService = fcsSyndicationFeedParserService;
-            _contractMappingService = contractMappingService;
+            _syndicationFeedParserService = syndicationFeedParserService;
+            _feedItemMappingService = feedItemMappingService;
+            _feedDataStorageService = feedDataStorageService;
+            _atomFeedSettings = atomFeedSettings;
             _logger = logger;
         }
 
-        public async Task<IEnumerable<Contractor>> GetNewDataFromFeedAsync(string uri, IEnumerable<Guid> existingSyndicationItemIds, CancellationToken cancellationToken)
+        public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
+            try
+            {
+                var existingItemIds = await _feedDataStorageService.GetExistingFeedItemIds(cancellationToken);
+
+                var newItems = await GetNewDataFromFeedAsync(_atomFeedSettings.FeedUri + "/api/fundingClaims/notifications", existingItemIds, cancellationToken);
+
+                await _feedDataStorageService.SaveFeedItems(cancellationToken, newItems);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError("Funding claims signing notifications Feed retrieval Failed", exception);
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<FundingClaimDto>> GetNewDataFromFeedAsync(string uri, IEnumerable<Guid> existingItemIds, CancellationToken cancellationToken)
+        {
+            
             string previousPageUri = uri;
-            var existingSyndicationItemIdsHashSet = new HashSet<Guid>(existingSyndicationItemIds.Distinct());
+            var contractorCache = new Dictionary<string, FundingClaimDto>();
+            IEnumerable<string> newCurrentPageItemIds;
 
-            var contractorCache = new Dictionary<string, Contractor>();
+            var existingSyndicationItemIdsHashSet = new HashSet<Guid>(existingItemIds.Distinct());
 
-            IEnumerable<Guid> newCurrentPageSyndicationItemIds;
 
             do
             {
-                _logger.LogVerbose($"FCS Contracts Reference Data - Load Syndication Feed from : {previousPageUri}");
+
+                _logger.LogDebug($"Funding claims signing feed - Load Syndication Feed from : {previousPageUri}");
 
                 var feed = await _retryPolicy.ExecuteAsync(async () => await _syndicationFeedService.LoadSyndicationFeedFromUriAsync(previousPageUri, cancellationToken));
 
-                var contractors = feed
+                var feedItems = feed
                     .Items
                     .Reverse()
-                    .Select(_fcsSyndicationFeedParserService.RetrieveContractFromSyndicationItem)
+                    .Select(_syndicationFeedParserService.RetrieveDataFromSyndicationItem)
                     .Where(m => !existingSyndicationItemIdsHashSet.Contains(m.syndicationItemId))
-                    .Select(m => _contractMappingService.Map(m.syndicationItemId, m.contract))
+                    .Select(m => _feedItemMappingService.Map(m.model))
                     .ToList();
 
-                newCurrentPageSyndicationItemIds = contractors.Where(x => x.SyndicationItemId != null).Select(c => c.SyndicationItemId.GetValueOrDefault(Guid.Empty));
+                newCurrentPageItemIds = feedItems.Select(c => c.FeedItemId);
 
-                foreach (var contractor in contractors)
+                foreach (var feedItem in feedItems)
                 {
-                    var contractNumber = contractor.Contracts.First().ContractNumber;
-
-                    if (!contractorCache.ContainsKey(contractNumber))
+                    if (!contractorCache.ContainsKey(feedItem.FeedItemId))
                     {
-                        contractorCache.Add(contractNumber, contractor);
+                        contractorCache.Add(feedItem.FeedItemId, feedItem);
                     }
                 }
 
-                previousPageUri = _fcsSyndicationFeedParserService.PreviousArchiveLink(feed);
+                previousPageUri = _syndicationFeedParserService.PreviousArchiveLink(feed);
             }
-            while (ContinueToNextPage(previousPageUri, newCurrentPageSyndicationItemIds));
+            while (ContinueToNextPage(previousPageUri, newCurrentPageItemIds));
 
             return contractorCache.Values;
         }
 
-        public bool ContinueToNextPage(string previousPageUri, IEnumerable<Guid> newCurrentPageSyndicationItemIds)
+        public bool ContinueToNextPage(string previousPageUri, IEnumerable<string> newCurrentPageItemIds)
         {
-            return previousPageUri != null && newCurrentPageSyndicationItemIds.Any();
+            return previousPageUri != null && newCurrentPageItemIds.Any();
         }
     }
 }

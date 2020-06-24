@@ -39,7 +39,7 @@ namespace ESFA.DC.FundingClaims.AtomFeed.Services
             return RetrieveLinkForRelationshipType(syndicationFeed, NextArchive);
         }
 
-        public(Guid syndicationItemId, T model) RetrieveContractFromSyndicationItem(SyndicationItem syndicationItem)
+        public(Guid syndicationItemId, T model) RetrieveDataFromSyndicationItem(SyndicationItem syndicationItem)
         {
             using (var stringWriter = new StringWriter())
             {

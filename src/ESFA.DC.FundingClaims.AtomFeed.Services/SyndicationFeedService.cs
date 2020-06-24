@@ -4,9 +4,9 @@ using System.ServiceModel.Syndication;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using ESFA.DC.FundingClaims.AtomFeed.Services.Config;
 using ESFA.DC.FundingClaims.AtomFeed.Services.Interfaces;
 using ESFA.DC.Logging.Interfaces;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
 
 namespace ESFA.DC.FundingClaims.AtomFeed.Services
 {
@@ -14,18 +14,28 @@ namespace ESFA.DC.FundingClaims.AtomFeed.Services
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger _logger;
+        private readonly AtomFeedSettings _atomFeedSettings;
 
-        public SyndicationFeedService(IHttpClientFactory httpClientFactory, ILogger logger)
+        //public SyndicationFeedService(IHttpClientFactory httpClientFactory, ILogger logger, AtomFeedSettings atomFeedSettings)
+        //{
+        //    _httpClientFactory = httpClientFactory;
+        //    _logger = logger;
+        //    _atomFeedSettings = atomFeedSettings;
+        //}
+        public SyndicationFeedService(ILogger logger, AtomFeedSettings atomFeedSettings)
         {
-            _httpClientFactory = httpClientFactory;
             _logger = logger;
+            _atomFeedSettings = atomFeedSettings;
         }
 
         public async Task<SyndicationFeed> LoadSyndicationFeedFromUriAsync(string uri, CancellationToken cancellationToken)
         {
             HttpResponseMessage response;
 
-            var httpClient = _httpClientFactory.GetHttpClient();
+            //TODO: review client and client factory ect
+            var httpClient = new HttpClient(new AuthenticationHttpMessageHandler(_atomFeedSettings));
+
+            //var httpClient = _httpClientFactory.CreateClient();
             response = await httpClient.GetAsync(uri, cancellationToken);
 
             try

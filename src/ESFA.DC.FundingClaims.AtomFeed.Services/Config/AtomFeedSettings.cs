@@ -2,15 +2,15 @@
 {
     public class AtomFeedSettings
     {
-        public string FeedUri { get; }
+        public string FeedUri { get; set; }
 
-        public string Authority { get; }
+        public string Authority { get; set; }
 
-        public string ResourceId { get; }
+        public string ResourceId { get; set; }
 
-        public string ClientId { get; }
+        public string ClientId { get; set; }
 
-        public string AppKey { get; }
+        public string AppKey { get; set; }
 
         public string ParentEntityName { get; set; }
 
