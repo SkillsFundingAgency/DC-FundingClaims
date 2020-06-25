@@ -23,7 +23,8 @@ stages:
     pool:
       name: DCT
       demands:
-      - IsBuildServer
+      - TestBuildServer
+      #- IsBuildServer
 
     steps:
 
@@ -61,6 +62,7 @@ stages:
         vstsFeed: 'dct-pkg'
 
     - task: MSBuild@1
+      displayName: 'Build Database Project'
       inputs:
         solution: '**/ESFA.DC.FundingClaims.Database.sqlproj'
         msbuildVersion: '16.0'

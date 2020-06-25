@@ -43,7 +43,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ESFA.DC.FundingClaims.AtomF
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ESFA.DC.FundingClaims.Signing.Models", "ESFA.DC.FundingClaims.Signing.Models\ESFA.DC.FundingClaims.Signing.Models.csproj", "{379E36D5-BEFF-46C0-B8BF-E183963C5FE9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESFA.DC.FundingClaims.Signing.Noticifications.Console", "ESFA.DC.FundingClaims.Signing.Noticifications.Console\ESFA.DC.FundingClaims.Signing.Noticifications.Console.csproj", "{D7A19150-2F6E-4C4B-83C3-C8D0C6FD0200}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ESFA.DC.FundingClaims.Signing.Noticifications.Console", "ESFA.DC.FundingClaims.Signing.Noticifications.Console\ESFA.DC.FundingClaims.Signing.Noticifications.Console.csproj", "{D7A19150-2F6E-4C4B-83C3-C8D0C6FD0200}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "_Solution Items", "{1662D4BF-8857-4457-981E-8B54F59DAB89}"
+	ProjectSection(SolutionItems) = preProject
+		..\azure-pipelines.yml = ..\azure-pipelines.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
