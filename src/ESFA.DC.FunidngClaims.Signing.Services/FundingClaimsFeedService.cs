@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using ESFA.DC.FundingClaims.AtomFeed.Services.Config;
@@ -12,14 +11,14 @@ using ESFA.DC.Logging.Interfaces;
 using Polly;
 using Polly.Retry;
 
-namespace ESFA.DC.ReferenceData.FCS.Service
+namespace ESFA.DC.FunidngClaims.Signing.Services
 {
     public class FundingClaimsFeedService : IFundingClaimsFeedService
     {
         private readonly ISyndicationFeedService _syndicationFeedService;
         private readonly ISyndicationFeedParserService<FundingClaimsFeedItem> _syndicationFeedParserService;
         private readonly IFeedItemMappingService _feedItemMappingService;
-        private readonly IFeedDataStorageService _feedDataStorageService;
+        private readonly IFeedRepository _feedRepository;
         private readonly AtomFeedSettings _atomFeedSettings;
         private readonly ILogger _logger;
 
@@ -31,14 +30,14 @@ namespace ESFA.DC.ReferenceData.FCS.Service
             ISyndicationFeedService syndicationFeedService,
             ISyndicationFeedParserService<FundingClaimsFeedItem> syndicationFeedParserService,
             IFeedItemMappingService feedItemMappingService,
-            IFeedDataStorageService feedDataStorageService,
+            IFeedRepository feedRepository,
             AtomFeedSettings atomFeedSettings,
             ILogger logger)
         {
             _syndicationFeedService = syndicationFeedService;
             _syndicationFeedParserService = syndicationFeedParserService;
             _feedItemMappingService = feedItemMappingService;
-            _feedDataStorageService = feedDataStorageService;
+            _feedRepository = feedRepository;
             _atomFeedSettings = atomFeedSettings;
             _logger = logger;
         }
@@ -47,11 +46,11 @@ namespace ESFA.DC.ReferenceData.FCS.Service
         {
             try
             {
-                var existingItemIds = await _feedDataStorageService.GetExistingFeedItemIdsAsync(cancellationToken);
+                var latestFeedDetails = await _feedRepository.GetLatestSyndicationDataAsync(cancellationToken);
 
-                var newItems = await GetNewDataFromFeedAsync(_atomFeedSettings.FeedUri, existingItemIds, cancellationToken);
+                var newItems = await GetNewDataFromFeedAsync(latestFeedDetails, cancellationToken);
 
-                await _feedDataStorageService.SaveFeedItems(cancellationToken, newItems);
+                 await _feedRepository.SaveFeedItemsAsync(cancellationToken, newItems);
             }
             catch (Exception exception)
             {
@@ -60,53 +59,48 @@ namespace ESFA.DC.ReferenceData.FCS.Service
             }
         }
 
-        public async Task<IEnumerable<FundingClaimSigningDto>> GetNewDataFromFeedAsync(string uri, IEnumerable<string> existingItemIds, CancellationToken cancellationToken)
+        public async Task<List<FundingClaimSigningDto>> GetNewDataFromFeedAsync(LastSigninNotificationFeed latestFeed, CancellationToken cancellationToken)
         {
             
-            string previousPageUri = uri;
-            var contractorCache = new Dictionary<string, FundingClaimSigningDto>();
-            IEnumerable<string> newCurrentPageItemIds;
+            string previousPageUri = latestFeed?.LatestFeedUri ?? _atomFeedSettings.DefaultFeedUri;
 
-            var existingSyndicationItemIdsHashSet = new HashSet<string>(existingItemIds);
-
+            var feedItemsCache = new Dictionary<string, FundingClaimSigningDto>();
+            bool existingFeedItemFound;
 
             do
             {
-
                 _logger.LogDebug($"Funding claims signing feed - Load Syndication Feed from : {previousPageUri}");
 
                 var feed = await _retryPolicy.ExecuteAsync(async () => await _syndicationFeedService.LoadSyndicationFeedFromUriAsync(previousPageUri, cancellationToken));
 
-                _syndicationFeedParserService.RetrieveDataFromSyndicationItem(feed);
+                existingFeedItemFound = feed.Items.Any(x => x.Id == latestFeed?.LatestSyndicationItemId);
 
-                var feedItems = feed
-                    .Items
-                    .Reverse()
-                    .Select(_syndicationFeedParserService.RetrieveDataFromSyndicationItem)
-                    .Where(m => !existingSyndicationItemIdsHashSet.Contains(m.model.FundingClaimId))
-                    .Select(m => _feedItemMappingService.Map(m.model))
-                    .ToList();
-
-                newCurrentPageItemIds = feedItems.Select(c => c.FeedItemId);
-
-                foreach (var feedItem in feedItems)
+                if (existingFeedItemFound)
                 {
-                    if (!contractorCache.ContainsKey(feedItem.FeedItemId))
-                    {
-                        contractorCache.Add(feedItem.FeedItemId, feedItem);
-                    }
+                    _logger.LogInfo($"We already have data for {feed.Id} so skipping this page : {previousPageUri}");
+                    continue;
+                }
+
+                foreach (var feedItem in feed.Items)
+                {
+                    var feedItemDetails = _syndicationFeedParserService.RetrieveDataFromSyndicationItem(feedItem);
+
+                    var feedItemDto = _feedItemMappingService.Map(feedItem.LastUpdatedTime.DateTime, feedItem.Id,
+                        feedItemDetails);
+
+                    feedItemsCache.Add(feedItem.Id, feedItemDto);
                 }
 
                 previousPageUri = _syndicationFeedParserService.PreviousArchiveLink(feed);
             }
-            while (ContinueToNextPage(previousPageUri, newCurrentPageItemIds));
+            while (ContinueToNextPage(previousPageUri, existingFeedItemFound));
 
-            return contractorCache.Values;
+            return feedItemsCache.Values.ToList();
         }
 
-        public bool ContinueToNextPage(string previousPageUri, IEnumerable<string> newCurrentPageItemIds)
+        public bool ContinueToNextPage(string previousPageUri, bool hasAnyNewFeedItems)
         {
-            return previousPageUri != null && newCurrentPageItemIds.Any();
+            return previousPageUri != null && hasAnyNewFeedItems;
         }
     }
 }

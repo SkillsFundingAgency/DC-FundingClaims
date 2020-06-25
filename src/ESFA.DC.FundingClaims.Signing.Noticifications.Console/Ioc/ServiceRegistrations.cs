@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using Autofac;
+using ESFA.DC.DateTimeProvider.Interface;
 using ESFA.DC.FundingClaims.AtomFeed.Services;
 using ESFA.DC.FundingClaims.AtomFeed.Services.Interfaces;
 using ESFA.DC.FundingClaims.Data;
@@ -14,7 +15,6 @@ using ESFA.DC.Logging;
 using ESFA.DC.Logging.Config;
 using ESFA.DC.Logging.Config.Interfaces;
 using ESFA.DC.Logging.Interfaces;
-using ESFA.DC.ReferenceData.FCS.Service;
 using ESFA.DC.Serialization.Interfaces;
 using ESFA.DC.Serialization.Xml;
 using Microsoft.EntityFrameworkCore;
@@ -29,13 +29,14 @@ namespace ESFA.DC.FundingClaims.Signing.Noticifications.Console.Ioc
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<FundingClaimsDataContext>().As<IFundingClaimsDataContext>().ExternallyOwned();
-            builder.RegisterType<FeedDataStorageService>().As<IFeedDataStorageService>();
+            builder.RegisterType<FeedRepository>().As<IFeedRepository>();
             builder.RegisterType<FeedItemMappingService>().As<IFeedItemMappingService>();
             builder.RegisterType<FundingClaimsFeedService>().As<IFundingClaimsFeedService>();
             builder.RegisterType<SyndicationFeedParserService<FundingClaimsFeedItem>>()
                 .As<ISyndicationFeedParserService<FundingClaimsFeedItem>>();
             builder.RegisterType<SyndicationFeedService>().As<ISyndicationFeedService>();
             builder.RegisterType<XmlSerializationService>().As<IXmlSerializationService>().InstancePerLifetimeScope();
+            builder.RegisterType<DateTimeProvider.DateTimeProvider>().As<IDateTimeProvider>().InstancePerLifetimeScope();
 
             //            builder.RegisterType<IHttpClientFactory>();
             //builder.RegisterType<DateTimeProvider.DateTimeProvider>().As<IDateTimeProvider>().InstancePerLifetimeScope();

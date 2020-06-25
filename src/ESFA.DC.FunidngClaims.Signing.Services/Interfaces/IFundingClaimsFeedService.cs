@@ -8,7 +8,7 @@ namespace ESFA.DC.FunidngClaims.Signing.Services.Interfaces
 {
     public interface IFundingClaimsFeedService
     {
-        Task<IEnumerable<FundingClaimSigningDto>> GetNewDataFromFeedAsync(string uri, IEnumerable<string> existingItemIds,
+        Task<List<FundingClaimSigningDto>> GetNewDataFromFeedAsync(string uri, IEnumerable<Guid> existingItemIds,
             CancellationToken cancellationToken);
 
         Task ExecuteAsync(CancellationToken cancellationToken);

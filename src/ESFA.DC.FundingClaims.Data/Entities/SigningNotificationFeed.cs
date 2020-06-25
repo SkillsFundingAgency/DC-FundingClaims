@@ -6,10 +6,10 @@ namespace ESFA.DC.FundingClaims.Data.Entities
     {
         public int Id { get; set; }
 
-        public string FundingClaimId { get; set; }
+        public DateTime FeedDateTimeUtc { get; set; }
 
-        public DateTime DateTimeRecievedUtc { get; set; }
+        public string LatestFeedUri { get; set; }
 
-        public bool HasBeenSigned { get; set; }
+        public string SyndicationFeedId { get; set; }
     }
 }

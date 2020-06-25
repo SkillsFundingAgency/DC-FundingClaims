@@ -6,7 +6,7 @@
     //"FundingClaims": "Data Source=DCol-ci-SqlServer-WEU.database.windows.net;Initial Catalog=FundingClaims;User ID=FundingClaims_RW_User;Password=KvyHuLBXFWDa9VP-iTICZeONx@os70528wrg1UMY3hlEz;"
   },
   "AtomFeedSettings": {
-    "FeedUri": "https://skillsfunding.service.gov.uk/api/fundingClaims/notifications",
+    "DefaultFeedUri": "https://skillsfunding.service.gov.uk/api/fundingClaims/notifications",
     "Authority": "https://login.microsoftonline.com/fcsazuresfabisgov.onmicrosoft.com",
     "ResourceId": "http://PDS-Contracts-WebApi-release",
     "ClientId": "da0110c6-33bc-4e82-9281-c0e248b56cc4",

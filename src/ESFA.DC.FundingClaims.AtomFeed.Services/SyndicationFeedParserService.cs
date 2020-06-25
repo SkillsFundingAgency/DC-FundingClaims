@@ -41,7 +41,7 @@ namespace ESFA.DC.FundingClaims.AtomFeed.Services
             return RetrieveLinkForRelationshipType(syndicationFeed, NextArchive);
         }
 
-        public(Guid syndicationItemId, T model) RetrieveDataFromSyndicationItem(SyndicationItem syndicationItem)
+        public (Guid SyndicationFeedId, T model) RetrieveDataFromSyndicationItem(SyndicationItem syndicationItem)
         {
             using (var stringWriter = new StringWriter())
             {
@@ -50,43 +50,21 @@ namespace ESFA.DC.FundingClaims.AtomFeed.Services
                     syndicationItem.Content.WriteTo(xmlWriter, "temp", "temp");
                 }
 
-                var contract = XDocument.Parse(stringWriter.ToString()).Descendants().ToList();
+                var fundingClaimFeedItem = XDocument.Parse(stringWriter.ToString()).Elements().Descendants();
 
                 using (var memoryStream = new MemoryStream())
                 {
                     using (var xmlWriter = XmlWriter.Create(memoryStream))
                     {
-                        contract.First().WriteTo(xmlWriter);
+                        fundingClaimFeedItem.First().WriteTo(xmlWriter);
                     }
 
                     memoryStream.Seek(0, SeekOrigin.Begin);
 
                     var model = _xmlserializationService.Deserialize<T>(memoryStream);
-
+                    
                     return (Guid.Parse(syndicationItem.Id.Remove(0, 5)), model);
-                }
-            }
-        }
-
-        public void RetrieveDataFromSyndicationItem(SyndicationFeed feed)
-        {
-            //XmlSerializer serializer = new XmlSerializer(typeof(SyndicationFeed), "http://www.w3.org/2005/Atom");
-
-            foreach (var feedItem in feed.Items)
-            {
-                XDocument docOData = new XDocument();
-                using (XmlWriter writer = docOData.CreateWriter())
-                {
-                    feedItem.Content.WriteTo(writer, "content", "w");
-
-                    IEnumerable<XElement> childList =
-                        from el in docOData.Elements()
-                        select el;
-
-                    foreach (XElement e in childList)
-                    {
-                        var child = e.Value;
-                    }
+                    
                 }
             }
         }

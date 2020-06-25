@@ -11,8 +11,6 @@ namespace ESFA.DC.FundingClaims.AtomFeed.Services.Interfaces
 
         string NextArchiveLink(SyndicationFeed syndicationFeed);
 
-        (Guid syndicationItemId, T model) RetrieveDataFromSyndicationItem(SyndicationItem syndicationItem);
-
-       void RetrieveDataFromSyndicationItem(SyndicationFeed feed);
+        T RetrieveDataFromSyndicationItem(SyndicationItem syndicationItem);
     }
 }

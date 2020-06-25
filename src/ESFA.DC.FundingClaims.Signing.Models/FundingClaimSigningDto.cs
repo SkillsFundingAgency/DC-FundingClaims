@@ -8,7 +8,7 @@ namespace ESFA.DC.FundingClaims.Signing.Models
     {
         public FundingClaimSigningDto(string fundingClaimId)
         {
-            FeedItemId = fundingClaimId;
+            FundingClaimId = fundingClaimId;
 
             var pieces = fundingClaimId.Split('_');
 
@@ -16,8 +16,11 @@ namespace ESFA.DC.FundingClaims.Signing.Models
             int.TryParse(pieces[2], out var version);
 
             Ukprn = ukprn;
-            CollectionPeriod = pieces[0];
+            CollectionPeriod = pieces[0].Split('-')[1];
             Version = version;
+
+            int.TryParse(pieces[0].Split('-')[0], out var year);
+            Year = year;
         }
         public long Ukprn { get; }
 
@@ -27,6 +30,12 @@ namespace ESFA.DC.FundingClaims.Signing.Models
 
         public int Version { get; }
 
-        public string FeedItemId { get; }
+        public string FundingClaimId { get; }
+
+        public string SyndicationFeedId { get; set; }
+
+        public DateTime UpdatedDateTimeUtc { get; set; }
+
+        public int Year { get; set; }
     }
 }

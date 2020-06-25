@@ -9,6 +9,7 @@
     <PackageReference Include="Autofac" Version="5.2.0" />
     <PackageReference Include="Autofac.Configuration" Version="5.1.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="ESFA.DC.DateTimeProvider" Version="0.1.6-beta0001" />
     <PackageReference Include="ESFA.DC.Logging" Version="0.1.10-beta0001" />
     <PackageReference Include="ESFA.DC.Serialization.Xml" Version="0.1.40-beta0001" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
