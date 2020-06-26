@@ -12,5 +12,7 @@ namespace ESFA.DC.FundingClaims.AtomFeed.Services.Interfaces
         string NextArchiveLink(SyndicationFeed syndicationFeed);
 
         T RetrieveDataFromSyndicationItem(SyndicationItem syndicationItem);
+
+        int CurrentPageNumber(SyndicationFeed syndicationFeed);
     }
 }

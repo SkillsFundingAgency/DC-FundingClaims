@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
+using System.ServiceModel.Syndication;
 using ESFA.DC.DateTimeProvider.Interface;
+using ESFA.DC.FundingClaims.AtomFeed.Services.Interfaces;
 using ESFA.DC.FundingClaims.Data.Entities;
 using ESFA.DC.FundingClaims.Signing.Models;
 using ESFA.DC.FunidngClaims.Signing.Services.Interfaces;
@@ -8,44 +11,45 @@ namespace ESFA.DC.FunidngClaims.Signing.Services
 {
     public class FeedItemMappingService : IFeedItemMappingService
     {
-        private readonly IDateTimeProvider _dateTimeProvider;
+        private readonly ISyndicationFeedParserService<FundingClaimsFeedItem> _syndicationFeedParserService;
 
-        public FeedItemMappingService(IDateTimeProvider dateTimeProvider)
+        public FeedItemMappingService(ISyndicationFeedParserService<FundingClaimsFeedItem> syndicationFeedParserService)
         {
-            _dateTimeProvider = dateTimeProvider;
+            _syndicationFeedParserService = syndicationFeedParserService;
         }
 
-        public FundingClaimSigningDto Map(DateTime updatedDateTime, string syndicationFeedId, FundingClaimsFeedItem feedItem)
+        public FundingClaimSigningDto Convert(int currentPageNumber, SyndicationItem feedItem)
         {
-            if (string.IsNullOrEmpty(feedItem.FundingClaimId))
+
+            var feedItemDetails = _syndicationFeedParserService.RetrieveDataFromSyndicationItem(feedItem);
+
+            if (string.IsNullOrEmpty(feedItemDetails.FundingClaimId))
             {
                 throw new ArgumentNullException("Funding claim id missing");
             }
 
-            var pieces = feedItem.FundingClaimId.Split('_');
+            var pieces = feedItemDetails.FundingClaimId.Split('_');
             if (pieces.Length != 3)
             {
-                throw new Exception($"invalid funding claim id : {feedItem.FundingClaimId}");
+                throw new Exception($"invalid funding claim id : {feedItemDetails.FundingClaimId}");
             }
 
-            var dto = new FundingClaimSigningDto(feedItem.FundingClaimId)
+            int.TryParse(pieces[2], out var version);
+
+            var collectionNameParts = pieces[0].Split('-');
+            
+            var dto = new FundingClaimSigningDto(feedItemDetails.FundingClaimId)
             {
-                IsSigned = feedItem.HasBeenSigned,
-                SyndicationFeedId = syndicationFeedId,
-                UpdatedDateTimeUtc = updatedDateTime,
+                IsSigned = feedItemDetails.HasBeenSigned,
+                SyndicationFeedId = feedItem.Id.SyndicationId(),
+                UpdatedDateTimeUtc = feedItem.LastUpdatedTime.UtcDateTime,
+                Ukprn = pieces[1],
+                Version = version,
+                Period = collectionNameParts[0],
+                PageNumber = currentPageNumber
             };
 
             return dto;
-        }
-
-        public SigningNotificationFeed Map(FundingClaimSigningDto dto)
-        {
-            return new SigningNotificationFeed()
-            {
-               FeedDateTimeUtc = dto.UpdatedDateTimeUtc,
-               //LatestFeedUri = dto
-               SyndicationFeedId = dto.SyndicationFeedId,
-            };
         }
     }
 }

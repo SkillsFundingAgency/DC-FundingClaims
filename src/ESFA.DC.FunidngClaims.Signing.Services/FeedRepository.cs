@@ -18,6 +18,7 @@ namespace ESFA.DC.FunidngClaims.Signing.Services
         private readonly Func<IFundingClaimsDataContext> _fundingclaimsDataContextFactory;
         private readonly IFeedItemMappingService _feedItemMappingService;
         private readonly ILogger _logger;
+        private const string CollectionPeriodName = "FC03";
 
         public FeedRepository(Func<IFundingClaimsDataContext> fundingclaimsDataContextFactory, IFeedItemMappingService feedItemMappingService, ILogger logger)
         {
@@ -34,9 +35,9 @@ namespace ESFA.DC.FunidngClaims.Signing.Services
                 data = await context.SigningNotificationFeed
                     .Select(x => new LastSigninNotificationFeed()
                     {
-                        LastDateTime = x.FeedDateTimeUtc,
-                        LatestFeedUri = x.LatestFeedUri,
-                        LatestSyndicationItemId = x.SyndicationFeedId
+                        DateTimeUtc = x.UpdatedDateTimeUtc,
+                        PageNumber = x.PageNumber,
+                        SyndicationItemId = x.SyndicationFeedId
                     })
                     .SingleOrDefaultAsync(cancellationToken);
             }
@@ -44,11 +45,11 @@ namespace ESFA.DC.FunidngClaims.Signing.Services
             return data;
         }
 
-        public async Task SaveFeedItemsAsync(CancellationToken cancellationToken, List<FundingClaimSigningDto> feedItems)
+        public async Task SaveFeedItemAsync(CancellationToken cancellationToken, FundingClaimSigningDto feedItem)
         {
             try
             {
-                if (!feedItems.Any())
+                if (feedItem == null)
                 {
                     _logger.LogInfo("No new items to save for funding claim feed items");
                     return;
@@ -56,15 +57,21 @@ namespace ESFA.DC.FunidngClaims.Signing.Services
 
                 using (var context = _fundingclaimsDataContextFactory())
                 {
-                    context.SigningNotificationFeed.Add( _feedItemMappingService.Map(feedItems.Last()));
+                    context.SigningNotificationFeed.Add( new SigningNotificationFeed()
+                    {
+                        UpdatedDateTimeUtc = feedItem.UpdatedDateTimeUtc,
+                        PageNumber= feedItem.PageNumber,
+                        SyndicationFeedId = feedItem.SyndicationFeedId
+                    });
+
                     await context.SaveChangesAsync(cancellationToken);
                 }
 
-                _logger.LogInfo($"Funding claims Signing updates - Added log and updated {feedItems.Count}");
+                _logger.LogInfo($"Funding claims Signing updates - Added {feedItem}");
             }
             catch (Exception e)
             {
-                _logger.LogError("Error occured while saving Feed items", e);
+                _logger.LogError("Error occured while saving latest feed item", e);
                 throw;
             }
         }
@@ -79,13 +86,43 @@ namespace ESFA.DC.FunidngClaims.Signing.Services
                     return;
                 }
 
+                var academicYears = feedItems.Select(x => x.Period).Distinct();
+                var ukpns = feedItems.Select(x => x.Ukprn).Distinct();
+
                 using (var context = _fundingclaimsDataContextFactory())
                 {
 
-                    var data = context.FundingClaimsSubmissionFile.Where(x => x.Period == )
+                    var submissionFiles = context.FundingClaimsSubmissionFile.Where(x => 
+                                                x.CollectionPeriod == CollectionPeriodName &&
+                                                academicYears.Contains(x.Period)
+                                                && ukpns.Contains(x.Ukprn));
 
-                    context.SigningNotificationFeed.AddRange(feedItems.Select(x => _feedItemMappingService.Map(x)));
-                    await context.SaveChangesAsync(cancellationToken);
+                    foreach (var feedItem in feedItems)
+                    {
+                        var submissionFile = await submissionFiles.SingleOrDefaultAsync(x =>
+                            x.Ukprn == feedItem.Ukprn &&
+                            x.Version == feedItem.Version &&
+                            x.Period == feedItem.Period, cancellationToken);
+
+                        if (submissionFile == null)
+                        {
+                            _logger.LogError(
+                                $"Submission Not found - Signing notification received for ukprn : {feedItem.Ukprn}, period : {feedItem.Period} and version : {feedItem.Version}");
+                            continue;
+                        }
+
+                        if (submissionFile.SignedOn.HasValue)
+                        {
+                            _logger.LogInfo(
+                                $"Submission found but already set to signed - Signing notification received for ukprn : {feedItem.Ukprn}, period : {feedItem.Period} and version : {feedItem.Version}");
+                            continue;
+                        }
+
+                        submissionFile.IsSigned = feedItem.IsSigned;
+                        submissionFile.SignedOn = feedItem.UpdatedDateTimeUtc;
+
+                        await context.SaveChangesAsync(cancellationToken);
+                    }
                 }
 
                 _logger.LogInfo($"Funding claims Signing updates - Added log and updated {feedItems.Count}");

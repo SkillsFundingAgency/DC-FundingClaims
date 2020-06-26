@@ -31,6 +31,20 @@ namespace ESFA.DC.FundingClaims.AtomFeed.Services
             return RetrieveLinkForRelationshipType(syndicationFeed, CurrentArchive);
         }
 
+        public int CurrentPageNumber(SyndicationFeed syndicationFeed)
+        {
+            var previousLink =  RetrieveLinkForRelationshipType(syndicationFeed, PreviousArchive);
+            if (string.IsNullOrEmpty(previousLink))
+            {
+                return 0;
+            }
+
+            var lastIndex = previousLink.LastIndexOf('/');
+            int.TryParse(previousLink.Substring(lastIndex + 1), out var pageNumber);
+
+            return pageNumber +1;
+        }
+
         public string PreviousArchiveLink(SyndicationFeed syndicationFeed)
         {
             return RetrieveLinkForRelationshipType(syndicationFeed, PreviousArchive);
@@ -41,7 +55,7 @@ namespace ESFA.DC.FundingClaims.AtomFeed.Services
             return RetrieveLinkForRelationshipType(syndicationFeed, NextArchive);
         }
 
-        public (Guid SyndicationFeedId, T model) RetrieveDataFromSyndicationItem(SyndicationItem syndicationItem)
+        public T RetrieveDataFromSyndicationItem(SyndicationItem syndicationItem)
         {
             using (var stringWriter = new StringWriter())
             {
@@ -63,7 +77,7 @@ namespace ESFA.DC.FundingClaims.AtomFeed.Services
 
                     var model = _xmlserializationService.Deserialize<T>(memoryStream);
                     
-                    return (Guid.Parse(syndicationItem.Id.Remove(0, 5)), model);
+                    return model;
                     
                 }
             }

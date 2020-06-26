@@ -6,10 +6,10 @@ namespace ESFA.DC.FundingClaims.Signing.Models
 {
     public class LastSigninNotificationFeed
     {
-        public string LatestFeedUri { get; set; }
+        public DateTime DateTimeUtc { get; set; }
 
-        public DateTime LastDateTime { get; set; }
+        public Guid SyndicationItemId { get; set; }
 
-        public string LatestSyndicationItemId { get; set; }   
+        public int PageNumber { get; set; }
     }
 }

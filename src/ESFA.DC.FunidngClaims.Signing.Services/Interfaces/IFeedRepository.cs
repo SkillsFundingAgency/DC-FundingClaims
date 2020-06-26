@@ -10,6 +10,8 @@ namespace ESFA.DC.FunidngClaims.Signing.Services.Interfaces
     {
         Task<LastSigninNotificationFeed> GetLatestSyndicationDataAsync(CancellationToken cancellationToken);
 
-        Task SaveFeedItemsAsync(CancellationToken cancellationToken, List<FundingClaimSigningDto> feedItems);
+        Task SaveFeedItemAsync(CancellationToken cancellationToken, FundingClaimSigningDto feedItem);
+
+        Task UpdateSubmissionFileAsync(CancellationToken cancellationToken, List<FundingClaimSigningDto> feedItems);
     }
 }
