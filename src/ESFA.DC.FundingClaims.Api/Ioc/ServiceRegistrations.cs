@@ -37,6 +37,8 @@ namespace ESFA.DC.FundingClaims.Api.Ioc
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<FundingClaimsReferenceDataService>().As<IFundingClaimsReferenceDataService>().InstancePerLifetimeScope();
+            builder.RegisterType<CollectionReferenceDataService>().As<ICollectionReferenceDataService>().InstancePerLifetimeScope();
+
             builder.RegisterType<FundingClaimsService>().As<IFundingClaimsService>().InstancePerLifetimeScope();
             builder.RegisterType<FundingClaimsMessagingService>().As<IFundingClaimsMessagingService>().InstancePerLifetimeScope();
             builder.RegisterType<QueuePublishService<MessageFundingClaimsSubmission>>().As<IQueuePublishService<MessageFundingClaimsSubmission>>().InstancePerLifetimeScope();

@@ -20,14 +20,5 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces
         Task<IEnumerable<SummarisedActualDeliveryToDate>> GetDeliveryToDateValues(long ukprn, int periodFrom, int periodTo, string collectionReturnCode, int collectionYear);
 
         Task<decimal?> GetCofRemovalValue(long ukprn);
-
-        Task<FundingClaimsCollection> GetFundingClaimsCollection(string collectionCode);
-
-        Task<FundingClaimsCollection> GetFundingClaimsCollection(DateTime? dateTimeUtc = null);
-
-
-        Task<List<FundingClaimsCollection>> GetAllFundingClaimsCollections();
-
-        Task<string> GetEmailTemplate(int collectionId);
     }
 }

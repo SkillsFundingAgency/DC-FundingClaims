@@ -22,6 +22,7 @@ namespace ESFA.DC.FundingClaims.Services
         private readonly IFundingClaimsMessagingService _fundingClaimsMessagingService;
         private readonly IIndex<int, IFundingStreamPeriodCodes> _fundingStreamPeriodCodes;
         private readonly IFundingClaimsReferenceDataService _fundingClaimsReferenceDataService;
+        private readonly ICollectionReferenceDataService _collectionReferenceDataService;
         private readonly ILogger _logger;
 
         public FundingClaimsService(
@@ -30,6 +31,7 @@ namespace ESFA.DC.FundingClaims.Services
             IFundingClaimsMessagingService fundingClaimsMessagingService,
             IIndex<int, IFundingStreamPeriodCodes> IFundingStreamPeriodCodes,
             IFundingClaimsReferenceDataService fundingClaimsReferenceDataService,
+            ICollectionReferenceDataService collectionReferenceDataService,
             ILogger logger)
         {
             _fundingClaimsContextFactory = fundingClaimsContextFactory;
@@ -37,6 +39,7 @@ namespace ESFA.DC.FundingClaims.Services
             _fundingClaimsMessagingService = fundingClaimsMessagingService;
             _fundingStreamPeriodCodes = IFundingStreamPeriodCodes;
             _fundingClaimsReferenceDataService = fundingClaimsReferenceDataService;
+            _collectionReferenceDataService = collectionReferenceDataService;
             _logger = logger;
         }
 
@@ -318,7 +321,7 @@ namespace ESFA.DC.FundingClaims.Services
             {
                 using (var context = _fundingClaimsContextFactory())
                 {
-                    var collections = await _fundingClaimsReferenceDataService.GetAllFundingClaimsCollections();
+                    var collections = await _collectionReferenceDataService.GetAllFundingClaimsCollections();
 
                     var data = await context.FundingClaimsSubmissionFile.Where(x => x.Ukprn == ukprn.ToString())
                         .OrderByDescending(x => x.UpdatedOn)

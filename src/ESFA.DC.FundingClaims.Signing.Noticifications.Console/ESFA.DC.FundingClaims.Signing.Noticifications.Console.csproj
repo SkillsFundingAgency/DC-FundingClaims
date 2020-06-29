@@ -10,6 +10,7 @@
     <PackageReference Include="Autofac.Configuration" Version="5.1.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="ESFA.DC.DateTimeProvider" Version="0.1.6-beta0001" />
+    <PackageReference Include="ESFA.DC.JobQueueManager" Version="0.1.73-beta0001" />
     <PackageReference Include="ESFA.DC.Logging" Version="0.1.10-beta0001" />
     <PackageReference Include="ESFA.DC.Serialization.Xml" Version="0.1.40-beta0001" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
@@ -24,6 +25,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ESFA.DC.FundingClaims.AtomFeed.Services\ESFA.DC.FundingClaims.AtomFeed.Services.csproj" />
     <ProjectReference Include="..\ESFA.DC.FundingClaims.Data\ESFA.DC.FundingClaims.Data.csproj" />
+    <ProjectReference Include="..\ESFA.DC.FundingClaims.ReferenceData.Services\ESFA.DC.FundingClaims.ReferenceData.Services.csproj" />
     <ProjectReference Include="..\ESFA.DC.FundingClaims.Signing.Models\ESFA.DC.FundingClaims.Signing.Models.csproj" />
     <ProjectReference Include="..\ESFA.DC.FunidngClaims.Signing.Services\ESFA.DC.FunidngClaims.Signing.Services.csproj" />
   </ItemGroup>

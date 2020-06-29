@@ -4,6 +4,7 @@ using System.Linq;
 using System.ServiceModel.Syndication;
 using System.Threading;
 using System.Threading.Tasks;
+using ESFA.DC.FundingClaims.AtomFeed.Services;
 using ESFA.DC.FundingClaims.AtomFeed.Services.Config;
 using ESFA.DC.FundingClaims.AtomFeed.Services.Interfaces;
 using ESFA.DC.FundingClaims.Signing.Models;

@@ -7,10 +7,13 @@ using ESFA.DC.FundingClaims.AtomFeed.Services;
 using ESFA.DC.FundingClaims.AtomFeed.Services.Interfaces;
 using ESFA.DC.FundingClaims.Data;
 using ESFA.DC.FundingClaims.Data.Entities;
+using ESFA.DC.FundingClaims.ReferenceData.Services;
+using ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces;
 using ESFA.DC.FundingClaims.Signing.Models;
 using ESFA.DC.FundingClaims.Signing.Noticifications.Console.Configuration;
 using ESFA.DC.FunidngClaims.Signing.Services;
 using ESFA.DC.FunidngClaims.Signing.Services.Interfaces;
+using ESFA.DC.JobQueueManager.Data;
 using ESFA.DC.Logging;
 using ESFA.DC.Logging.Config;
 using ESFA.DC.Logging.Config.Interfaces;
@@ -30,6 +33,7 @@ namespace ESFA.DC.FundingClaims.Signing.Noticifications.Console.Ioc
         {
             builder.RegisterType<FundingClaimsDataContext>().As<IFundingClaimsDataContext>().ExternallyOwned();
             builder.RegisterType<FeedRepository>().As<IFeedRepository>();
+            builder.RegisterType<NotificationCalendarService>().As<INotificationCalendarService>();
             builder.RegisterType<FeedItemMappingService>().As<IFeedItemMappingService>();
             builder.RegisterType<FundingClaimsFeedService>().As<IFundingClaimsFeedService>();
             builder.RegisterType<SyndicationFeedParserService<FundingClaimsFeedItem>>()
@@ -37,9 +41,8 @@ namespace ESFA.DC.FundingClaims.Signing.Noticifications.Console.Ioc
             builder.RegisterType<SyndicationFeedService>().As<ISyndicationFeedService>();
             builder.RegisterType<XmlSerializationService>().As<IXmlSerializationService>().InstancePerLifetimeScope();
             builder.RegisterType<DateTimeProvider.DateTimeProvider>().As<IDateTimeProvider>().InstancePerLifetimeScope();
-
-            //            builder.RegisterType<IHttpClientFactory>();
-            //builder.RegisterType<DateTimeProvider.DateTimeProvider>().As<IDateTimeProvider>().InstancePerLifetimeScope();
+            builder.RegisterType<CollectionReferenceDataService>().As<ICollectionReferenceDataService>().InstancePerLifetimeScope();
+            builder.RegisterType<AuthenticationHttpMessageHandler>().As<DelegatingHandler>();
 
             builder.Register(c =>
             {
@@ -75,6 +78,20 @@ namespace ESFA.DC.FundingClaims.Signing.Noticifications.Console.Ioc
                     return optionsBuilder.Options;
                 })
                 .As<DbContextOptions<FundingClaimsDataContext>>()
+                .SingleInstance();
+
+            builder.RegisterType<JobQueueDataContext>().As<IJobQueueDataContext>().ExternallyOwned();
+            builder.Register(context =>
+                {
+                    var connectionStrings = context.Resolve<ConnectionStrings>();
+                    var optionsBuilder = new DbContextOptionsBuilder<JobQueueDataContext>();
+                    optionsBuilder.UseSqlServer(
+                        connectionStrings.JobManagement_RO,
+                        options => options.EnableRetryOnFailure(3, TimeSpan.FromSeconds(3), new List<int>()));
+
+                    return optionsBuilder.Options;
+                })
+                .As<DbContextOptions<JobQueueDataContext>>()
                 .SingleInstance();
         }
     }

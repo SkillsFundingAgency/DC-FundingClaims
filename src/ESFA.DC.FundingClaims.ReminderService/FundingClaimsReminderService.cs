@@ -16,17 +16,17 @@ namespace ESFA.DC.FundingClaims.ReminderService
     public class FundingClaimsReminderService : IFundingClaimsReminderService
     {
         private readonly ILogger _logger;
-        private readonly IFundingClaimsReferenceDataService _referenceDataService;
+        private readonly ICollectionReferenceDataService _collectionReferenceData;
         private readonly IFundingClaimsEmailService _fundingClaimsEmailService;
         private readonly IEmailNotifier _emailNotifier;
 
         public FundingClaimsReminderService(
-            IFundingClaimsReferenceDataService referenceDataService,
+            ICollectionReferenceDataService collectionReferenceData,
             IFundingClaimsEmailService fundingClaimsEmailService,
             IEmailNotifier emailNotifier,
             ILogger logger)
         {
-            _referenceDataService = referenceDataService;
+            _collectionReferenceData = collectionReferenceData;
             _fundingClaimsEmailService = fundingClaimsEmailService;
             _emailNotifier = emailNotifier;
             _logger = logger;
@@ -46,7 +46,7 @@ namespace ESFA.DC.FundingClaims.ReminderService
             const string dateFormatString = "h tt d MMMM";
             int emailsSentCount = 0;
 
-            var collection = await _referenceDataService.GetFundingClaimsCollection();
+            var collection = await _collectionReferenceData.GetFundingClaimsCollection();
             if (collection == null)
             {
                 _logger.LogDebug("Collection closed, no emails to send");
@@ -54,7 +54,7 @@ namespace ESFA.DC.FundingClaims.ReminderService
             }
 
 
-            var emailTemplate = await _referenceDataService.GetEmailTemplate(collection.CollectionId); 
+            var emailTemplate = await _collectionReferenceData.GetEmailTemplate(collection.CollectionId); 
 
             if (emailTemplate == null)
             {

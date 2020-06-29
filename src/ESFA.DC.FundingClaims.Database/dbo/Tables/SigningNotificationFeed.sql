@@ -1,8 +1,9 @@
 ﻿CREATE TABLE [dbo].[SigningNotificationFeed](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
-	[FeedDateTime] [datetime] NOT NULL,
-	[LatestFeedUri] [varchar](max) NOT NULL,
+	[FeedDateTimeUtc] [datetime] NOT NULL,
+	[PageNumber] INT NOT NULL,
 	[SyndicationFeedId] [uniqueidentifier] NOT NULL,
+	DateTimeUpdatedUtc datetime NOT NULL
  CONSTRAINT [PK_SigninFeedItem] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC

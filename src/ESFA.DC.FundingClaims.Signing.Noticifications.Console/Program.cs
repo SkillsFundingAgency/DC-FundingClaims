@@ -35,13 +35,19 @@ namespace ESFA.DC.FundingClaims.Signing.Noticifications.Console
             containerBuilder.RegisterModule<ServiceRegistrations>();
             var container = containerBuilder.Build();
 
+            
+
             using (var scope = container.BeginLifetimeScope())
             {
                 var logger = scope.Resolve<ILogger>();
                 logger.LogInfo($"Starting funding claim reminder service web job.");
 
-                var service = scope.Resolve<IFundingClaimsFeedService>();
-                await service.ExecuteAsync(CancellationToken.None);
+                var pollRequiredService = scope.Resolve<INotificationCalendarService>();
+                if (await pollRequiredService.IsSigningNotificationPollRequiredAsync(CancellationToken.None))
+                {
+                    var service = scope.Resolve<IFundingClaimsFeedService>();
+                    await service.ExecuteAsync(CancellationToken.None);
+                }
 
             }
         }

@@ -9,7 +9,6 @@ namespace ESFA.DC.FunidngClaims.Signing.Services.Interfaces
     public interface IFundingClaimsFeedService
     {
         Task<List<FundingClaimSigningDto>> GetNewDataFromFeedAsync(CancellationToken cancellationToken, LastSigninNotificationFeed lastStoredFeedRecord);
-
         Task ExecuteAsync(CancellationToken cancellationToken);
     }
 }

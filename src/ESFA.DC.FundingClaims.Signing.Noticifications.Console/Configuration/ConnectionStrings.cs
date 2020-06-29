@@ -9,5 +9,9 @@ namespace ESFA.DC.FundingClaims.Signing.Noticifications.Console.Configuration
 
         [JsonRequired]
         public string FundingClaims { get; set; }
+
+
+        [JsonRequired]
+        public string JobManagement_RO { get; set; }
     }
 }

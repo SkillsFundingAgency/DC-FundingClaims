@@ -12,31 +12,20 @@ namespace ESFA.DC.FundingClaims.AtomFeed.Services
 {
     public class SyndicationFeedService : ISyndicationFeedService
     {
-        private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger _logger;
-        private readonly AtomFeedSettings _atomFeedSettings;
+        private readonly DelegatingHandler _delegatingHandler;
 
-        //public SyndicationFeedService(IHttpClientFactory httpClientFactory, ILogger logger, AtomFeedSettings atomFeedSettings)
-        //{
-        //    _httpClientFactory = httpClientFactory;
-        //    _logger = logger;
-        //    _atomFeedSettings = atomFeedSettings;
-        //}
-        public SyndicationFeedService(ILogger logger, AtomFeedSettings atomFeedSettings)
+        public SyndicationFeedService(ILogger logger, DelegatingHandler delegatingHandler)
         {
             _logger = logger;
-            _atomFeedSettings = atomFeedSettings;
+            _delegatingHandler = delegatingHandler;
         }
 
         public async Task<SyndicationFeed> LoadSyndicationFeedFromUriAsync(string uri, CancellationToken cancellationToken)
         {
-            HttpResponseMessage response;
 
-            //TODO: review client and client factory ect
-            var httpClient = new HttpClient(new AuthenticationHttpMessageHandler(_atomFeedSettings));
-
-            //var httpClient = _httpClientFactory.CreateClient();
-            response = await httpClient.GetAsync(uri, cancellationToken);
+            var httpClient = new HttpClient(_delegatingHandler);
+            var response = await httpClient.GetAsync(uri, cancellationToken);
 
             try
             {

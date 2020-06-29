@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ESFA.DC.FundingClaims.AtomFeed.Services\ESFA.DC.FundingClaims.AtomFeed.Services.csproj" />
     <ProjectReference Include="..\ESFA.DC.FundingClaims.Data\ESFA.DC.FundingClaims.Data.csproj" />
+    <ProjectReference Include="..\ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces\ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces.csproj" />
     <ProjectReference Include="..\ESFA.DC.FundingClaims.Signing.Models\ESFA.DC.FundingClaims.Signing.Models.csproj" />
   </ItemGroup>
 

@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.ServiceModel.Syndication;
 using ESFA.DC.DateTimeProvider.Interface;
+using ESFA.DC.FundingClaims.AtomFeed.Services;
 using ESFA.DC.FundingClaims.AtomFeed.Services.Interfaces;
 using ESFA.DC.FundingClaims.Data.Entities;
 using ESFA.DC.FundingClaims.Signing.Models;
@@ -42,7 +43,7 @@ namespace ESFA.DC.FunidngClaims.Signing.Services
             {
                 IsSigned = feedItemDetails.HasBeenSigned,
                 SyndicationFeedId = feedItem.Id.SyndicationId(),
-                UpdatedDateTimeUtc = feedItem.LastUpdatedTime.UtcDateTime,
+                FeedDateTimeUtc = feedItem.LastUpdatedTime.UtcDateTime,
                 Ukprn = pieces[1],
                 Version = version,
                 Period = collectionNameParts[0],

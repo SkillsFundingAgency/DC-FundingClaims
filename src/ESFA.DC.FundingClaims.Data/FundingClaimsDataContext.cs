@@ -218,7 +218,7 @@ namespace ESFA.DC.FundingClaims.Data
 
             modelBuilder.Entity<SigningNotificationFeed>(entity =>
             {
-                entity.Property(e => e.UpdatedDateTimeUtc).HasColumnType("datetime");
+                entity.Property(e => e.FeedDateTimeUtc).HasColumnType("datetime");
 
                 entity.Property(e => e.SyndicationFeedId).IsRequired();
             });

@@ -8,6 +8,5 @@ namespace ESFA.DC.FunidngClaims.Signing.Services.Interfaces
     public interface IFeedItemMappingService
     {
         FundingClaimSigningDto Convert(int currentPageNumber, SyndicationItem feedItem);
-
     }
 }

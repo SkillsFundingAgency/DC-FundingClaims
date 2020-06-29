@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace ESFA.DC.FunidngClaims.Signing.Services
+namespace ESFA.DC.FundingClaims.AtomFeed.Services
 {
     public static class StringExtensions
     {

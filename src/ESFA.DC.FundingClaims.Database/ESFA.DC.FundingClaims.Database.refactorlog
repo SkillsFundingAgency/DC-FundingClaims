@@ -14,4 +14,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="CollectionName" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="5de1d9d3-1d77-4d62-8be4-bd89c74a0cff" ChangeDateTime="06/29/2020 09:33:57">
+    <Property Name="ElementName" Value="[dbo].[SigningNotificationFeed].[LatestFeedUri]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SigningNotificationFeed]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="PageNumber" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="0b6cdc2a-043f-4fde-b694-6b0659454657" ChangeDateTime="06/29/2020 09:34:42">
+    <Property Name="ElementName" Value="[dbo].[SigningNotificationFeed].[FeedDateTime]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SigningNotificationFeed]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="FeedDateTimeUtc" />
+  </Operation>
 </Operations>

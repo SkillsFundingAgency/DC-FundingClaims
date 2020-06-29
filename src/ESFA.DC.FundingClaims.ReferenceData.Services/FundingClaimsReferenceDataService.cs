@@ -30,8 +30,6 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
         private readonly Func<IFundingClaimsDataContext> _fundingClaimsContextFactory;
         private readonly IIndex<int, IFundingStreamPeriodCodes> _fundingStreamPeriodCodes;
         private readonly Func<ISummarisationContext> _summarisedActualsContextFactory;
-        private readonly Func<IJobQueueDataContext> _jobQueueDataContextFactory;
-        private readonly IDateTimeProvider _dateTimeProvider;
         private readonly ILogger _logger;
 
         public FundingClaimsReferenceDataService(
@@ -41,8 +39,6 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
             Func<IFundingClaimsDataContext> fundingClaimsContextFactory,
             IIndex<int, IFundingStreamPeriodCodes> IFundingStreamPeriodCodes,
             Func<ISummarisationContext> summarisedActualsContextFactory,
-            Func<IJobQueueDataContext> jobQueueDataContextFactory,
-            IDateTimeProvider dateTimeProvider,  
             ILogger logger)
         {
             _fcsContextFactory = fcsContextFactory;
@@ -51,8 +47,6 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
             _fundingClaimsContextFactory = fundingClaimsContextFactory;
             _fundingStreamPeriodCodes = IFundingStreamPeriodCodes;
             _summarisedActualsContextFactory = summarisedActualsContextFactory;
-            _jobQueueDataContextFactory = jobQueueDataContextFactory;
-            _dateTimeProvider = dateTimeProvider;
             _logger = logger;
         }
 
@@ -348,80 +342,6 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
             return 7;
         }
 
-        public async Task<FundingClaimsCollection> GetFundingClaimsCollection(string collectionCode)
-        {
-            var nowUtcDateTime = _dateTimeProvider.GetNowUtc();
-            using (var context = _jobQueueDataContextFactory())
-            {
-                var result = await context.FundingClaimsCollectionMetaData.Include(x => x.Collection)
-                    .Where(x => x.CollectionCode == collectionCode)
-                    .Select(x => Convert(x))
-                    .FirstOrDefaultAsync();
-                return result;
-            }
-        }
-
-        public async Task<List<FundingClaimsCollection>> GetAllFundingClaimsCollections()
-        {
-            using (var context = _jobQueueDataContextFactory())
-            {
-                var result = await context.FundingClaimsCollectionMetaData.Include(x => x.Collection)
-                    .Select(x => Convert(x))
-                    .ToListAsync();
-                return result;
-            }
-        }
-
-        public async Task<FundingClaimsCollection> GetFundingClaimsCollection(DateTime? dateTimeUtc = null)
-        {
-            dateTimeUtc = dateTimeUtc ?? _dateTimeProvider.GetNowUtc();
-
-            using (var context = _jobQueueDataContextFactory())
-            {
-                var data = await context.FundingClaimsCollectionMetaData.Include(x => x.Collection)
-                    .SingleOrDefaultAsync(x => dateTimeUtc >= x.SubmissionOpenDateUtc && dateTimeUtc <= x.SubmissionCloseDateUtc);
-
-                if (data == null)
-                {
-                    return null;
-                }
-
-                return Convert(data);
-            }
-        }
-
-        public async Task<string> GetEmailTemplate(int collectionId)
-        {
-            using (IJobQueueDataContext context = _jobQueueDataContextFactory())
-            {
-                var emailTemplate = await
-                    context.JobEmailTemplate.SingleOrDefaultAsync(x => x.CollectionId == collectionId
-                                                                       && x.Active.Value);
-
-                return emailTemplate?.TemplateOpenPeriod ?? string.Empty;
-            }
-        }
-
-        private FundingClaimsCollection Convert(FundingClaimsCollectionMetaData data)
-        {
-            var nowUtcDateTime = _dateTimeProvider.GetNowUtc();
-
-            return new FundingClaimsCollection()
-            {
-                CollectionId = data.CollectionId,
-                CollectionYear = data.Collection.CollectionYear.GetValueOrDefault(),
-                CollectionCode = data.CollectionCode,
-                RequiresSignature = data.RequiresSignature.GetValueOrDefault(),
-                SignatureCloseDateUtc = data.SignatureCloseDateUtc,
-                SubmissionOpenDateUtc = data.SubmissionOpenDateUtc,
-                SubmissionCloseDateUtc = data.SubmissionCloseDateUtc,
-                CollectionName = data.Collection.Name,
-                SummarisedPeriodFrom = data.SummarisedPeriodFrom,
-                SummarisedPeriodTo = data.SummarisedPeriodTo,
-                SummarisedReturnPeriod = data.SummarisedReturnPeriod,
-                DisplayName = data.Collection.Description,
-                IsOpenForSubmission = nowUtcDateTime >= data.SubmissionOpenDateUtc && nowUtcDateTime <= data.SubmissionCloseDateUtc
-            };
-        }
+      
     }
 }

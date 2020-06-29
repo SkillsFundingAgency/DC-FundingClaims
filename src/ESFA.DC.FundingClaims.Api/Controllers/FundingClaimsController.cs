@@ -19,17 +19,20 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly ILogger _logger;
         private readonly IFundingClaimsReferenceDataService _fundingClaimsReferenceDataService;
+        private readonly ICollectionReferenceDataService _collectionReferenceDataService;
 
         public FundingClaimsController(
             IFundingClaimsService fundingClaimsService,
             IDateTimeProvider dateTimeProvider,
             ILogger logger,
-            IFundingClaimsReferenceDataService fundingClaimsReferenceDataService)
+            IFundingClaimsReferenceDataService fundingClaimsReferenceDataService,
+            ICollectionReferenceDataService collectionReferenceDataService)
         {
             _fundingClaimsService = fundingClaimsService;
             _dateTimeProvider = dateTimeProvider;
             _logger = logger;
             _fundingClaimsReferenceDataService = fundingClaimsReferenceDataService;
+            _collectionReferenceDataService = collectionReferenceDataService;
         }
 
         [HttpGet("provider-reference/{ukprn}/{collectionYear}")]
@@ -288,13 +291,13 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
         public async Task<FundingClaimsCollection> GetFundingClaimsCollection(DateTime? dateTimeUtc = null)
         {
             dateTimeUtc = dateTimeUtc ?? _dateTimeProvider.GetNowUtc();
-            return await _fundingClaimsReferenceDataService.GetFundingClaimsCollection(dateTimeUtc);
+            return await _collectionReferenceDataService.GetFundingClaimsCollection(dateTimeUtc);
         }
 
         [HttpGet("collection/code/{collectionCode}")]
         public async Task<FundingClaimsCollection> GetFundingClaimsCollection(string collectionCode)
         {
-            return await _fundingClaimsReferenceDataService.GetFundingClaimsCollection(collectionCode);
+            return await _collectionReferenceDataService.GetFundingClaimsCollection(collectionCode);
         }
     }
 }

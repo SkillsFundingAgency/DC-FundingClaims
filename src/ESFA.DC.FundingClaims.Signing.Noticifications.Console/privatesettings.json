@@ -1,7 +1,8 @@
 ﻿{
   "ConnectionStrings": {
     "AppLogs": "Server=.;Database=AppLogs;Integrated Security=True;",
-    "FundingClaims": "Server=.;Database=FundingClaims;Integrated Security=True;"
+    "FundingClaims": "Server=.;Database=FundingClaims;Integrated Security=True;",
+    "JobManagement_RO": "Server=.;Database=JobManagement;Integrated Security=True;"
 
     //"FundingClaims": "Data Source=DCol-ci-SqlServer-WEU.database.windows.net;Initial Catalog=FundingClaims;User ID=FundingClaims_RW_User;Password=KvyHuLBXFWDa9VP-iTICZeONx@os70528wrg1UMY3hlEz;"
   },

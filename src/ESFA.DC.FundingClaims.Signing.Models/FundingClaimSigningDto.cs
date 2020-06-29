@@ -21,7 +21,7 @@ namespace ESFA.DC.FundingClaims.Signing.Models
 
         public Guid SyndicationFeedId { get; set; }
 
-        public DateTime UpdatedDateTimeUtc { get; set; }
+        public DateTime FeedDateTimeUtc { get; set; }
 
         public string Period { get; set; }
 

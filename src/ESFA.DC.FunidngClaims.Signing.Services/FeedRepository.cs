@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ESFA.DC.DateTimeProvider.Interface;
 using ESFA.DC.FundingClaims.Data;
 using ESFA.DC.FundingClaims.Data.Entities;
 using ESFA.DC.FundingClaims.Signing.Models;
@@ -18,13 +19,19 @@ namespace ESFA.DC.FunidngClaims.Signing.Services
         private readonly Func<IFundingClaimsDataContext> _fundingclaimsDataContextFactory;
         private readonly IFeedItemMappingService _feedItemMappingService;
         private readonly ILogger _logger;
+        private readonly IDateTimeProvider _dateTimeProvider;
         private const string CollectionPeriodName = "FC03";
 
-        public FeedRepository(Func<IFundingClaimsDataContext> fundingclaimsDataContextFactory, IFeedItemMappingService feedItemMappingService, ILogger logger)
+        public FeedRepository(
+            Func<IFundingClaimsDataContext> fundingclaimsDataContextFactory,
+            IFeedItemMappingService feedItemMappingService,
+            ILogger logger,
+            IDateTimeProvider dateTimeProvider)
         {
             _fundingclaimsDataContextFactory = fundingclaimsDataContextFactory;
             _feedItemMappingService = feedItemMappingService;
             _logger = logger;
+            _dateTimeProvider = dateTimeProvider;
         }
 
         public async Task<LastSigninNotificationFeed> GetLatestSyndicationDataAsync(CancellationToken cancellationToken)
@@ -35,9 +42,11 @@ namespace ESFA.DC.FunidngClaims.Signing.Services
                 data = await context.SigningNotificationFeed
                     .Select(x => new LastSigninNotificationFeed()
                     {
-                        DateTimeUtc = x.UpdatedDateTimeUtc,
+                        FeedDateTimeUtc = x.FeedDateTimeUtc,
                         PageNumber = x.PageNumber,
-                        SyndicationItemId = x.SyndicationFeedId
+                        SyndicationItemId = x.SyndicationFeedId,
+                        DateTimeUpdatedUtc = x.DateTimeUpdatedUtc
+
                     })
                     .SingleOrDefaultAsync(cancellationToken);
             }
@@ -57,12 +66,17 @@ namespace ESFA.DC.FunidngClaims.Signing.Services
 
                 using (var context = _fundingclaimsDataContextFactory())
                 {
-                    context.SigningNotificationFeed.Add( new SigningNotificationFeed()
+                    var entry = await context.SigningNotificationFeed.SingleOrDefaultAsync(cancellationToken);
+                    if (entry == null)
                     {
-                        UpdatedDateTimeUtc = feedItem.UpdatedDateTimeUtc,
-                        PageNumber= feedItem.PageNumber,
-                        SyndicationFeedId = feedItem.SyndicationFeedId
-                    });
+                        entry = new SigningNotificationFeed();
+                        context.SigningNotificationFeed.Add(entry);
+                    }
+
+                    entry.FeedDateTimeUtc = feedItem.FeedDateTimeUtc;
+                    entry.PageNumber = feedItem.PageNumber;
+                    entry.SyndicationFeedId = feedItem.SyndicationFeedId;
+                    entry.DateTimeUpdatedUtc = entry.DateTimeUpdatedUtc;
 
                     await context.SaveChangesAsync(cancellationToken);
                 }
@@ -94,8 +108,8 @@ namespace ESFA.DC.FunidngClaims.Signing.Services
 
                     var submissionFiles = context.FundingClaimsSubmissionFile.Where(x => 
                                                 x.CollectionPeriod == CollectionPeriodName &&
-                                                academicYears.Contains(x.Period)
-                                                && ukpns.Contains(x.Ukprn));
+                                                academicYears.Contains(x.Period) &&
+                                                ukpns.Contains(x.Ukprn));
 
                     foreach (var feedItem in feedItems)
                     {
@@ -119,7 +133,7 @@ namespace ESFA.DC.FunidngClaims.Signing.Services
                         }
 
                         submissionFile.IsSigned = feedItem.IsSigned;
-                        submissionFile.SignedOn = feedItem.UpdatedDateTimeUtc;
+                        submissionFile.SignedOn = feedItem.FeedDateTimeUtc;
 
                         await context.SaveChangesAsync(cancellationToken);
                     }
