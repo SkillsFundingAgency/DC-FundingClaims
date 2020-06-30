@@ -35,8 +35,6 @@ namespace ESFA.DC.FundingClaims.Signing.Noticifications.Console
             containerBuilder.RegisterModule<ServiceRegistrations>();
             var container = containerBuilder.Build();
 
-            
-
             using (var scope = container.BeginLifetimeScope())
             {
                 var logger = scope.Resolve<ILogger>();
