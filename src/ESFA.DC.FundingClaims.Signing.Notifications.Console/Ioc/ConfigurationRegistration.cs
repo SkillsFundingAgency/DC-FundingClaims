@@ -1,9 +1,9 @@
 ﻿using Autofac;
 using ESFA.DC.FundingClaims.AtomFeed.Services.Config;
-using ESFA.DC.FundingClaims.Signing.Noticifications.Console.Configuration;
+using ESFA.DC.FundingClaims.Signing.Notifications.Console.Configuration;
 using Microsoft.Extensions.Configuration;
 
-namespace ESFA.DC.FundingClaims.Signing.Noticifications.Console.Ioc
+namespace ESFA.DC.FundingClaims.Signing.Notifications.Console.Ioc
 {
     public static class ConfigurationRegistration
     {
@@ -13,7 +13,6 @@ namespace ESFA.DC.FundingClaims.Signing.Noticifications.Console.Ioc
                             .As<ConnectionStrings>().SingleInstance();
             builder.Register(c => configuration.GetConfigSection<AtomFeedSettings>())
                 .As<AtomFeedSettings>().SingleInstance();
-
         }
     }
 }

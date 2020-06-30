@@ -6,11 +6,10 @@ using ESFA.DC.DateTimeProvider.Interface;
 using ESFA.DC.FundingClaims.AtomFeed.Services;
 using ESFA.DC.FundingClaims.AtomFeed.Services.Interfaces;
 using ESFA.DC.FundingClaims.Data;
-using ESFA.DC.FundingClaims.Data.Entities;
 using ESFA.DC.FundingClaims.ReferenceData.Services;
 using ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces;
 using ESFA.DC.FundingClaims.Signing.Models;
-using ESFA.DC.FundingClaims.Signing.Noticifications.Console.Configuration;
+using ESFA.DC.FundingClaims.Signing.Notifications.Console.Configuration;
 using ESFA.DC.FunidngClaims.Signing.Services;
 using ESFA.DC.FunidngClaims.Signing.Services.Interfaces;
 using ESFA.DC.JobQueueManager.Data;
@@ -21,11 +20,10 @@ using ESFA.DC.Logging.Interfaces;
 using ESFA.DC.Serialization.Interfaces;
 using ESFA.DC.Serialization.Xml;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using IHttpClientFactory = System.Net.Http.IHttpClientFactory;
+using Quartz;
 using LogLevel = ESFA.DC.Logging.Enums.LogLevel;
 
-namespace ESFA.DC.FundingClaims.Signing.Noticifications.Console.Ioc
+namespace ESFA.DC.FundingClaims.Signing.Notifications.Console.Ioc
 {
     public class ServiceRegistrations : Module
     {
@@ -43,6 +41,7 @@ namespace ESFA.DC.FundingClaims.Signing.Noticifications.Console.Ioc
             builder.RegisterType<DateTimeProvider.DateTimeProvider>().As<IDateTimeProvider>().InstancePerLifetimeScope();
             builder.RegisterType<CollectionReferenceDataService>().As<ICollectionReferenceDataService>().InstancePerLifetimeScope();
             builder.RegisterType<AuthenticationHttpMessageHandler>().As<DelegatingHandler>();
+            builder.RegisterType<SigningFeedJob>().As<IJob>();
 
             builder.Register(c =>
             {
@@ -65,6 +64,8 @@ namespace ESFA.DC.FundingClaims.Signing.Noticifications.Console.Ioc
             builder.RegisterType<ExecutionContext>().As<IExecutionContext>().InstancePerLifetimeScope();
             builder.RegisterType<SerilogLoggerFactory>().As<ISerilogLoggerFactory>().InstancePerLifetimeScope();
             builder.RegisterType<SeriLogger>().As<ILogger>().InstancePerLifetimeScope();
+
+
 
             builder.RegisterType<FundingClaimsDataContext>().As<IFundingClaimsDataContext>().ExternallyOwned();
             builder.Register(context =>

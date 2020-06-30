@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace ESFA.DC.FundingClaims.Signing.Noticifications.Console
+namespace ESFA.DC.FundingClaims.Signing.Notifications.Console
 {
     public static class ConfigurationExtensions
     {

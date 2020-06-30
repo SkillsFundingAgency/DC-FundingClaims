@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace ESFA.DC.FundingClaims.Signing.Noticifications.Console.Configuration
+namespace ESFA.DC.FundingClaims.Signing.Notifications.Console.Configuration
 {
     class ConnectionStrings
     {
