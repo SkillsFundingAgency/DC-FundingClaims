@@ -74,6 +74,7 @@ namespace ESFA.DC.FundingClaims.Services
             catch (Exception e)
             {
                 _logger.LogError($"error getting draft values for ukprn : {ukprn} ", e);
+                throw;
             }
 
             return items;
@@ -82,13 +83,14 @@ namespace ESFA.DC.FundingClaims.Services
         public async Task<List<Model.FundingClaimsDataItem>> GetSubmissionAsync(CancellationToken cancellationToken, Guid submissionId, long ukprn)
         {
             var items = new List<Model.FundingClaimsDataItem>();
+            string ukprnStringValue = ukprn.ToString();
 
             try
             {
                 using (IFundingClaimsDataContext context = _fundingClaimsContextFactory())
                 {
                     if (!(await context.FundingClaimsSubmissionFile.
-                        AnyAsync(x => x.Ukprn == ukprn.ToString() && x.SubmissionId == submissionId, cancellationToken)))
+                        AnyAsync(x => x.Ukprn == ukprnStringValue && x.SubmissionId == submissionId, cancellationToken)))
                     {
                         throw new Exception($"submission does not belong to the provider : ukprn :{ukprn} , submission id : {submissionId}");
                     }

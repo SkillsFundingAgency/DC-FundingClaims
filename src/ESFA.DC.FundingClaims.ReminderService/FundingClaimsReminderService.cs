@@ -63,7 +63,7 @@ namespace ESFA.DC.FundingClaims.ReminderService
                 return 0;
             }
 
-            var emails = (await _fundingClaimsEmailService.GetUnsubmittedClaimEmailAddressses(collection.CollectionCode,collection.CollectionYear.ToString(), collection.SubmissionOpenDateUtc)).ToList();
+            var emails = (await _fundingClaimsEmailService.GetUnsubmittedClaimEmailAddressesAsync(cancellationToken, collection.CollectionCode,collection.CollectionYear.ToString(), collection.SubmissionOpenDateUtc)).ToList();
 
             if (!emails.Any())
             {
