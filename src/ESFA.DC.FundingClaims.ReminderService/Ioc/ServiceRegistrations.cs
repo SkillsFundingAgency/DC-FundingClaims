@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Autofac;
 using ESFA.DC.DateTimeProvider.Interface;
-using ESFA.DC.FuncingClaims.Services.Interfaces;
+using ESFA.DC.FundingClaims.Services.Interfaces;
 using ESFA.DC.FundingClaims.Data;
 using ESFA.DC.FundingClaims.EmailNotification.Services;
 using ESFA.DC.FundingClaims.ReminderService.Configuration;

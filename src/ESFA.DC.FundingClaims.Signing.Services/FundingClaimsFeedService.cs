@@ -8,12 +8,12 @@ using ESFA.DC.FundingClaims.AtomFeed.Services;
 using ESFA.DC.FundingClaims.AtomFeed.Services.Config;
 using ESFA.DC.FundingClaims.AtomFeed.Services.Interfaces;
 using ESFA.DC.FundingClaims.Signing.Models;
-using ESFA.DC.FunidngClaims.Signing.Services.Interfaces;
+using ESFA.DC.FundingClaims.Signing.Services.Interfaces;
 using ESFA.DC.Logging.Interfaces;
 using Polly;
 using Polly.Retry;
 
-namespace ESFA.DC.FunidngClaims.Signing.Services
+namespace ESFA.DC.FundingClaims.Signing.Services
 {
     public class FundingClaimsFeedService : IFundingClaimsFeedService
     {

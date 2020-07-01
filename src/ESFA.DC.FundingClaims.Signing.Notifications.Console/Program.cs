@@ -39,7 +39,7 @@ namespace ESFA.DC.FundingClaims.Signing.Notifications.Console
             var trigger = TriggerBuilder.Create()
                 .WithIdentity("SigningFeedJob", "Jobs")
                 .StartNow()
-                .WithSchedule(SimpleScheduleBuilder.RepeatMinutelyForever(1)).Build();
+                .WithSchedule(SimpleScheduleBuilder.RepeatMinutelyForever(15)).Build();
 
             var cts = new CancellationTokenSource();
 

@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ESFA.DC.FuncingClaims.Services.Interfaces\ESFA.DC.FuncingClaims.Services.Interfaces.csproj" />
+    <ProjectReference Include="..\ESFA.DC.FundingClaims.Services.Interfaces\ESFA.DC.FundingClaims.Services.Interfaces.csproj" />
     <ProjectReference Include="..\ESFA.DC.FundingClaims.Data\ESFA.DC.FundingClaims.Data.csproj" />
     <ProjectReference Include="..\ESFA.DC.FundingClaims.Message\ESFA.DC.FundingClaims.Message.csproj" />
     <ProjectReference Include="..\ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces\ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces.csproj" />

@@ -4,8 +4,8 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using ESFA.DC.DateTimeProvider.Interface;
-using ESFA.DC.FuncingClaims.Services.Interfaces;
 using ESFA.DC.FundingClaims.Data;
+using ESFA.DC.FundingClaims.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace ESFA.DC.FundingClaims.Services

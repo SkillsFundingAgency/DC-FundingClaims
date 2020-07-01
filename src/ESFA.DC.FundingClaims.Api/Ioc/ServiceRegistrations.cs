@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Autofac;
 using ESFA.DC.Api.Common.Settings;
 using ESFA.DC.DateTimeProvider.Interface;
-using ESFA.DC.FuncingClaims.Services.Interfaces;
+using ESFA.DC.FundingClaims.Services.Interfaces;
 using ESFA.DC.FundingClaims.Data;
 using ESFA.DC.FundingClaims.Message;
 using ESFA.DC.FundingClaims.Model;

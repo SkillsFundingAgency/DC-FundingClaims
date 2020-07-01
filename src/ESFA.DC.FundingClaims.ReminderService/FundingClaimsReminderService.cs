@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using ESFA.DC.FuncingClaims.Services.Interfaces;
+using ESFA.DC.FundingClaims.Services.Interfaces;
 using ESFA.DC.FundingClaims.EmailNotification.Services;
 using ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces;
 using ESFA.DC.FundingClaims.ReminderService.Interfaces;

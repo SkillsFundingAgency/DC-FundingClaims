@@ -1,9 +1,7 @@
-﻿using System;
-using System.ServiceModel.Syndication;
-using ESFA.DC.FundingClaims.Data.Entities;
+﻿using System.ServiceModel.Syndication;
 using ESFA.DC.FundingClaims.Signing.Models;
 
-namespace ESFA.DC.FunidngClaims.Signing.Services.Interfaces
+namespace ESFA.DC.FundingClaims.Signing.Services.Interfaces
 {
     public interface IFeedItemMappingService
     {

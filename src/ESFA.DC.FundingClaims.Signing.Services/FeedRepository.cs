@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using ESFA.DC.DateTimeProvider.Interface;
 using ESFA.DC.FundingClaims.Data;
 using ESFA.DC.FundingClaims.Data.Entities;
 using ESFA.DC.FundingClaims.Signing.Models;
-using ESFA.DC.FunidngClaims.Signing.Services.Interfaces;
+using ESFA.DC.FundingClaims.Signing.Services.Interfaces;
 using ESFA.DC.Logging.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace ESFA.DC.FunidngClaims.Signing.Services
+namespace ESFA.DC.FundingClaims.Signing.Services
 {
     public class FeedRepository : IFeedRepository
     {

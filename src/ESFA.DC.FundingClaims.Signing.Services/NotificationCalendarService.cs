@@ -1,14 +1,11 @@
-﻿using ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using ESFA.DC.DateTimeProvider.Interface;
-using ESFA.DC.FunidngClaims.Signing.Services.Interfaces;
+using ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces;
+using ESFA.DC.FundingClaims.Signing.Services.Interfaces;
 using ESFA.DC.Logging.Interfaces;
 
-namespace ESFA.DC.FunidngClaims.Signing.Services
+namespace ESFA.DC.FundingClaims.Signing.Services
 {
     public class NotificationCalendarService : INotificationCalendarService
     {

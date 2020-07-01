@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
-using ESFA.DC.FuncingClaims.Services.Interfaces;
 using ESFA.DC.FundingClaims.Message;
+using ESFA.DC.FundingClaims.Services.Interfaces;
 using ESFA.DC.Queueing.Interface;
 
 namespace ESFA.DC.FundingClaims.Services

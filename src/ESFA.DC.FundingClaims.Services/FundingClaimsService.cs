@@ -4,12 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Autofac.Features.Indexed;
 using ESFA.DC.DateTimeProvider.Interface;
-using ESFA.DC.FuncingClaims.Services.Interfaces;
 using ESFA.DC.FundingClaims.Data;
 using ESFA.DC.FundingClaims.Message;
 using ESFA.DC.FundingClaims.Model;
 using ESFA.DC.FundingClaims.Model.Interfaces;
 using ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces;
+using ESFA.DC.FundingClaims.Services.Interfaces;
 using ESFA.DC.Logging.Interfaces;
 using Microsoft.EntityFrameworkCore;
 

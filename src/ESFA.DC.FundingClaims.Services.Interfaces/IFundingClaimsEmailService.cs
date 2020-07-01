@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ESFA.DC.FuncingClaims.Services.Interfaces
+namespace ESFA.DC.FundingClaims.Services.Interfaces
 {
     public interface IFundingClaimsEmailService
     {

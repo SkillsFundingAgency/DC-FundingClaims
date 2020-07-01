@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using ESFA.DC.FundingClaims.Message;
 
-namespace ESFA.DC.FuncingClaims.Services.Interfaces
+namespace ESFA.DC.FundingClaims.Services.Interfaces
 {
     public interface IFundingClaimsMessagingService
     {

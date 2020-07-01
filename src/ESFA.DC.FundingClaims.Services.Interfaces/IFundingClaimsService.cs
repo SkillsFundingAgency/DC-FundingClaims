@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ESFA.DC.FundingClaims.Model;
 
-namespace ESFA.DC.FuncingClaims.Services.Interfaces
+namespace ESFA.DC.FundingClaims.Services.Interfaces
 {
     public interface IFundingClaimsService
     {

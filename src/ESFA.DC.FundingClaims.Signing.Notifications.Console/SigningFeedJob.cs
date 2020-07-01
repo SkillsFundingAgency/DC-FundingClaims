@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using ESFA.DC.FunidngClaims.Signing.Services.Interfaces;
+using ESFA.DC.FundingClaims.Signing.Services.Interfaces;
 using Quartz;
 
 namespace ESFA.DC.FundingClaims.Signing.Notifications.Console

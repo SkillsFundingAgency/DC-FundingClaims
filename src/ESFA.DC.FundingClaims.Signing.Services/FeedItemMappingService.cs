@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 using System.ServiceModel.Syndication;
-using ESFA.DC.DateTimeProvider.Interface;
 using ESFA.DC.FundingClaims.AtomFeed.Services;
 using ESFA.DC.FundingClaims.AtomFeed.Services.Interfaces;
-using ESFA.DC.FundingClaims.Data.Entities;
 using ESFA.DC.FundingClaims.Signing.Models;
-using ESFA.DC.FunidngClaims.Signing.Services.Interfaces;
+using ESFA.DC.FundingClaims.Signing.Services.Interfaces;
 
-namespace ESFA.DC.FunidngClaims.Signing.Services
+namespace ESFA.DC.FundingClaims.Signing.Services
 {
     public class FeedItemMappingService : IFeedItemMappingService
     {
@@ -29,22 +26,22 @@ namespace ESFA.DC.FunidngClaims.Signing.Services
                 throw new ArgumentNullException("Funding claim id missing");
             }
 
-            var pieces = feedItemDetails.FundingClaimId.Split('_');
-            if (pieces.Length != 3)
+            var idParts = feedItemDetails.FundingClaimId.Split('_');
+            if (idParts.Length != 3)
             {
                 throw new Exception($"invalid funding claim id : {feedItemDetails.FundingClaimId}");
             }
 
-            int.TryParse(pieces[2], out var version);
+            int.TryParse(idParts[2], out var version);
 
-            var collectionNameParts = pieces[0].Split('-');
+            var collectionNameParts = idParts[0].Split('-');
             
             var dto = new FundingClaimSigningDto(feedItemDetails.FundingClaimId)
             {
                 IsSigned = feedItemDetails.HasBeenSigned,
                 SyndicationFeedId = feedItem.Id.SyndicationId(),
                 FeedDateTimeUtc = feedItem.LastUpdatedTime.UtcDateTime,
-                Ukprn = pieces[1],
+                Ukprn = idParts[1],
                 Version = version,
                 Period = collectionNameParts[0],
                 PageNumber = currentPageNumber

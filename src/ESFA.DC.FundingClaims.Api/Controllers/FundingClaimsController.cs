@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ESFA.DC.DateTimeProvider.Interface;
-using ESFA.DC.FuncingClaims.Services.Interfaces;
+using ESFA.DC.FundingClaims.Services.Interfaces;
 using ESFA.DC.FundingClaims.Model;
 using ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces;
 using ESFA.DC.Logging.Interfaces;
