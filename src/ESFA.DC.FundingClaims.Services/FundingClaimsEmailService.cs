@@ -33,8 +33,8 @@ namespace ESFA.DC.FundingClaims.Services
                 var submittedProviders = await fundingClaimsContext.FundingClaimsSubmissionFile.Where(x =>
                         x.Period == year &&
                         x.CollectionPeriod == collectionCode)
-                    .Select(x => long.Parse(x.Ukprn))
                     .Distinct()
+                    .Select(x => long.Parse(x.Ukprn))
                     .ToListAsync(cancellationToken);
 
                 var emailAddressesList = await fundingClaimsContext.FundingClaimsSupportingData

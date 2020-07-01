@@ -28,7 +28,18 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
         private readonly Func<ISummarisationContext> _summarisedActualsContextFactory;
         private readonly ILogger _logger;
 
-        public FundingClaimsReferenceDataService(
+        private readonly Dictionary<string, int> rateBandsDisctionary =
+            new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+            {
+                {"540+ hours (Band 5)", 1},
+                {"450+ hours (Band 4a)", 2},
+                {"450 to 539 hours (Band 4b)", 3},
+                {"360 to 449 hours (Band 3)", 4},
+                {"280 to 359 hours (Band 2)", 5},
+                {"Up to 279 hours (Band 1)", 6}
+            };
+
+    public FundingClaimsReferenceDataService(
             Func<IFcsContext> fcsContextFactory,
             Func<IIlr1819RulebaseContext> ilr1819RulebaseContextFactory,
             Func<IOrganisationsContext> organisationContextFactory,
@@ -302,7 +313,7 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
                 FundLine = fundLine,
                 RateBand = x.Key.RateBand,
                 StudentNumbers = x.Select(p => p.LearnRefNumber).Count(),
-                DeliveryToDate = x.Select(p => p.OnProgPayment).Sum(),
+                DeliveryToDate = x.Sum(p => p.OnProgPayment),
                 RateBandSortOrder = GetRateBandSortOrder(x.Key.RateBand),
                 FundLineSortOrder = fundLineSortOrder,
             }).ToList();
@@ -313,37 +324,11 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
         private int GetRateBandSortOrder(string rateBand)
         {
             int result = 0;
-
-            if (rateBand.Equals("540+ hours (Band 5)", StringComparison.InvariantCultureIgnoreCase))
+            if (rateBandsDisctionary.TryGetValue(rateBand, out result))
             {
-                return 1;
+                return result;
             }
-
-            if (rateBand.Equals("450+ hours (Band 4a)", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return 2;
-            }
-
-            if (rateBand.Equals("450 to 539 hours (Band 4b)", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return 3;
-            }
-
-            if (rateBand.Equals("360 to 449 hours (Band 3)", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return 4;
-            }
-
-            if (rateBand.Equals("280 to 359 hours (Band 2)", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return 5;
-            }
-
-            if (rateBand.Equals("Up to 279 hours (Band 1)", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return 6;
-            }
-
+            
             return 7;
         }
 
