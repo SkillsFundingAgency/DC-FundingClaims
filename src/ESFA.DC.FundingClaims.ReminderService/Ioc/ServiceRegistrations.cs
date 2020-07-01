@@ -5,6 +5,8 @@ using ESFA.DC.DateTimeProvider.Interface;
 using ESFA.DC.FundingClaims.Services.Interfaces;
 using ESFA.DC.FundingClaims.Data;
 using ESFA.DC.FundingClaims.EmailNotification.Services;
+using ESFA.DC.FundingClaims.ReferenceData.Services;
+using ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces;
 using ESFA.DC.FundingClaims.ReminderService.Configuration;
 using ESFA.DC.FundingClaims.ReminderService.Interfaces;
 using ESFA.DC.FundingClaims.Services;
@@ -28,6 +30,7 @@ namespace ESFA.DC.FundingClaims.ReminderService.Ioc
             builder.RegisterType<FundingClaimsReminderService>().As<IFundingClaimsReminderService>().InstancePerLifetimeScope();
             builder.RegisterType<FundingClaimsEmailService>().As<IFundingClaimsEmailService>().InstancePerLifetimeScope();
             builder.RegisterType<DateTimeProvider.DateTimeProvider>().As<IDateTimeProvider>().InstancePerLifetimeScope();
+            builder.RegisterType<CollectionReferenceDataService>().As<ICollectionReferenceDataService>().InstancePerLifetimeScope();
 
             builder.Register(c =>
             {

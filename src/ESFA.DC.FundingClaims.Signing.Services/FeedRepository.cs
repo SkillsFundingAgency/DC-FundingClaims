@@ -75,7 +75,7 @@ namespace ESFA.DC.FundingClaims.Signing.Services
                     entry.FeedDateTimeUtc = feedItem.FeedDateTimeUtc;
                     entry.PageNumber = feedItem.PageNumber;
                     entry.SyndicationFeedId = feedItem.SyndicationFeedId;
-                    entry.DateTimeUpdatedUtc = entry.DateTimeUpdatedUtc;
+                    entry.DateTimeUpdatedUtc = _dateTimeProvider.GetNowUtc();
 
                     await context.SaveChangesAsync(cancellationToken);
                 }

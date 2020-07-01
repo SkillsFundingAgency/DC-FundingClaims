@@ -22,12 +22,16 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ESFA.DC.FundingClaims.EmailNotification.Services\ESFA.DC.FundingClaims.EmailNotification.Services.csproj" />
+    <ProjectReference Include="..\ESFA.DC.FundingClaims.ReferenceData.Services\ESFA.DC.FundingClaims.ReferenceData.Services.csproj" />
     <ProjectReference Include="..\ESFA.DC.FundingClaims.Services\ESFA.DC.FundingClaims.Services.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="privatesettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
