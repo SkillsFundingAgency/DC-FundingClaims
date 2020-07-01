@@ -5,17 +5,8 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
-using ESFA.DC.DateTimeProvider.Interface;
-using ESFA.DC.FundingClaims.Message;
-using ESFA.DC.FundingClaims.ReminderService.Configuration;
 using ESFA.DC.FundingClaims.ReminderService.Interfaces;
 using ESFA.DC.FundingClaims.ReminderService.Ioc;
-using ESFA.DC.Logging;
-using ESFA.DC.Logging.Config;
-using ESFA.DC.Serialization.Interfaces;
-using ESFA.DC.Serialization.Json;
-using ESFA.DC.Logging.Config.Interfaces;
-using ESFA.DC.Logging.Enums;
 using ESFA.DC.Logging.Interfaces;
 using ExecutionContext = ESFA.DC.Logging.ExecutionContext;
 
@@ -50,7 +41,7 @@ namespace ESFA.DC.FundingClaims.ReminderService
                 logger.LogInfo($"Starting funding claim reminder service web job.");
 
                 var fundingClaimsReminderService = scope.Resolve<IFundingClaimsReminderService>();
-                await fundingClaimsReminderService.Execute();
+                await fundingClaimsReminderService.Execute(CancellationToken.None);
             }
         }
     }

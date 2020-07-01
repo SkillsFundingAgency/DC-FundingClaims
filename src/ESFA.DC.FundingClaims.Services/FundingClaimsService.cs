@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Autofac.Features.Indexed;
 using ESFA.DC.DateTimeProvider.Interface;
@@ -43,7 +44,7 @@ namespace ESFA.DC.FundingClaims.Services
             _logger = logger;
         }
 
-        public async Task<List<Model.FundingClaimsDataItem>> GetDraftAsync(string collectionCode, long ukprn)
+        public async Task<List<Model.FundingClaimsDataItem>> GetDraftAsync(CancellationToken cancellationToken, string collectionCode, long ukprn)
         {
             var items = new List<Model.FundingClaimsDataItem>();
 
@@ -51,7 +52,8 @@ namespace ESFA.DC.FundingClaims.Services
             {
                 using (IFundingClaimsDataContext context = _fundingClaimsContextFactory())
                 {
-                    foreach (var value in await context.FundingClaimsData.Where(x => x.Ukprn == ukprn && x.CollectionPeriod == collectionCode).ToListAsync())
+                    foreach (var value in await context.FundingClaimsData.Where(x => x.Ukprn == ukprn && x.CollectionPeriod == collectionCode)
+                        .ToListAsync(cancellationToken))
                     {
                         items.Add(new Model.FundingClaimsDataItem()
                         {
@@ -77,7 +79,7 @@ namespace ESFA.DC.FundingClaims.Services
             return items;
         }
 
-        public async Task<List<Model.FundingClaimsDataItem>> GetSubmissionAsync(Guid submissionId, long ukprn)
+        public async Task<List<Model.FundingClaimsDataItem>> GetSubmissionAsync(CancellationToken cancellationToken, Guid submissionId, long ukprn)
         {
             var items = new List<Model.FundingClaimsDataItem>();
 
@@ -85,13 +87,13 @@ namespace ESFA.DC.FundingClaims.Services
             {
                 using (IFundingClaimsDataContext context = _fundingClaimsContextFactory())
                 {
-                    if (!(await context.FundingClaimsSubmissionFile.AnyAsync(x =>
-                        x.Ukprn == ukprn.ToString() && x.SubmissionId == submissionId)))
+                    if (!(await context.FundingClaimsSubmissionFile.
+                        AnyAsync(x => x.Ukprn == ukprn.ToString() && x.SubmissionId == submissionId, cancellationToken)))
                     {
                         throw new Exception($"submission does not belong to the provider : ukprn :{ukprn} , submission id : {submissionId}");
                     }
 
-                    var data = await context.FundingClaimsSubmissionValues.Where(x => x.SubmissionId == submissionId).ToListAsync();
+                    var data = await context.FundingClaimsSubmissionValues.Where(x => x.SubmissionId == submissionId).ToListAsync(cancellationToken);
                     foreach (var value in data)
                     {
                         items.Add(new Model.FundingClaimsDataItem()
@@ -119,7 +121,7 @@ namespace ESFA.DC.FundingClaims.Services
             return items;
         }
 
-        public async Task<bool> SaveDraftAsync(FundingClaimsData fundingClaimsData)
+        public async Task<bool> SaveDraftAsync(CancellationToken cancellationToken, FundingClaimsData fundingClaimsData)
         {
             try
             {
@@ -129,19 +131,23 @@ namespace ESFA.DC.FundingClaims.Services
                 {
                     var ilr1619FundingStreamPeriodCode = _fundingStreamPeriodCodes[fundingClaimsData.AcademicYear].Ilr16To19;
 
-                    if (fundingClaimsData.FundingClaimsDataItems.All(x => x.FundingStreamPeriodCode.Equals(ilr1619FundingStreamPeriodCode, StringComparison.OrdinalIgnoreCase)))
+                    if (fundingClaimsData.FundingClaimsDataItems.All(x => x.FundingStreamPeriodCode == ilr1619FundingStreamPeriodCode))
                     {
-                        existingData = await context.FundingClaimsData.Where(x => x.CollectionPeriod == fundingClaimsData.CollectionCode && x.Ukprn == fundingClaimsData.Ukprn && x.FundingStreamPeriodCode.Equals(ilr1619FundingStreamPeriodCode, StringComparison.OrdinalIgnoreCase)).ToListAsync();
+                        existingData = await context.FundingClaimsData.Where(x => x.CollectionPeriod == fundingClaimsData.CollectionCode
+                                                                                  && x.Ukprn == fundingClaimsData.Ukprn
+                                                                                  && x.FundingStreamPeriodCode == ilr1619FundingStreamPeriodCode).ToListAsync(cancellationToken);
                     }
                     else
                     {
-                        existingData = await context.FundingClaimsData.Where(x => x.CollectionPeriod == fundingClaimsData.CollectionCode && x.Ukprn == fundingClaimsData.Ukprn && !x.FundingStreamPeriodCode.Equals(ilr1619FundingStreamPeriodCode, StringComparison.OrdinalIgnoreCase)).ToListAsync();
+                        existingData = await context.FundingClaimsData.Where(x => x.CollectionPeriod == fundingClaimsData.CollectionCode
+                                                                                  && x.Ukprn == fundingClaimsData.Ukprn
+                                                                                  && x.FundingStreamPeriodCode != ilr1619FundingStreamPeriodCode).ToListAsync(cancellationToken);
                     }
 
                     if (existingData.Any())
                     {
                         context.FundingClaimsData.RemoveRange(existingData);
-                        _logger.LogInfo($"removed funding claims draft data submission detail for ukprn : {fundingClaimsData.Ukprn}, collectionPerioId : {fundingClaimsData.CollectionCode} ");
+                        _logger.LogInfo($"removed funding claims draft data submission detail for ukprn : {fundingClaimsData.Ukprn}, collectionPeriodId : {fundingClaimsData.CollectionCode} ");
                     }
 
                     foreach (var value in fundingClaimsData.FundingClaimsDataItems)
@@ -174,7 +180,7 @@ namespace ESFA.DC.FundingClaims.Services
                         LastUpdatedDateTimeUtc = today,
                     });
 
-                    await context.SaveChangesAsync();
+                    await context.SaveChangesAsync(cancellationToken);
 
                     _logger.LogInfo($"saved funding claims draft data submission for ukprn : {fundingClaimsData.Ukprn}, collectionPerioId : {fundingClaimsData.CollectionCode} ");
                 }
@@ -188,19 +194,19 @@ namespace ESFA.DC.FundingClaims.Services
             return true;
         }
 
-        public async Task<List<ContractAllocation>> GetSubmittedMaxContractValues(long ukprn, Guid submissionId)
+        public async Task<List<ContractAllocation>> GetSubmittedMaxContractValuesAsync(CancellationToken cancellationToken, long ukprn, Guid submissionId)
         {
             var items = new List<ContractAllocation>();
 
             using (var context = _fundingClaimsContextFactory())
             {
-                if (!(await context.FundingClaimsSubmissionFile.AnyAsync(x =>
-                    x.Ukprn == ukprn.ToString() && x.SubmissionId == submissionId)))
+                if (!(await context.FundingClaimsSubmissionFile
+                    .AnyAsync(x => x.Ukprn == ukprn.ToString() && x.SubmissionId == submissionId, cancellationToken)))
                 {
                     throw new Exception($"submission does not belong to the provider : ukprn :{ukprn} , submission id : {submissionId}");
                 }
 
-                var contractAllocations = await context.FundingClaimMaxContractValues.Where(x => x.SubmissionId == submissionId).ToListAsync();
+                var contractAllocations = await context.FundingClaimMaxContractValues.Where(x => x.SubmissionId == submissionId).ToListAsync(cancellationToken);
 
                 foreach (var contractAllocation in contractAllocations)
                 {
@@ -215,9 +221,9 @@ namespace ESFA.DC.FundingClaims.Services
             return items;
         }
 
-        public async Task<string> ConvertToSubmissionAsync(long ukprn, int latestSubmissionVersion, string collectionCode, int academicYear)
+        public async Task<string> ConvertToSubmissionAsync(CancellationToken cancellationToken, long ukprn, int latestSubmissionVersion, string collectionCode, int academicYear)
         {
-            var orgDetails = await _fundingClaimsReferenceDataService.GetorganisationDetails(ukprn);
+            var orgDetails = await _fundingClaimsReferenceDataService.GetOrganisationDetailsAsync(cancellationToken, ukprn);
 
             if (orgDetails == null)
             {
@@ -226,7 +232,7 @@ namespace ESFA.DC.FundingClaims.Services
 
             var currentDateTime = _dateTimeProvider.GetNowUtc();
 
-            var contractsAllocations = await _fundingClaimsReferenceDataService.GetContractAllocationsAsync(ukprn, academicYear);
+            var contractsAllocations = await _fundingClaimsReferenceDataService.GetContractAllocationsAsync(cancellationToken, ukprn, academicYear);
             using (IFundingClaimsDataContext context = _fundingClaimsContextFactory())
             {
                 var draftFundingClaims = await context.FundingClaimsData.Where(x => x.Ukprn == ukprn && x.CollectionPeriod == collectionCode).ToListAsync();
@@ -313,7 +319,7 @@ namespace ESFA.DC.FundingClaims.Services
             }
         }
 
-        public async Task<List<FundingClaimsSubmission>> GetSubmissionHistoryAsync(long ukprn)
+        public async Task<List<FundingClaimsSubmission>> GetSubmissionHistoryAsync(CancellationToken cancellationToken, long ukprn)
         {
             var result = new List<FundingClaimsSubmission>();
 
@@ -321,11 +327,11 @@ namespace ESFA.DC.FundingClaims.Services
             {
                 using (var context = _fundingClaimsContextFactory())
                 {
-                    var collections = await _collectionReferenceDataService.GetAllFundingClaimsCollections();
+                    var collections = await _collectionReferenceDataService.GetAllFundingClaimsCollectionsAsync(cancellationToken);
 
                     var data = await context.FundingClaimsSubmissionFile.Where(x => x.Ukprn == ukprn.ToString())
                         .OrderByDescending(x => x.UpdatedOn)
-                        .ToListAsync();
+                        .ToListAsync(cancellationToken);
 
                     foreach (var item in data)
                     {
@@ -350,13 +356,13 @@ namespace ESFA.DC.FundingClaims.Services
             }
         }
 
-        public async Task<int> GetLatestSubmissionVersion(long ukprn)
+        public async Task<int> GetLatestSubmissionVersionAsync(CancellationToken cancellationToken, long ukprn)
         {
             using (IFundingClaimsDataContext context = _fundingClaimsContextFactory())
             {
                 var latestSubmission = await context.FundingClaimsSubmissionFile
                     .Where(x => x.Ukprn == ukprn.ToString())
-                    .MaxAsync(x => (int?)x.Version);
+                    .MaxAsync(x => (int?)x.Version, cancellationToken);
 
                 return latestSubmission.GetValueOrDefault();
             }

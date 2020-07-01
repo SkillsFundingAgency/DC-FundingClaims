@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using ESFA.DC.FundingClaims.Model;
 
@@ -7,18 +8,18 @@ namespace ESFA.DC.FundingClaims.Services.Interfaces
 {
     public interface IFundingClaimsService
     {
-        Task<bool> SaveDraftAsync(FundingClaimsData fundingClaimsData);
+        Task<bool> SaveDraftAsync(CancellationToken cancellationToken, FundingClaimsData fundingClaimsData);
 
-        Task<List<FundingClaimsDataItem>> GetDraftAsync(string collectionCode, long ukprn);
+        Task<List<FundingClaimsDataItem>> GetDraftAsync(CancellationToken cancellationToken, string collectionCode, long ukprn);
 
-        Task<List<FundingClaimsDataItem>> GetSubmissionAsync(Guid submissionId, long ukprn);
+        Task<List<FundingClaimsDataItem>> GetSubmissionAsync(CancellationToken cancellationToken, Guid submissionId, long ukprn);
 
-        Task<string> ConvertToSubmissionAsync(long ukprn, int latestSubmissionVersion, string collectionName, int academicYear);
+        Task<string> ConvertToSubmissionAsync(CancellationToken cancellationToken, long ukprn, int latestSubmissionVersion, string collectionName, int academicYear);
 
-        Task<List<FundingClaimsSubmission>> GetSubmissionHistoryAsync(long ukprn);
+        Task<List<FundingClaimsSubmission>> GetSubmissionHistoryAsync(CancellationToken cancellationToken, long ukprn);
 
-        Task<List<ContractAllocation>> GetSubmittedMaxContractValues(long ukprn, Guid submissionId);
+        Task<List<ContractAllocation>> GetSubmittedMaxContractValuesAsync(CancellationToken cancellationToken, long ukprn, Guid submissionId);
 
-        Task<int> GetLatestSubmissionVersion(long ukprn);
+        Task<int> GetLatestSubmissionVersionAsync(CancellationToken cancellationToken, long ukprn);
     }
 }

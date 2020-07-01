@@ -24,13 +24,13 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
             _dateTimeProvider = dateTimeProvider;
         }
 
-        public async Task<FundingClaimsCollection> GetFundingClaimsCollection(string collectionCode)
+        public async Task<FundingClaimsCollection> GetFundingClaimsCollectionAsync(CancellationToken cancellationToken, string collectionCode)
         {
             using (var context = _jobQueueDataContextFactory())
             {
                 var data = await context.FundingClaimsCollectionMetaData.Include(x => x.Collection)
                     .Where(x => x.CollectionCode == collectionCode)
-                    .FirstOrDefaultAsync();
+                    .FirstOrDefaultAsync(cancellationToken);
 
                 if (data == null)
                 {
@@ -41,25 +41,25 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
             }
         }
 
-        public async Task<List<FundingClaimsCollection>> GetAllFundingClaimsCollections()
+        public async Task<List<FundingClaimsCollection>> GetAllFundingClaimsCollectionsAsync(CancellationToken cancellationToken)
         {
             using (var context = _jobQueueDataContextFactory())
             {
                 var result = await context.FundingClaimsCollectionMetaData.Include(x => x.Collection)
                     .Select(x => Convert(x))
-                    .ToListAsync();
+                    .ToListAsync(cancellationToken);
                 return result;
             }
         }
 
-        public async Task<FundingClaimsCollection> GetFundingClaimsCollection(DateTime? dateTimeUtc = null)
+        public async Task<FundingClaimsCollection> GetFundingClaimsCollectionAsync(CancellationToken cancellationToken, DateTime? dateTimeUtc = null)
         {
             dateTimeUtc = dateTimeUtc ?? _dateTimeProvider.GetNowUtc();
 
             using (var context = _jobQueueDataContextFactory())
             {
                 var data = await context.FundingClaimsCollectionMetaData.Include(x => x.Collection)
-                    .SingleOrDefaultAsync(x => dateTimeUtc >= x.SubmissionOpenDateUtc && dateTimeUtc <= x.SubmissionCloseDateUtc);
+                    .SingleOrDefaultAsync(x => dateTimeUtc >= x.SubmissionOpenDateUtc && dateTimeUtc <= x.SubmissionCloseDateUtc, cancellationToken);
 
                 if (data == null)
                 {
@@ -88,13 +88,13 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
             }
         }
 
-        public async Task<string> GetEmailTemplate(int collectionId)
+        public async Task<string> GetEmailTemplateAsync(CancellationToken cancellationToken, int collectionId)
         {
             using (IJobQueueDataContext context = _jobQueueDataContextFactory())
             {
                 var emailTemplate = await
                     context.JobEmailTemplate.SingleOrDefaultAsync(x => x.CollectionId == collectionId
-                                                                       && x.Active.Value);
+                                                                       && x.Active.Value, cancellationToken);
 
                 return emailTemplate?.TemplateOpenPeriod ?? string.Empty;
             }

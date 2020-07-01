@@ -1,9 +1,8 @@
 ﻿using ESFA.DC.FundingClaims.Model;
-using ESFA.DC.ReferenceData.Organisations.Model;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using ESFA.DC.FundingClaims.Model.Interfaces;
 using ESFA.DC.ILR1819.DataStore.EF.Interface;
@@ -14,11 +13,8 @@ using ESFA.DC.Summarisation.Model.Interface;
 using Microsoft.EntityFrameworkCore;
 using ESFA.DC.FundingClaims.Data;
 using Autofac.Features.Indexed;
-using ESFA.DC.DateTimeProvider.Interface;
 using ESFA.DC.ILR1819.DataStore.EF;
 using ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces;
-using ESFA.DC.JobQueueManager.Data;
-using ESFA.DC.JobQueueManager.Data.Entities;
 
 namespace ESFA.DC.FundingClaims.ReferenceData.Services
 {
@@ -50,7 +46,7 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
             _logger = logger;
         }
 
-        public async Task<List<ContractAllocation>> GetContractAllocationsAsync(long ukprn, int collectionYear)
+        public async Task<List<ContractAllocation>> GetContractAllocationsAsync(CancellationToken cancellationToken, long ukprn, int collectionYear)
         {
             var items = new List<ContractAllocation>();
             var stringCollectionYear = collectionYear.ToString();
@@ -58,7 +54,7 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
             using (var context = _fcsContextFactory())
             {
                 var contractAllocations = await context.ContractAllocations
-                    .Where(x => x.DeliveryUkprn == ukprn && x.Period == stringCollectionYear).ToListAsync();
+                    .Where(x => x.DeliveryUkprn == ukprn && x.Period == stringCollectionYear).ToListAsync(cancellationToken);
 
                 //all contracts
                 foreach (var contractAllocation in contractAllocations)
@@ -70,7 +66,7 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
             return items;
         }
 
-        public async Task<List<Ilr16To19FundingClaim>> Get1619FundingClaimDetailsAsync(long ukprn)
+        public async Task<List<Ilr16To19FundingClaim>> Get1619FundingClaimDetailsAsync(CancellationToken cancellationToken, long ukprn)
         {
             List<Ilr16To19FundingClaim> result = new List<Ilr16To19FundingClaim>();
 
@@ -79,7 +75,7 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
                 using (IIlr1819RulebaseContext context = _ilr1819RulebaseContextFactory())
                 {
                     var mainData = await context.FM25_Learners
-                        .Where(x => x.UKPRN == ukprn && x.StartFund.GetValueOrDefault()).ToListAsync();
+                        .Where(x => x.UKPRN == ukprn && x.StartFund.GetValueOrDefault()).ToListAsync(cancellationToken);
 
                     var data1 = GetLineByLineFundingClaims(
                         mainData.Where(x => x.FundLine.Equals(
@@ -125,20 +121,23 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
             return result.OrderBy(x => x.FundLineSortOrder).ThenBy(x => x.RateBandSortOrder).ToList();
         }
 
-        public async Task<ProviderReferenceData> GetProviderRefernceDataAsync(long ukprn, int collectionYear)
+        public async Task<ProviderReferenceData> GetProviderReferenceDataAsync(CancellationToken cancellationToken, long ukprn, int collectionYear)
         {
             var stringCollectionYear = collectionYear.ToString();
+            string aebNonProcuredPeriodCode = _fundingStreamPeriodCodes[collectionYear].AdultEducationBudgetNonProcured;
+
             var result = new ProviderReferenceData();
+
 
             using (var context = _fcsContextFactory())
             {
                 //community learning
-                var data = await context.ContractDeliverables.Include(x => x.ContractAllocation).FirstOrDefaultAsync(x =>
+                var data = await context.ContractDeliverables
+                    .FirstOrDefaultAsync(x =>
                     x.ContractAllocation.DeliveryUkprn == ukprn &&
-                    x.ContractAllocation.Period == collectionYear.ToString() &&
+                    x.ContractAllocation.Period == stringCollectionYear &&
                     x.DeliverableCode == 5 &&
-                    x.ContractAllocation.FundingStreamPeriodCode.Equals(_fundingStreamPeriodCodes[collectionYear]
-                        .AdultEducationBudgetNonProcured));
+                    x.ContractAllocation.FundingStreamPeriodCode == aebNonProcuredPeriodCode, cancellationToken);
                 if (data != null)
                 {
                     result.AebcClallocation = data.PlannedValue.GetValueOrDefault();
@@ -148,14 +147,14 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
             return result;
         }
 
-        public async Task<ProviderReferenceData> GetProviderRefernceDataAsync(long ukprn)
+        public async Task<ProviderReferenceData> GetProviderReferenceDataAsync(CancellationToken cancellationToken, long ukprn)
         {
             try
             {
                 using (IFundingClaimsDataContext context = _fundingClaimsContextFactory())
                 {
                     var data = await context.FundingClaimsProviderReferenceData.FirstOrDefaultAsync(x =>
-                        x.Ukprn == ukprn);
+                        x.Ukprn == ukprn, cancellationToken);
                     if (data != null)
                     {
                         return new ProviderReferenceData()
@@ -177,13 +176,13 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
             }
         }
 
-        public async Task<ProviderDetails> GetorganisationDetails(long ukprn)
+        public async Task<ProviderDetails> GetOrganisationDetailsAsync(CancellationToken cancellationToken, long ukprn)
         {
             try
             {
                 using (var context = _organisationContextFactory())
                 {
-                    var orgEntity = await context.OrgDetails.FirstOrDefaultAsync(x => x.Ukprn == ukprn);
+                    var orgEntity = await context.OrgDetails.FirstOrDefaultAsync(x => x.Ukprn == ukprn, cancellationToken);
                     return new ProviderDetails()
                     {
                         Ukprn = ukprn,
@@ -194,12 +193,18 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
             }
             catch (Exception e)
             {
-                _logger.LogError($"Failed to get GetorganisationDetails for ukprn : {ukprn}", e);
+                _logger.LogError($"Failed to get GetOrganisationDetails for ukprn : {ukprn}", e);
                 throw;
             }
         }
 
-        public async Task<IEnumerable<SummarisedActualDeliveryToDate>> GetDeliveryToDateValues(long ukprn, int periodFrom, int periodTo, string collectionReturnCode, int collectionYear)
+        public async Task<IEnumerable<SummarisedActualDeliveryToDate>> GetDeliveryToDateValuesAsync(
+                                                CancellationToken cancellationToken, 
+                                                long ukprn, 
+                                                int periodFrom, 
+                                                int periodTo, 
+                                                string collectionReturnCode, 
+                                                int collectionYear)
         {
             try
             {
@@ -208,7 +213,7 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
                 using (var context = _fcsContextFactory())
                 {
                     organisationIdentifier =
-                        (await context.ContractAllocations.Where(x => x.DeliveryUkprn == ukprn).FirstOrDefaultAsync())
+                        (await context.ContractAllocations.Where(x => x.DeliveryUkprn == ukprn).FirstOrDefaultAsync(cancellationToken))
                         ?.DeliveryOrganisation;
                 }
 
@@ -222,11 +227,11 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
                                                                   x.Period >= periodFrom && x.Period <= periodTo &&
                                                                   x.CollectionReturn.CollectionReturnCode == collectionReturnCode &&
                                                                   (
-                                                                      (x.FundingStreamPeriodCode.Equals(fundingStreamPeriodCodes.AdultEducationBudgetNonProcured, StringComparison.OrdinalIgnoreCase) &&
+                                                                      (x.FundingStreamPeriodCode == fundingStreamPeriodCodes.AdultEducationBudgetNonProcured &&
                                                                        x.DeliverableCode >= 2 && x.DeliverableCode <= 6) ||
-                                                                      (x.FundingStreamPeriodCode.Equals(fundingStreamPeriodCodes.AdvanceLoadBursary, StringComparison.OrdinalIgnoreCase) &&
+                                                                      (x.FundingStreamPeriodCode == fundingStreamPeriodCodes.AdvanceLoadBursary &&
                                                                        x.DeliverableCode >= 2 && x.DeliverableCode <= 4) ||
-                                                                      (x.FundingStreamPeriodCode.Equals(fundingStreamPeriodCodes.TraineeshipNonProcured, StringComparison.OrdinalIgnoreCase) &&
+                                                                      (x.FundingStreamPeriodCode == fundingStreamPeriodCodes.TraineeshipNonProcured &&
                                                                        x.DeliverableCode >= 2 && x.DeliverableCode <= 3)))
                         .GroupBy(x => new { x.FundingStreamPeriodCode, x.DeliverableCode })
                         .ToList()
@@ -251,7 +256,7 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
             }
         }
 
-        public async Task<decimal?> GetCofRemovalValue(long ukprn)
+        public async Task<decimal?> GetCofRemovalValueAsync(CancellationToken cancellationToken, long ukprn)
         {
             try
             {
@@ -261,7 +266,7 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
                 using (var context = _organisationContextFactory())
                 {
                     var data = await context.ConditionOfFundingRemovals.FirstOrDefaultAsync(x =>
-                        x.Ukprn == ukprn && x.EffectiveFrom >= startDate && x.EffectiveTo <= endDate);
+                        x.Ukprn == ukprn && x.EffectiveFrom >= startDate && x.EffectiveTo <= endDate, cancellationToken) ;
 
                     return data?.CoFremoval;
                 }

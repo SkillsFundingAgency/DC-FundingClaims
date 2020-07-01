@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using ESFA.DC.FundingClaims.Services.Interfaces;
 using ESFA.DC.FundingClaims.EmailNotification.Services;
@@ -32,21 +33,21 @@ namespace ESFA.DC.FundingClaims.ReminderService
             _logger = logger;
         }
 
-        public async Task Execute()
+        public async Task Execute(CancellationToken cancellationToken)
         {
             _logger.LogInfo("Funding Claims Email Reminder Service Started.");
 
-            var numberOfEmailsSent = await SendEmails();
+            var numberOfEmailsSent = await SendEmails(cancellationToken);
 
             _logger.LogInfo($"Funding Claims Email Reminder Service Stopped.{Environment.NewLine}Number of email reminders sent: {numberOfEmailsSent}");
         }
 
-        private async Task<int> SendEmails()
+        private async Task<int> SendEmails(CancellationToken cancellationToken)
         {
             const string dateFormatString = "h tt d MMMM";
             int emailsSentCount = 0;
 
-            var collection = await _collectionReferenceData.GetFundingClaimsCollection();
+            var collection = await _collectionReferenceData.GetFundingClaimsCollectionAsync(cancellationToken);
             if (collection == null)
             {
                 _logger.LogDebug("Collection closed, no emails to send");
@@ -54,7 +55,7 @@ namespace ESFA.DC.FundingClaims.ReminderService
             }
 
 
-            var emailTemplate = await _collectionReferenceData.GetEmailTemplate(collection.CollectionId); 
+            var emailTemplate = await _collectionReferenceData.GetEmailTemplateAsync(cancellationToken, collection.CollectionId); 
 
             if (emailTemplate == null)
             {

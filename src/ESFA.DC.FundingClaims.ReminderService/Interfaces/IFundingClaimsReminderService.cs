@@ -1,9 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace ESFA.DC.FundingClaims.ReminderService.Interfaces
 {
     public interface IFundingClaimsReminderService
     {
-        Task Execute();
+        Task Execute(CancellationToken cancellationToken);
     }
 }

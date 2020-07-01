@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using ESFA.DC.DateTimeProvider.Interface;
 using ESFA.DC.FundingClaims.Services.Interfaces;
@@ -36,7 +37,7 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
         }
 
         [HttpGet("provider-reference/{ukprn}/{collectionYear}")]
-        public async Task<IActionResult> GetProviderReferenceData(long ukprn, int collectionYear)
+        public async Task<IActionResult> GetProviderReferenceData(CancellationToken cancellationToken, long ukprn, int collectionYear)
         {
             if (ukprn == 0)
             {
@@ -48,11 +49,11 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
                 ProviderReferenceData data;
                 if (collectionYear == 1819)
                 {
-                    data = await _fundingClaimsReferenceDataService.GetProviderRefernceDataAsync(ukprn);
+                    data = await _fundingClaimsReferenceDataService.GetProviderReferenceDataAsync(cancellationToken, ukprn);
                 }
                 else
                 {
-                    data = await _fundingClaimsReferenceDataService.GetProviderRefernceDataAsync(ukprn, collectionYear);
+                    data = await _fundingClaimsReferenceDataService.GetProviderReferenceDataAsync(cancellationToken, ukprn, collectionYear);
                 }
 
                 _logger.LogInfo($"Returning reference data for ukprn : {ukprn}");
@@ -66,7 +67,7 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
         }
 
         [HttpGet("16To19/{ukprn}")]
-        public async Task<IActionResult> Get1619FundingClaimDetails(long ukprn)
+        public async Task<IActionResult> Get1619FundingClaimDetails(CancellationToken cancellationToken, long ukprn)
         {
             if (ukprn == 0)
             {
@@ -75,7 +76,7 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
 
             try
             {
-                var result = await _fundingClaimsReferenceDataService.Get1619FundingClaimDetailsAsync(ukprn);
+                var result = await _fundingClaimsReferenceDataService.Get1619FundingClaimDetailsAsync(cancellationToken, ukprn);
                 return Ok(result);
             }
             catch (Exception e)
@@ -86,7 +87,7 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
         }
 
         [HttpGet("contract-allocations/{ukprn}/{collectionYear}")]
-        public async Task<IActionResult> GetContractAllocations(long ukprn, int collectionYear)
+        public async Task<IActionResult> GetContractAllocations(CancellationToken cancellationToken, long ukprn, int collectionYear)
         {
             if (ukprn == 0)
             {
@@ -95,7 +96,7 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
 
             try
             {
-                var items = await _fundingClaimsReferenceDataService.GetContractAllocationsAsync(ukprn, collectionYear);
+                var items = await _fundingClaimsReferenceDataService.GetContractAllocationsAsync(cancellationToken, ukprn, collectionYear);
                 return Ok(items);
             }
             catch (Exception e)
@@ -106,7 +107,7 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
         }
 
         [HttpGet("delivery-to-date/{ukprn}/{periodFrom}/{periodTo}/{collectionReturnCode}/{collectionYear}")]
-        public async Task<IActionResult> GetDeliveryToDateValues(long ukprn, int periodFrom, int periodTo, string collectionReturnCode, int collectionYear)
+        public async Task<IActionResult> GetDeliveryToDateValues(CancellationToken cancellationToken, long ukprn, int periodFrom, int periodTo, string collectionReturnCode, int collectionYear)
         {
             if (ukprn == 0)
             {
@@ -115,7 +116,9 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
 
             try
             {
-                IEnumerable<SummarisedActualDeliveryToDate> result = await _fundingClaimsReferenceDataService.GetDeliveryToDateValues(ukprn, periodFrom, periodTo, collectionReturnCode, collectionYear);
+                IEnumerable<SummarisedActualDeliveryToDate> result = await _fundingClaimsReferenceDataService
+                    .GetDeliveryToDateValuesAsync(cancellationToken, ukprn, periodFrom, periodTo, collectionReturnCode, collectionYear);
+
                 return Ok(result);
             }
             catch (Exception e)
@@ -127,7 +130,7 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
 
         [HttpPost]
         [Route("draft")]
-        public async Task<IActionResult> SaveDraftValuesAsync([FromBody] FundingClaimsData draftFundingClaims)
+        public async Task<IActionResult> SaveDraftValuesAsync(CancellationToken cancellationToken, [FromBody] FundingClaimsData draftFundingClaims)
         {
             _logger.LogInfo($"Save draft received for ukprn :{draftFundingClaims?.Ukprn}, items count : {draftFundingClaims?.FundingClaimsDataItems?.Count}");
 
@@ -144,7 +147,7 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
 
             try
             {
-                await _fundingClaimsService.SaveDraftAsync(draftFundingClaims);
+                await _fundingClaimsService.SaveDraftAsync(cancellationToken, draftFundingClaims);
                 return Ok();
             }
             catch (Exception e)
@@ -156,7 +159,7 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
 
         [HttpGet]
         [Route("draft/{collectionCode}/{ukprn}")]
-        public async Task<IActionResult> GetDraftValuesAsync(string collectionCode, long ukprn)
+        public async Task<IActionResult> GetDraftValuesAsync(CancellationToken cancellationToken, string collectionCode, long ukprn)
         {
             _logger.LogInfo($"Get draft received for ukprn :{ukprn}, collection period : {collectionCode}");
 
@@ -167,7 +170,7 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
 
             try
             {
-                var data = await _fundingClaimsService.GetDraftAsync(collectionCode, ukprn);
+                var data = await _fundingClaimsService.GetDraftAsync(cancellationToken, collectionCode, ukprn);
                 return Ok(data);
             }
             catch (Exception e)
@@ -179,7 +182,7 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
 
         [HttpGet]
         [Route("submit/{collectionCode}/{academicYear}/{ukprn}")]
-        public async Task<IActionResult> ConvertToSubmission(string collectionCode, int academicYear, long ukprn)
+        public async Task<IActionResult> ConvertToSubmission(CancellationToken cancellationToken, string collectionCode, int academicYear, long ukprn)
         {
             _logger.LogInfo($"ConvertToSubmission received for ukprn :{ukprn}, collection period : {collectionCode}");
 
@@ -190,9 +193,9 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
 
             try
             {
-                var latestSubmissionVersion = await _fundingClaimsService.GetLatestSubmissionVersion(ukprn);
+                var latestSubmissionVersion = await _fundingClaimsService.GetLatestSubmissionVersionAsync(cancellationToken, ukprn);
 
-                var data = await _fundingClaimsService.ConvertToSubmissionAsync(ukprn, latestSubmissionVersion, collectionCode, academicYear);
+                var data = await _fundingClaimsService.ConvertToSubmissionAsync(cancellationToken, ukprn, latestSubmissionVersion, collectionCode, academicYear);
                 return Ok(data);
             }
             catch (Exception e)
@@ -204,11 +207,11 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
 
         [HttpGet]
         [Route("cof-removal/{ukprn}")]
-        public async Task<IActionResult> GetCofRemovalValue(long ukprn)
+        public async Task<IActionResult> GetCofRemovalValue(CancellationToken cancellationToken, long ukprn)
         {
             try
             {
-                var result = await _fundingClaimsReferenceDataService.GetCofRemovalValue(ukprn);
+                var result = await _fundingClaimsReferenceDataService.GetOrganisationDetailsAsync(cancellationToken,ukprn);
                 return Ok(result);
             }
             catch (Exception e)
@@ -220,7 +223,7 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
 
         [HttpGet]
         [Route("submissions/{ukprn}")]
-        public async Task<IActionResult> GetSubmissionHistoryAsync(long ukprn)
+        public async Task<IActionResult> GetSubmissionHistoryAsync(CancellationToken cancellationToken, long ukprn)
         {
             _logger.LogInfo($"GetSubmissionHistoryAsync received for ukprn :{ukprn}");
 
@@ -231,7 +234,7 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
 
             try
             {
-                var data = await _fundingClaimsService.GetSubmissionHistoryAsync(ukprn);
+                var data = await _fundingClaimsService.GetSubmissionHistoryAsync(cancellationToken, ukprn);
                 return Ok(data);
             }
             catch (Exception e)
@@ -243,7 +246,7 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
 
         [HttpGet]
         [Route("submission-detail/{ukprn}/{submissionId}")]
-        public async Task<IActionResult> GetSubmissionDetails(long ukprn, string submissionId)
+        public async Task<IActionResult> GetSubmissionDetails(CancellationToken cancellationToken, long ukprn, string submissionId)
         {
             _logger.LogInfo($"GetSubmissionDetails received for ukprn :{ukprn}, submissionId : {submissionId}");
 
@@ -254,7 +257,7 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
 
             try
             {
-                var data = await _fundingClaimsService.GetSubmissionAsync(new Guid(submissionId), ukprn);
+                var data = await _fundingClaimsService.GetSubmissionAsync(cancellationToken, new Guid(submissionId), ukprn);
                 return Ok(data);
             }
             catch (Exception e)
@@ -266,7 +269,7 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
 
         [HttpGet]
         [Route("submission-contract-values/{ukprn}/{submissionId}")]
-        public async Task<IActionResult> GetSubmissionContractValues(long ukprn, string submissionId)
+        public async Task<IActionResult> GetSubmissionContractValues(CancellationToken cancellationToken, long ukprn, string submissionId)
         {
             _logger.LogInfo($"GetSubmissionContractValues received for ukprn :{ukprn}, submissionId : {submissionId}");
 
@@ -277,7 +280,7 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
 
             try
             {
-                var data = await _fundingClaimsService.GetSubmittedMaxContractValues(ukprn, new Guid(submissionId));
+                var data = await _fundingClaimsService.GetSubmittedMaxContractValuesAsync(cancellationToken, ukprn, new Guid(submissionId));
                 return Ok(data);
             }
             catch (Exception e)
@@ -288,16 +291,16 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
         }
 
         [HttpGet("collection/{dateTimeUtc?}")]
-        public async Task<FundingClaimsCollection> GetFundingClaimsCollection(DateTime? dateTimeUtc = null)
+        public async Task<FundingClaimsCollection> GetFundingClaimsCollection(CancellationToken cancellationToken, DateTime? dateTimeUtc = null)
         {
             dateTimeUtc = dateTimeUtc ?? _dateTimeProvider.GetNowUtc();
-            return await _collectionReferenceDataService.GetFundingClaimsCollection(dateTimeUtc);
+            return await _collectionReferenceDataService.GetFundingClaimsCollectionAsync(cancellationToken, dateTimeUtc);
         }
 
         [HttpGet("collection/code/{collectionCode}")]
-        public async Task<FundingClaimsCollection> GetFundingClaimsCollection(string collectionCode)
+        public async Task<FundingClaimsCollection> GetFundingClaimsCollection(CancellationToken cancellationToken, string collectionCode)
         {
-            return await _collectionReferenceDataService.GetFundingClaimsCollection(collectionCode);
+            return await _collectionReferenceDataService.GetFundingClaimsCollectionAsync(cancellationToken, collectionCode);
         }
     }
 }
