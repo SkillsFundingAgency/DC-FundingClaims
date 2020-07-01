@@ -28,11 +28,16 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
         {
             using (var context = _jobQueueDataContextFactory())
             {
-                var result = await context.FundingClaimsCollectionMetaData.Include(x => x.Collection)
+                var data = await context.FundingClaimsCollectionMetaData.Include(x => x.Collection)
                     .Where(x => x.CollectionCode == collectionCode)
-                    .Select(x => Convert(x))
                     .FirstOrDefaultAsync();
-                return result;
+
+                if (data == null)
+                {
+                    return null;
+                }
+
+                return Convert(data);
             }
         }
 
