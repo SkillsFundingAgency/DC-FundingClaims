@@ -328,3 +328,7 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+/src/ESFA.DC.FundingClaims.Api/appsettings.salman.json
+/src/EfModelGenerator/Entities
+
+privatesettings.json

@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <CodeAnalysisRuleSet>ESFA.DC.FundingClaims.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <CodeAnalysisRuleSet>ESFA.DC.FundingClaims.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="5.2.0" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="ESFA.DC.DateTimeProvider.Interface" Version="0.1.6-beta0001" />
+    <PackageReference Include="ESFA.DC.Logging" Version="0.1.4-beta0001" />
+    <PackageReference Include="ESFA.DC.Queueing" Version="0.1.18-beta0001" />
+    <PackageReference Include="ESFA.DC.Queueing.Interface" Version="0.1.14-beta0001" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ESFA.DC.FundingClaims.Services.Interfaces\ESFA.DC.FundingClaims.Services.Interfaces.csproj" />
+    <ProjectReference Include="..\ESFA.DC.FundingClaims.Data\ESFA.DC.FundingClaims.Data.csproj" />
+    <ProjectReference Include="..\ESFA.DC.FundingClaims.Message\ESFA.DC.FundingClaims.Message.csproj" />
+    <ProjectReference Include="..\ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces\ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces.csproj" />
+  </ItemGroup>
+
+</Project>

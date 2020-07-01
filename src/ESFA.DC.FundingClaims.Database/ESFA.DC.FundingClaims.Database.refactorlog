@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <Operation Name="Rename Refactor" Key="7b3d4cfe-bfb1-4e77-8a61-54f9a5494ae7" ChangeDateTime="04/11/2019 13:31:09">
+    <Property Name="ElementName" Value="[dbo].[FundingClaimsFieldRule].[CollectionKey]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FundingClaimsFieldRule]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DataCollectionKey" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="1a928e51-a639-4f88-925f-bf8260cb833c" ChangeDateTime="09/20/2019 10:52:04">
+    <Property Name="ElementName" Value="[dbo].[FundingClaimDetails].[DataCollectionKey]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FundingClaimDetails]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CollectionName" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="5de1d9d3-1d77-4d62-8be4-bd89c74a0cff" ChangeDateTime="06/29/2020 09:33:57">
+    <Property Name="ElementName" Value="[dbo].[SigningNotificationFeed].[LatestFeedUri]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SigningNotificationFeed]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="PageNumber" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="0b6cdc2a-043f-4fde-b694-6b0659454657" ChangeDateTime="06/29/2020 09:34:42">
+    <Property Name="ElementName" Value="[dbo].[SigningNotificationFeed].[FeedDateTime]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SigningNotificationFeed]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="FeedDateTimeUtc" />
+  </Operation>
+</Operations>

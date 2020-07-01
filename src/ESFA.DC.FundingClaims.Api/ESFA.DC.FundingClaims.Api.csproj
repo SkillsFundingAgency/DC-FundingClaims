@@ -1,13 +1,34 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
-    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Autofac" Version="5.2.0" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="ESFA.DC.Api.Common" Version="0.1.9" />
+    <PackageReference Include="ESFA.DC.DateTimeProvider" Version="0.1.6-beta0001" />
+    <PackageReference Include="ESFA.DC.ILR1819.Database.EF" Version="0.1.381" />
+    <PackageReference Include="ESFA.DC.ILR1920.Database.EF" Version="0.0.566" />
+    <PackageReference Include="ESFA.DC.JobQueueManager.Data" Version="0.2.75-beta0001" />
+    <PackageReference Include="ESFA.DC.Logging" Version="0.1.10-beta0001" />
+    <PackageReference Include="ESFA.DC.ReferenceData.FCS.Model" Version="0.2.789" />
+    <PackageReference Include="ESFA.DC.Serialization.Json" Version="0.1.39-beta0001" />
+    <PackageReference Include="ESFA.DC.Summarisation.Model" Version="0.0.922" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ESFA.DC.FundingClaims.Services.Interfaces\ESFA.DC.FundingClaims.Services.Interfaces.csproj" />
+    <ProjectReference Include="..\ESFA.DC.FundingClaims.ReferenceData.Services\ESFA.DC.FundingClaims.ReferenceData.Services.csproj" />
+    <ProjectReference Include="..\ESFA.DC.FundingClaims.Services\ESFA.DC.FundingClaims.Services.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="appsettings.salman.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
