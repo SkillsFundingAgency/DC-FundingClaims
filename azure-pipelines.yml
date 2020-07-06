@@ -1,13 +1,23 @@
 
-name:  $(GitVersion.NuGetVersion)
+#name:  $(GitVersion.NuGetVersion)
+name: $(GitVersion.SemVer)
+
+parameters:
+- name: BuildConfiguration
+  displayName: Release or Debug
+  type: string
+  default: Release
+  values:
+  - Release
+  - Debug
 
 resources:
 - repo: self
   fetchDepth: 30
 
 variables:
-  BuildConfiguration: 'Release'
   BuildPlatform: 'Any CPU'
+ # BuildConfiguration: 'Release'
 
 stages:
 - stage: Build
@@ -23,8 +33,8 @@ stages:
     pool:
       name: DCT
       demands:
-      - TestBuildServer
-      #- IsBuildServer
+      #- TestBuildServer
+      - IsBuildServer
 
     steps:
 
@@ -34,16 +44,25 @@ stages:
         packageType: sdk
         version: $(DotnetCore.Version)
         
-    - task: NuGetToolInstaller@0
-      displayName: 'Use NuGet : $(Nuget.Version)'
-      inputs:
-        versionSpec: '> $(Nuget.Version)'
-        checkLatest: true
+#    - task: NuGetToolInstaller@0
+#      displayName: 'Use NuGet : $(Nuget.Version)'
+#      inputs:
+#        versionSpec: '> $(Nuget.Version)'
+#        checkLatest: true
 
     - task: UseGitVersion@5
       displayName: use Git Version to generate build number
       inputs:
         versionSpec: '5.x'
+
+    - task: PowerShell@2
+      name: DislayAllVariables2
+      displayName: 'Display all variables'
+      continueOnError: true  
+      inputs:
+        targetType: 'inline'
+        script: |
+            (gci env:*).GetEnumerator() | Sort-Object Name | ForEach {Write-Host "Name: $($_.Name) | Value : $($_.Value)"}
 
     # Generate the report using ReportGenerator (https://github.com/danielpalme/ReportGenerator)
     # First install the tool on the machine, then run it
@@ -61,70 +80,21 @@ stages:
         feedsToUse: 'select'
         vstsFeed: 'dct-pkg'
 
-    - task: MSBuild@1
-      displayName: 'Build Database Project'
-      inputs:
-        solution: '**/ESFA.DC.FundingClaims.Database.sqlproj'
-        msbuildVersion: '16.0'
-        msbuildArchitecture: 'x64'
-        platform: '$(BuildPlatform)'
-        configuration: '$(BuildConfiguration)'
-        msbuildArguments: '-p:version="$(Build.BuildNumber)" -p:FileVersion="$(Build.BuildNumber)"'
-        clean: true
-        maximumCpuCount: true
-        restoreNugetPackages: false
-        logProjectEvents: true
-        createLogFile: true
-
     - task: DotNetCoreCLI@2
-      displayName: 'Build Solution'
+      displayName: Build Projects
       inputs:
-        command: 'build'
-        vstsFeed: 'dct-pkg'
+        workingDirectory: "$(Build.SourcesDirectory)/src/"
         projects: '**/*.csproj'
-        configuration: $(BuildConfiguration) 
-        arguments: '-p:version="$(GitVersion.AssemblySemVer)" -p:FileVersion="$(GitVersion.AssemblySemFileVer)"'
-
-    - task: DotNetCoreCLI@2
-      displayName: 'Package Api Artifact Folder'
-      inputs:
-        command: publish
-        configuration: $(BuildConfiguration) 
-        publishWebProjects: false
-        zipAfterPublish: true
-        nobuild: true
-        projects: '**/*.FundingClaims.Api'
-        arguments: '--output "$(build.artifactstagingdirectory)\Web\API" -p:version="$(Build.BuildNumber)" -p:FileVersion="$(Build.BuildNumber)"'
-        vstsFeed: 'dct-pkg'
-
-    - task: DotNetCoreCLI@2
-      enabled: false
-      displayName: 'Build WebJob in Temp Folder'
-      inputs:
-        command: 'build'
-        vstsFeed: 'dct-pkg'
-        projects: '**/*.FundingClaim.Console.csproj'
-        configuration: $(BuildConfiguration) 
-        arguments: '-p:version="$(GitVersion.AssemblySemVer)" -p:FileVersion="$(GitVersion.AssemblySemFileVer)" --output "$(build.SourcesDirectory)\tmp\app_Data\Jobs\Continuous\ESFA.DC.FundingClaim.Console"'
-
-    - task: DotNetCoreCLI@2
-      enabled: false
-      displayName: 'Build WebJob in Temp Folder'
-      inputs:
-        command: 'build'
-        vstsFeed: 'dct-pkg'
-        projects: '**/*.FundingClaims.ReminderService.csproj'
-        configuration: $(BuildConfiguration) 
-        arguments: '-p:version="$(GitVersion.AssemblySemVer)" -p:FileVersion="$(GitVersion.AssemblySemFileVer)" --output "$(build.SourcesDirectory)\tmp\app_Data\Jobs\Triggered\ESFA.DC.FundingClaim.Console"'
+        command: build
+        arguments: "--configuration ${{ parameters.BuildConfiguration }} --no-restore -p:version=$(Build.BuildNumber) -p:FileVersion=$(Build.BuildNumber)"
 
 #********************************************************************************
-# Copy Files into Aftifact Folder before test.
+# Copy Nuget Packages into Aftifact Folder before test.
 #********************************************************************************   
-    
     - task: CopyFiles@2
       displayName: 'Copy Nuget Interface Packages Files - Artifact NugetInterface Directory'
       inputs:
-        SourceFolder: '$(build.sourcesdirectory)\src'
+        SourceFolder: '$(build.sourcesdirectory)/src'
         Contents: |
          **\*$(Build.Configuration)*\*Interface.nupkg
          !**\packages\**
@@ -138,13 +108,74 @@ stages:
       inputs:
         SourceFolder: '$(build.sourcesdirectory)\src'
         Contents: |
-         **\*$(Build.Configuration)*\*.nupkg
+         **\${{ parameters.BuildConfiguration }}\*.nupkg
          !**\packages\**
          !**\bin\x64\**
         TargetFolder: '$(build.artifactstagingdirectory)\Nuget\Packages'
         CleanTargetFolder: true
         flattenFolders: true
-            
+
+        
+#********************************************************************************
+# Package Web Api
+#********************************************************************************   
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Package Api Artifact Folder'
+      inputs:
+        command: publish
+        publishWebProjects: false
+        zipAfterPublish: true
+        nobuild: true
+        projects: '**/*.FundingClaims.Api.csproj'
+        arguments: '--configuration ${{ parameters.BuildConfiguration }} --no-build -p:version="$(Build.BuildNumber)" -p:FileVersion="$(Build.BuildNumber)" --output "$(Build.ArtifactStagingDirectory)\Web\API"'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Build WebJob - FundingClaim.Consol'
+      inputs:
+        command: publish
+        configuration: '${{ parameters.BuildConfiguration }}'
+        publishWebProjects: false
+        zipAfterPublish: true
+        nobuild: true
+        projects: '**/*.FundingClaim.Console.csproj'
+        arguments: '--configuration ${{ parameters.BuildConfiguration }} --no-build -p:version="$(Build.BuildNumber)" -p:FileVersion="$(Build.BuildNumber)" --output "$(Build.SourcesDirectory)\tmp\app_Data\Jobs\Continuous\ESFA.DC.FundingClaim.Console"'
+        
+    - task: DotNetCoreCLI@2
+      displayName: 'Build WebJob - FundingClaim.Consol'
+      inputs:
+        command: publish
+        configuration: '${{ parameters.BuildConfiguration }}'
+        publishWebProjects: false
+        zipAfterPublish: true
+        nobuild: true
+        projects: '**/*.FundingClaims.ReminderService.csproj'
+        arguments: '--configuration ${{ parameters.BuildConfiguration }} --no-build -p:version="$(Build.BuildNumber)" -p:FileVersion="$(Build.BuildNumber)" --output "$(Build.SourcesDirectory)\tmp\app_Data\Jobs\Triggered\ESFA.DC.FundingClaim.ReminderService"'
+
+    ## Create Zip File for Deployment     
+    - task: ArchiveFiles@2
+      displayName: 'Package WebJobs for Website'
+      inputs:
+        rootFolderOrFile: '$(Build.SourcesDirectory)\tmp'
+        includeRootFolder: false
+        archiveFile: '$(Build.ArtifactStagingDirectory)\Web\WebJobs.zip'
+
+#********************************************************************************
+# SQL database Project Build and Acopy to  Artifact Directory
+#********************************************************************************   
+    - task: MSBuild@1
+      enabled: true
+      displayName: 'Build solution'
+      inputs:
+        solution: '**/ESFA.DC.FundingClaims.Database.sqlproj'
+        configuration: '${{ parameters.BuildConfiguration }}'
+        msbuildArguments: '-p:version=$(Build.BuildNumber) -p:FileVersion=$(Build.BuildNumber) -p:SkipInvalidConfigurations=true'
+        clean: false
+        maximumCpuCount: true
+        restoreNugetPackages: false
+        logProjectEvents: true
+        createLogFile: true  
+        
     - task: CopyFiles@2
       displayName: 'Copy Database Files - Artifact Databases Directory'
       inputs:
@@ -154,11 +185,12 @@ stages:
         TargetFolder: '$(build.artifactstagingdirectory)\Databases'
         CleanTargetFolder: true
         flattenFolders: true
-      
+
 #********************************************************************************
 # Count Artifact Files to decide what to Publish
 #********************************************************************************    
     - task: PowerShell@2
+      enabled: true
       displayName: 'Check What to Publish'
       continueOnError: true  
       inputs:
@@ -167,20 +199,19 @@ stages:
                   Write-Host "##vso[task.setvariable variable=PublishArtifact_Web]$(Test-Path '$(build.artifactstagingdirectory)\Web' -PathType Any)";
                   Write-Host "##vso[task.setvariable variable=PublishArtifact_NugetPackages]$(Test-Path '$(build.artifactstagingdirectory)\Nuget' -PathType Any)";
                   Write-Host "##vso[task.setvariable variable=PublishArtifact_Databases]$(Test-Path '$(build.artifactstagingdirectory)\Databases' -PathType Any)";
-      enabled: true
 
 #********************************************************************************
 # Run Unit Tests
 #********************************************************************************
-    # Run all tests with "/p:CollectCoverage=true /p:CoverletOutputFormat=cobertura" to generate the code coverage file
     - task: DotNetCoreCLI@2
-      displayName: Run .net Core Unit Tests
+      displayName: 'Run xUnit Test - Core Framework'
+      enabled: false
       inputs:
         command: test
-        arguments: '--configuration $(BuildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
-        nobuild: true
-        projects: '**/*Tests.csproj'
+        projects: 'src/*Tests/*.csproj'
+        arguments: '--configuration $(Build.Configuration) --collect "Code coverage"'
 
+        
 #********************************************************************************
 # Generate Code Coverage Report and Publish
 #********************************************************************************
@@ -189,17 +220,17 @@ stages:
      ## Generate the report using ReportGenerator (https://github.com/danielpalme/ReportGenerator)
     # First install the tool on the machine, then run it
     - script: |
-        dotnet tool update -g dotnet-reportgenerator-globaltool --version 4.3.6  
-        reportgenerator -reports:$(Build.SourcesDirectory)/**/*Tests/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:Cobertura
+          dotnet tool update -g dotnet-reportgenerator-globaltool --version 4.3.6  
+          reportgenerator -reports:$(Build.SourcesDirectory)/**/*Tests/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:Cobertura
       displayName: Create Code coverage report
-      enabled: true
+      enabled: false
   
     # Publish the code coverage result (summary and web site)
     # The summary allows to view the coverage percentage in the summary tab
     # The web site allows to view which lines are covered directly in Azure Pipeline
     - task: PublishCodeCoverageResults@1
       displayName: 'Publish code coverage'
-      enabled: true
+      enabled: false
       inputs:
         codeCoverageTool: Cobertura
         summaryFileLocation: '$(Build.SourcesDirectory)/CodeCoverage/Cobertura.xml'
@@ -212,15 +243,15 @@ stages:
     ## Publish Web Artifacts
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Artifact: Web'
-      enabled: true
+      enabled: True
       condition: and(succeeded(), eq(variables['PublishArtifact_Web'], 'True'))
       inputs:
         ArtifactName: Web
         PathtoPublish: '$(build.artifactstagingdirectory)\Web'
-    
+
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Artifact: NugetPackages'
-      enabled: true
+      enabled: True
       condition: and(succeeded(), eq(variables['PublishArtifact_NugetPackages'], 'True'))
       inputs:
         ArtifactName: NugetPackages
@@ -228,7 +259,7 @@ stages:
     
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Artifact: Databases'
-      enabled: true
+      enabled: True
       condition: and(succeeded(), eq(variables['PublishArtifact_Databases'], 'True'))
       inputs:
         ArtifactName: Databases
