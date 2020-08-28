@@ -12,23 +12,21 @@ namespace ESFA.DC.FundingClaims.Data
 {
     public interface IFundingClaimsDataContext : IDisposable
     {
-        DbSet<FundingClaimDetails> FundingClaimDetails { get; set; }
-
-        DbSet<FundingClaimMaxContractValues> FundingClaimMaxContractValues { get; set; }
+        DbSet<DeliverableCode> DeliverableCode { get; set; }
 
         DbSet<FundingClaimsData> FundingClaimsData { get; set; }
 
+        DbSet<FundingClaimsLog> FundingClaimsLog { get; set; }
+
         DbSet<FundingClaimsProviderReferenceData> FundingClaimsProviderReferenceData { get; set; }
 
-        DbSet<FundingClaimsSubmissionFile> FundingClaimsSubmissionFile { get; set; }
-
-        DbSet<FundingClaimsSubmissionValues> FundingClaimsSubmissionValues { get; set; }
-
-        DbSet<SubmissionTypes> SubmissionTypes { get; set; }
-
-        DbSet<FundingClaimsSupportingData> FundingClaimsSupportingData { get; set; }
-
         DbSet<SigningNotificationFeed> SigningNotificationFeed { get; set; }
+
+        DbSet<Submission> Submission { get; set; }
+
+        DbSet<SubmissionContractDetail> SubmissionContractDetail { get; set; }
+
+        DbSet<SubmissionValue> SubmissionValue { get; set; }
 
         int SaveChanges();
 

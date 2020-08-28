@@ -4,7 +4,7 @@
     {
         public long Id { get; set; }
 
-        public string CollectionPeriod { get; set; }
+        public string CollectionName { get; set; }
 
         public int DeliverableCode { get; set; }
 

@@ -62,21 +62,15 @@
     <Folder Include="Reference" />
     <Folder Include="Security" />
     <Folder Include="Draft" />
-    <Folder Include="Static" />
     <Folder Include="zzDeploymentProfiles\" />
     <Folder Include="ReferenceData" />
     <Folder Include="dbo\Stored Procedures\" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="dbo\Tables\FundingClaimsSubmissionValues.sql" />
-    <Build Include="dbo\Tables\FundingClaimMaxContractValues.sql" />
-    <Build Include="dbo\Tables\FundingClaimDetails.sql" />
     <Build Include="Reference\FundingClaimsProviderReferenceData.sql" />
     <Build Include="Security\Reference.sql" />
     <Build Include="Security\Draft.sql" />
     <Build Include="Draft\FundingClaimsData.sql" />
-    <Build Include="Static\SubmissionTypes.sql" />
-    <Build Include="dbo\Tables\FundingClaimsSubmissionFile.sql" />
     <Build Include="Security\Role_DataProcessor.sql" />
     <Build Include="Security\User_DsciUser.sql" />
     <Build Include="Security\RoleMemberships.sql" />
@@ -85,8 +79,12 @@
     <Build Include="Security\Role_DataViewer.sql" />
     <None Include="z.ExtendedProperties.sql" />
     <Build Include="dbo\Stored Procedures\GetLatestFundingClaims.sql" />
-    <Build Include="Draft\FundingClaimsSupportingData.sql" />
     <Build Include="dbo\Tables\SigningNotificationFeed.sql" />
+    <Build Include="dbo\Tables\DeliverableCode.sql" />
+    <Build Include="dbo\Tables\FundingClaimsLog.sql" />
+    <Build Include="dbo\Tables\Submission.sql" />
+    <Build Include="dbo\Tables\SubmissionContractDetail.sql" />
+    <Build Include="dbo\Tables\SubmissionValue.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="ESFA.DC.FundingClaims.Database.refactorlog" />
@@ -125,7 +123,6 @@
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="zzz.Script.PostDeployment.sql" />
-    <None Include="ReferenceData\StaticSubmissionTypes.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="zzDeploymentProfiles\zz.Local.Dev.Version.publish.xml" />

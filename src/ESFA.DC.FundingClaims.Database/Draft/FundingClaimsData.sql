@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [Draft].[FundingClaimsData] (
     [Id]                       BIGINT           IDENTITY (1, 1) NOT NULL,
-    [CollectionPeriod]         NVARCHAR (50)    NOT NULL,
+    [CollectionName]         NVARCHAR (50)    NOT NULL,
     [DeliverableCode]          INT              NOT NULL,
     [DeliverableDescription]   NVARCHAR (1000)  NOT NULL,
     [DeliveryToDate]           DECIMAL (10, 2)  NULL,

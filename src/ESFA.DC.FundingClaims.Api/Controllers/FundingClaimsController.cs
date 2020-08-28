@@ -152,7 +152,7 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError($"error occured to SaveDraftValuesAsync data for ukprn : {draftFundingClaims?.Ukprn}  collection period : {draftFundingClaims?.CollectionCode} ", e);
+                _logger.LogError($"error occured to SaveDraftValuesAsync data for ukprn : {draftFundingClaims?.Ukprn}  collection period : {draftFundingClaims?.CollectionName} ", e);
                 return BadRequest();
             }
         }

@@ -187,19 +187,14 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
             }
         }
 
-        public async Task<ProviderDetails> GetOrganisationDetailsAsync(CancellationToken cancellationToken, long ukprn)
+        public async Task<string> GetOrganisationNameAsync(CancellationToken cancellationToken, long ukprn)
         {
             try
             {
                 using (var context = _organisationContextFactory())
                 {
                     var orgEntity = await context.OrgDetails.FirstOrDefaultAsync(x => x.Ukprn == ukprn, cancellationToken);
-                    return new ProviderDetails()
-                    {
-                        Ukprn = ukprn,
-                        Name = orgEntity.Name,
-                        IsHesaProvider = orgEntity.Hesaprovider.GetValueOrDefault()
-                    };
+                    return orgEntity.Name ?? string.Empty
                 }
             }
             catch (Exception e)

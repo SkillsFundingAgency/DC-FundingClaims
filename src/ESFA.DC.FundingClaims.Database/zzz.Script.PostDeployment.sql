@@ -18,7 +18,7 @@ GO
 
 
 RAISERROR('		   Ref Data',10,1) WITH NOWAIT;
-	:r .\ReferenceData\StaticSubmissionTypes.sql
+	--:r .\ReferenceData\StaticSubmissionTypes.sql
 GO
 
 RAISERROR('		   Update User Account Passwords',10,1) WITH NOWAIT;

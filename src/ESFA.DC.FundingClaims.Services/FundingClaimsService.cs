@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Autofac.Features.Indexed;
 using ESFA.DC.DateTimeProvider.Interface;
 using ESFA.DC.FundingClaims.Data;
+using ESFA.DC.FundingClaims.Data.Entities;
 using ESFA.DC.FundingClaims.Message;
 using ESFA.DC.FundingClaims.Model;
 using ESFA.DC.FundingClaims.Model.Interfaces;
@@ -13,6 +14,7 @@ using ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces;
 using ESFA.DC.FundingClaims.Services.Interfaces;
 using ESFA.DC.Logging.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using FundingClaimsData = ESFA.DC.FundingClaims.Model.FundingClaimsData;
 
 namespace ESFA.DC.FundingClaims.Services
 {
@@ -127,69 +129,77 @@ namespace ESFA.DC.FundingClaims.Services
         {
             try
             {
-                List<Data.Entities.FundingClaimsData> existingData = null;
-
                 using (IFundingClaimsDataContext context = _fundingClaimsContextFactory())
                 {
-                    var ilr1619FundingStreamPeriodCode = _fundingStreamPeriodCodes[fundingClaimsData.AcademicYear].Ilr16To19;
+                    var submission = await context.Submission.SingleOrDefaultAsync(x => x.CollectionName == fundingClaimsData.CollectionName && x.Ukprn == fundingClaimsData.Ukprn && x.IsSubmitted == false, cancellationToken);
 
-                    if (fundingClaimsData.FundingClaimsDataItems.All(x => x.FundingStreamPeriodCode == ilr1619FundingStreamPeriodCode))
+                    if (submission == null)
                     {
-                        existingData = await context.FundingClaimsData.Where(x => x.CollectionPeriod == fundingClaimsData.CollectionCode
-                                                                                  && x.Ukprn == fundingClaimsData.Ukprn
-                                                                                  && x.FundingStreamPeriodCode == ilr1619FundingStreamPeriodCode).ToListAsync(cancellationToken);
+                        submission = new Submission
+                        {
+                            SubmissionId = Guid.NewGuid(),
+                            Ukprn = fundingClaimsData.Ukprn,
+                            CollectionName = fundingClaimsData.CollectionName,
+                            CollectionYear = fundingClaimsData.CollectionYear,
+                            CreatedBy = fundingClaimsData.UserName,
+                            CreatedDateTimeUtc = _dateTimeProvider.GetNowUtc(),
+                        };
                     }
                     else
                     {
-                        existingData = await context.FundingClaimsData.Where(x => x.CollectionPeriod == fundingClaimsData.CollectionCode
-                                                                                  && x.Ukprn == fundingClaimsData.Ukprn
-                                                                                  && x.FundingStreamPeriodCode != ilr1619FundingStreamPeriodCode).ToListAsync(cancellationToken);
+                        //find unique FSPs
+                        var fundingStreamPeriodCodes = fundingClaimsData.FundingClaimsDataItems
+                            .Select(x => x.FundingStreamPeriodCode).Distinct();
+
+                        //find and remove values
+                        context.SubmissionValue.RemoveRange(context.SubmissionValue.Where(x => x.SubmissionId == submission.SubmissionId && fundingStreamPeriodCodes.Contains(x.FundingStreamPeriodCode)));
+
+                        context.FundingClaimsLog.RemoveRange(context.FundingClaimsLog.Where(f => f.SubmissionId == submission.SubmissionId));
+
+                        ////find and remove contract allocations
+                        //context.SubmissionContractDetail.RemoveRange(context.SubmissionContractDetail.Where(x => x.SubmissionId == existingSubmission.SubmissionId && fundingStreamPeriodCodes.Contains(x.FundingStreamPeriodCode)));
+
+                        _logger.LogInfo($"removed funding claims draft data submission detail for ukprn : {fundingClaimsData.Ukprn}, collectionName: {fundingClaimsData.CollectionName}");
                     }
 
-                    if (existingData.Any())
-                    {
-                        context.FundingClaimsData.RemoveRange(existingData);
-                        _logger.LogInfo($"removed funding claims draft data submission detail for ukprn : {fundingClaimsData.Ukprn}, collectionPeriodId : {fundingClaimsData.CollectionCode} ");
-                    }
+                    submission.IsSigned = false;
+                    submission.SubmittedDateTimeUtc = null;
+                    submission.SubmittedBy = null;
+                    submission.SignedOnDateTimeUtc = null;
+                    submission.Version = 0;
 
                     foreach (var value in fundingClaimsData.FundingClaimsDataItems)
                     {
-                        context.FundingClaimsData.Add(new Data.Entities.FundingClaimsData()
+                        context.SubmissionValue.Add(new SubmissionValue()
                         {
-                            CollectionPeriod = fundingClaimsData.CollectionCode,
                             ContractAllocationNumber = value.ContractAllocationNumber,
-                            DeliverableCode = value.DeliverableCode,
-                            DeliverableDescription = value.DeliverableDescription,
-                            ExceptionalAdjustments = value.ExceptionalAdjustments,
+                            ExceptionalAdjustments = value.ExceptionalAdjustments.GetValueOrDefault(),
                             FundingStreamPeriodCode = value.FundingStreamPeriodCode,
-                            ForecastedDelivery = value.ForecastedDelivery,
-                            DeliveryToDate = value.DeliveryToDate,
-                            StudentNumbers = value.StudentNumbers,
-                            TotalDelivery = value.TotalDelivery,
-                            Ukprn = fundingClaimsData.Ukprn,
+                            ForecastedDelivery = value.ForecastedDelivery.GetValueOrDefault(),
+                            DeliveryToDate = value.DeliveryToDate.GetValueOrDefault(),
+                            StudentNumbers = value.StudentNumbers.GetValueOrDefault(),
+                            TotalDelivery = value.TotalDelivery.GetValueOrDefault(),
+                            DeliverableCodeId = value.DeliverableCode,
                         });
                     }
 
-                    context.FundingClaimsSupportingData.RemoveRange(
-                        context.FundingClaimsSupportingData.Where(f => f.CollectionCode == fundingClaimsData.CollectionCode && f.Ukprn == fundingClaimsData.Ukprn));
-
                     var today = _dateTimeProvider.GetNowUtc();
-                    await context.FundingClaimsSupportingData.AddAsync(new Data.Entities.FundingClaimsSupportingData()
-                    {
-                        CollectionCode = fundingClaimsData.CollectionCode,
-                        Ukprn = fundingClaimsData.Ukprn,
-                        UserEmailAddress = fundingClaimsData.EmailAddress,
-                        LastUpdatedDateTimeUtc = today,
-                    });
+                    await context.FundingClaimsLog.AddAsync(
+                        new FundingClaimsLog()
+                        {
+                            SubmissionId = submission.SubmissionId,
+                            UserEmailAddress = fundingClaimsData.EmailAddress,
+                            UpdatedDateTimeUtc = today,
+                        }, cancellationToken);
 
                     await context.SaveChangesAsync(cancellationToken);
 
-                    _logger.LogInfo($"saved funding claims draft data submission for ukprn : {fundingClaimsData.Ukprn}, collectionPerioId : {fundingClaimsData.CollectionCode} ");
+                    _logger.LogInfo($"saved funding claims draft data submission for ukprn : {fundingClaimsData.Ukprn}, collectionPerioId : {fundingClaimsData.CollectionName} ");
                 }
             }
             catch (Exception e)
             {
-                _logger.LogError($"error getting submission detail for ukprn : {fundingClaimsData.Ukprn}, collectionPerioId id : {fundingClaimsData.CollectionCode} ", e);
+                _logger.LogError($"error getting submission detail for ukprn : {fundingClaimsData.Ukprn}, collectionPerioId id : {fundingClaimsData.CollectionName} ", e);
                 throw;
             }
 
@@ -223,151 +233,108 @@ namespace ESFA.DC.FundingClaims.Services
             return items;
         }
 
-        public async Task<string> ConvertToSubmissionAsync(CancellationToken cancellationToken, long ukprn, int latestSubmissionVersion, string collectionCode, int academicYear)
+        public async Task<string> ConvertToSubmissionAsync(CancellationToken cancellationToken, Guid submissionId)
         {
-            var orgDetails = await _fundingClaimsReferenceDataService.GetOrganisationDetailsAsync(cancellationToken, ukprn);
-
-            if (orgDetails == null)
-            {
-                throw new Exception($"ukprn is not valid : {ukprn}");
-            }
-
-            var currentDateTime = _dateTimeProvider.GetNowUtc();
-
-            var contractsAllocations = await _fundingClaimsReferenceDataService.GetContractAllocationsAsync(cancellationToken, ukprn, academicYear);
             using (IFundingClaimsDataContext context = _fundingClaimsContextFactory())
             {
-                var draftFundingClaims = await context.FundingClaimsData.Where(x => x.Ukprn == ukprn && x.CollectionPeriod == collectionCode).ToListAsync();
+                var submission =
+                    await context.Submission.SingleOrDefaultAsync(
+                        x => x.SubmissionId == submissionId && x.IsSubmitted == false, cancellationToken);
 
-                _logger.LogInfo($"Got draft values for funding ");
-                var submissionId = Guid.NewGuid();
-
-                foreach (var value in draftFundingClaims)
+                if (submission == null)
                 {
-                    var contract = contractsAllocations?.FirstOrDefault(x =>
-                        x.FundingStreamPeriodCode.Equals(value.FundingStreamPeriodCode));
+                    _logger.LogError($"submission id : {submissionId} not found, can not proceed with submission");
+                    throw new ArgumentException(
+                        $"submission id : {submissionId} not found, can not proceed with submission");
+                }
+
+                submission.IsSubmitted = true;
+                submission.SubmittedDateTimeUtc = _dateTimeProvider.GetNowUtc();
+                submission.Declaration = true;
+                //submission.OrganisationIdentifier = orgDetails.Name
+
+                var contractsAllocations =
+                    await _fundingClaimsReferenceDataService.GetContractAllocationsAsync(
+                        cancellationToken,
+                        submission.Ukprn,
+                        submission.CollectionYear);
+
+                var fundingStreamPeriodCodes = context.SubmissionValue
+                    .Where(x => x.SubmissionId == submissionId)
+                    .Select(x => x.FundingStreamPeriodCode)
+                    .Distinct();
+
+                foreach (var value in fundingStreamPeriodCodes)
+                {
+                    var contract = contractsAllocations?.FirstOrDefault(x => x.FundingStreamPeriodCode.Equals(value));
 
                     if (contract != null)
                     {
-                        if (!context.FundingClaimMaxContractValues.Local.Any(x => x.SubmissionId == submissionId && x.FundingStreamPeriodCode == value.FundingStreamPeriodCode))
+                        context.SubmissionContractDetail.Add(new SubmissionContractDetail()
                         {
-                            context.FundingClaimMaxContractValues.Add(new Data.Entities.FundingClaimMaxContractValues()
-                            {
-                                SubmissionId = submissionId,
-                                FundingStreamPeriodCode = value.FundingStreamPeriodCode,
-                                MaximumContractValue = contract.MaximumContractValue,
-                            });
-                        }
-
-                        if (!context.FundingClaimsSubmissionFile.Local.Any(x => x.SubmissionId == submissionId))
-                        {
-                            context.FundingClaimsSubmissionFile.Add(new Data.Entities.FundingClaimsSubmissionFile()
-                            {
-                                SubmissionId = submissionId,
-                                Period = contract.Period,
-                                Ukprn = ukprn.ToString(),
-                                PeriodTypeCode = contract.PeriodTypeCode,
-                                OrganisationIdentifier = contract.OrganisationIdentifier,
-                                CollectionPeriod = collectionCode,
-                                IsHeProvider = orgDetails.IsHesaProvider,
-                                Declaration = true,
-                                SubmissionType = 2,
-                                ProviderName = orgDetails.Name,
-                                Allb24PlsMaximumContractValue = 0m,
-                                AsbMaximumContractValue = 0m,
-                                ClContractValue = 0m,
-                                DlsMaximumContractValue = 0m,
-                                Version = latestSubmissionVersion + 1,
-                                UpdatedOn = currentDateTime,
-                                UpdatedBy = orgDetails.Name,
-                            });
-                        }
-
-                        context.FundingClaimsSubmissionValues.Add(new Data.Entities.FundingClaimsSubmissionValues()
-                        {
-                            CollectionPeriod = collectionCode,
-                            ContractAllocationNumber = value.ContractAllocationNumber,
-                            DeliverableCode = value.DeliverableCode,
-                            DeliverableDescription = value.DeliverableDescription,
-                            ExceptionalAdjustments = value.ExceptionalAdjustments.GetValueOrDefault(),
-                            FundingStreamPeriodCode = value.FundingStreamPeriodCode,
-                            ForecastedDelivery = value.ForecastedDelivery.GetValueOrDefault(),
-                            DeliveryToDate = value.DeliveryToDate.GetValueOrDefault(),
-                            StudentNumbers = value.StudentNumbers.GetValueOrDefault(),
-                            TotalDelivery = value.TotalDelivery.GetValueOrDefault(),
                             SubmissionId = submissionId,
+                            FundingStreamPeriodCode = value,
+                            ContractValue = contract.MaximumContractValue,
                         });
                     }
                 }
 
-                await context.SaveChangesAsync();
-
-                _logger.LogInfo($"Successfully converted to funding claims submission for submission Id :{submissionId}");
-
-                try
-                {
-                    await _fundingClaimsMessagingService.SendMessageAsync(
-                            new MessageFundingClaimsSubmission
-                            {
-                                SubmissionId = submissionId,
-                            });
-                }
-                catch (Exception e)
-                {
-                    _logger.LogError($"Failed to send message to funding claims queue for submission Id :{submissionId}", e);
-                }
-
-                return submissionId.ToString();
+                await context.SaveChangesAsync(cancellationToken);
             }
-        }
 
-        public async Task<List<FundingClaimsSubmission>> GetSubmissionHistoryAsync(CancellationToken cancellationToken, long ukprn)
-        {
-            var result = new List<FundingClaimsSubmission>();
+            _logger.LogInfo($"Successfully converted to funding claims submission for submission Id :{submissionId}");
 
-            try
-            {
-                using (var context = _fundingClaimsContextFactory())
-                {
-                    var collections = await _collectionReferenceDataService.GetAllFundingClaimsCollectionsAsync(cancellationToken);
-
-                    var data = await context.FundingClaimsSubmissionFile.Where(x => x.Ukprn == ukprn.ToString())
-                        .OrderByDescending(x => x.UpdatedOn)
-                        .ToListAsync(cancellationToken);
-
-                    foreach (var item in data)
-                    {
-                        result.Add(new FundingClaimsSubmission()
-                        {
-                            Ukprn = ukprn,
-                            SubmissionId = item.SubmissionId.ToString(),
-                            CollectionCode = item.CollectionPeriod,
-                            SubmittedDateTime = item.UpdatedOn,
-                            IsSigned = item.IsSigned,
-                            CollectionDisplayName = collections.SingleOrDefault(x => x.CollectionCode.Equals(item.CollectionPeriod))?.DisplayName,
-                        });
-                    }
-                }
-
-                return result.OrderByDescending(x => x.SubmittedDateTime).ToList();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError($"Failed to get GetSubmissionHistoryAsync for ukprn : {ukprn}", e);
-                throw;
-            }
-        }
-
-        public async Task<int> GetLatestSubmissionVersionAsync(CancellationToken cancellationToken, long ukprn)
-        {
-            using (IFundingClaimsDataContext context = _fundingClaimsContextFactory())
-            {
-                var latestSubmission = await context.FundingClaimsSubmissionFile
-                    .Where(x => x.Ukprn == ukprn.ToString())
-                    .MaxAsync(x => (int?)x.Version, cancellationToken);
-
-                return latestSubmission.GetValueOrDefault();
-            }
+            return submissionId.ToString();
         }
     }
+
+    public async Task<List<FundingClaimsSubmission>> GetSubmissionHistoryAsync(CancellationToken cancellationToken, long ukprn)
+    {
+        var result = new List<FundingClaimsSubmission>();
+
+        try
+        {
+            using (var context = _fundingClaimsContextFactory())
+            {
+                var collections = await _collectionReferenceDataService.GetAllFundingClaimsCollectionsAsync(cancellationToken);
+
+                var data = await context.FundingClaimsSubmissionFile.Where(x => x.Ukprn == ukprn.ToString())
+                    .OrderByDescending(x => x.UpdatedOn)
+                    .ToListAsync(cancellationToken);
+
+                foreach (var item in data)
+                {
+                    result.Add(new FundingClaimsSubmission()
+                    {
+                        Ukprn = ukprn,
+                        SubmissionId = item.SubmissionId.ToString(),
+                        CollectionCode = item.CollectionPeriod,
+                        SubmittedDateTime = item.UpdatedOn,
+                        IsSigned = item.IsSigned,
+                        CollectionDisplayName = collections.SingleOrDefault(x => x.CollectionCode.Equals(item.CollectionPeriod))?.DisplayName,
+                    });
+                }
+            }
+
+            return result.OrderByDescending(x => x.SubmittedDateTime).ToList();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError($"Failed to get GetSubmissionHistoryAsync for ukprn : {ukprn}", e);
+            throw;
+        }
+    }
+
+    public async Task<int> GetLatestSubmissionVersionAsync(CancellationToken cancellationToken, long ukprn)
+    {
+        using (IFundingClaimsDataContext context = _fundingClaimsContextFactory())
+        {
+            var latestSubmission = await context.FundingClaimsSubmissionFile
+                .Where(x => x.Ukprn == ukprn.ToString())
+                .MaxAsync(x => (int?)x.Version, cancellationToken);
+
+            return latestSubmission.GetValueOrDefault();
+        }
+    }
+}
 }
