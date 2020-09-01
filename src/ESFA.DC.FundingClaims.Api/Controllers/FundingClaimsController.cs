@@ -147,7 +147,7 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
 
             try
             {
-                await _fundingClaimsService.SaveDraftAsync(cancellationToken, draftFundingClaims);
+                await _fundingClaimsService.SaveSubmissionAsync(cancellationToken, draftFundingClaims);
                 return Ok();
             }
             catch (Exception e)
@@ -158,33 +158,31 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
         }
 
         [HttpGet]
-        [Route("draft/{collectionCode}/{ukprn}")]
-        public async Task<IActionResult> GetDraftValuesAsync(CancellationToken cancellationToken, string collectionCode, long ukprn)
+        [Route("draft/{collectionName}/{ukprn}")]
+        public async Task<IActionResult> GetDraftValuesAsync(CancellationToken cancellationToken, string collectionName, long ukprn)
         {
-            _logger.LogInfo($"Get draft received for ukprn :{ukprn}, collection period : {collectionCode}");
-
-            if (ukprn == 0)
+            if (ukprn == 0 || string.IsNullOrEmpty(collectionName))
             {
                 return BadRequest();
             }
 
             try
             {
-                var data = await _fundingClaimsService.GetDraftAsync(cancellationToken, collectionCode, ukprn);
+                var data = await _fundingClaimsService.GetSubmissionDetailsAsync(cancellationToken, ukprn, null, collectionName);
                 return Ok(data);
             }
             catch (Exception e)
             {
-                _logger.LogError($"error occured to GetDraftValuesAsync data for ukprn : {ukprn}  collection period : {collectionCode} ", e);
+                _logger.LogError($"error occured to GetDraftValuesAsync data for ukprn : {ukprn}  collection Name : {collectionName} ", e);
                 return BadRequest();
             }
         }
 
         [HttpGet]
-        [Route("submit/{collectionCode}/{academicYear}/{ukprn}")]
-        public async Task<IActionResult> ConvertToSubmission(CancellationToken cancellationToken, string collectionCode, int academicYear, long ukprn)
+        [Route("submit/{collectionName}/{ukprn}")]
+        public async Task<IActionResult> ConvertToSubmission(CancellationToken cancellationToken, string collectionName, long ukprn)
         {
-            _logger.LogInfo($"ConvertToSubmission received for ukprn :{ukprn}, collection period : {collectionCode}");
+            _logger.LogInfo($"ConvertToSubmission received for ukprn :{ukprn}, collection Name : {collectionName}");
 
             if (ukprn == 0)
             {
@@ -193,14 +191,12 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
 
             try
             {
-                var latestSubmissionVersion = await _fundingClaimsService.GetLatestSubmissionVersionAsync(cancellationToken, ukprn);
-
-                var data = await _fundingClaimsService.ConvertToSubmissionAsync(cancellationToken, ukprn, latestSubmissionVersion, collectionCode, academicYear);
+                var data = await _fundingClaimsService.ConvertToSubmissionAsync(cancellationToken, ukprn, collectionName);
                 return Ok(data);
             }
             catch (Exception e)
             {
-                _logger.LogError($"error occured to ConvertToSubmission data for ukprn : {ukprn}  collection period : {collectionCode} ", e);
+                _logger.LogError($"error occured to ConvertToSubmission data for ukprn : {ukprn}  collection Name : {collectionName} ", e);
                 return BadRequest();
             }
         }
@@ -257,7 +253,7 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
 
             try
             {
-                var data = await _fundingClaimsService.GetSubmissionAsync(cancellationToken, new Guid(submissionId), ukprn);
+                var data = await _fundingClaimsService.GetSubmissionDetailsAsync(cancellationToken, ukprn, new Guid(submissionId));
                 return Ok(data);
             }
             catch (Exception e)
