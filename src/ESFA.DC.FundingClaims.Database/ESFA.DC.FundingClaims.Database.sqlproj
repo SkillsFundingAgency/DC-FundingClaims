@@ -61,7 +61,6 @@
     <Folder Include="dbo\Tables\" />
     <Folder Include="Reference" />
     <Folder Include="Security" />
-    <Folder Include="Draft" />
     <Folder Include="zzDeploymentProfiles\" />
     <Folder Include="ReferenceData" />
     <Folder Include="dbo\Stored Procedures\" />
@@ -69,8 +68,6 @@
   <ItemGroup>
     <Build Include="Reference\FundingClaimsProviderReferenceData.sql" />
     <Build Include="Security\Reference.sql" />
-    <Build Include="Security\Draft.sql" />
-    <Build Include="Draft\FundingClaimsData.sql" />
     <Build Include="Security\Role_DataProcessor.sql" />
     <Build Include="Security\User_DsciUser.sql" />
     <Build Include="Security\RoleMemberships.sql" />
@@ -85,12 +82,10 @@
     <Build Include="dbo\Tables\Submission.sql" />
     <Build Include="dbo\Tables\SubmissionContractDetail.sql" />
     <Build Include="dbo\Tables\SubmissionValue.sql" />
+    <Build Include="dbo\Tables\CollectionDetail.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="ESFA.DC.FundingClaims.Database.refactorlog" />
-  </ItemGroup>
-  <ItemGroup>
-    <Build Include="Security\Static.sql" />
   </ItemGroup>
   <ItemGroup>
     <SqlCmdVariable Include="BUILD_BRANCHNAME">

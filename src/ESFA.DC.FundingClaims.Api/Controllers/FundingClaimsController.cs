@@ -207,7 +207,7 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
         {
             try
             {
-                var result = await _fundingClaimsReferenceDataService.GetOrganisationDetailsAsync(cancellationToken,ukprn);
+                var result = await _fundingClaimsReferenceDataService.GetCofRemovalValueAsync(cancellationToken,ukprn);
                 return Ok(result);
             }
             catch (Exception e)

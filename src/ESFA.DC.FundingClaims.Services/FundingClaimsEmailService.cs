@@ -24,23 +24,23 @@ namespace ESFA.DC.FundingClaims.Services
             _dateTimeProvider = dateTimeProvider;
         }
 
-        public async Task<ICollection<string>> GetUnsubmittedClaimEmailAddressesAsync(CancellationToken cancellationToken, string collectionCode, string year, DateTime startDateTimeUtc)
+        public async Task<ICollection<string>> GetUnsubmittedClaimEmailAddressesAsync(CancellationToken cancellationToken, string collectionName, int year, DateTime startDateTimeUtc)
         {
             var yesterday = _dateTimeProvider.GetNowUtc().AddDays(-1);
 
             using (var fundingClaimsContext = _fundingClaimsContextFactory())
             {
-                var submittedProviders = await fundingClaimsContext.FundingClaimsSubmissionFile.Where(x =>
-                        x.Period == year &&
-                        x.CollectionPeriod == collectionCode)
+                var submittedProviders = await fundingClaimsContext.Submission.Where(x =>
+                        x.Collection.CollectionYear == year &&
+                        x.Collection.CollectionName == collectionName)
                     .Distinct()
-                    .Select(x => long.Parse(x.Ukprn))
+                    .Select(x => x.Ukprn)
                     .ToListAsync(cancellationToken);
 
-                var emailAddressesList = await fundingClaimsContext.FundingClaimsSupportingData
-                    .Where(c => c.CollectionCode == collectionCode &&
-                                c.LastUpdatedDateTimeUtc <= yesterday && c.LastUpdatedDateTimeUtc >= startDateTimeUtc
-                                && !submittedProviders.Contains(c.Ukprn))
+                var emailAddressesList = await fundingClaimsContext.ChangeLog
+                    .Where(c => c.Submission.Collection.CollectionName == collectionName &&
+                                c.UpdatedDateTimeUtc <= yesterday && c.UpdatedDateTimeUtc >= startDateTimeUtc
+                                && !submittedProviders.Contains(c.Submission.Ukprn))
                     .Select(x => x.UserEmailAddress)
                     .ToListAsync(cancellationToken);
 

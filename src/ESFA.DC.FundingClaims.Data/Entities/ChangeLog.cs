@@ -2,7 +2,7 @@
 
 namespace ESFA.DC.FundingClaims.Data.Entities
 {
-    public partial class FundingClaimsLog
+    public partial class ChangeLog
     {
         public int Id { get; set; }
 
@@ -11,5 +11,7 @@ namespace ESFA.DC.FundingClaims.Data.Entities
         public string UserEmailAddress { get; set; }
 
         public DateTime UpdatedDateTimeUtc { get; set; }
+
+        public virtual Submission Submission { get; set; }
     }
 }

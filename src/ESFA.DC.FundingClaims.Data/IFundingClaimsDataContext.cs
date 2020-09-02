@@ -14,9 +14,7 @@ namespace ESFA.DC.FundingClaims.Data
     {
         DbSet<DeliverableCode> DeliverableCode { get; set; }
 
-        DbSet<FundingClaimsData> FundingClaimsData { get; set; }
-
-        DbSet<FundingClaimsLog> FundingClaimsLog { get; set; }
+        DbSet<ChangeLog> ChangeLog { get; set; }
 
         DbSet<FundingClaimsProviderReferenceData> FundingClaimsProviderReferenceData { get; set; }
 
@@ -27,6 +25,8 @@ namespace ESFA.DC.FundingClaims.Data
         DbSet<SubmissionContractDetail> SubmissionContractDetail { get; set; }
 
         DbSet<SubmissionValue> SubmissionValue { get; set; }
+
+        DbSet<CollectionDetail> CollectionDetail { get; set; }
 
         int SaveChanges();
 

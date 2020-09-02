@@ -187,23 +187,6 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
             }
         }
 
-        public async Task<string> GetOrganisationNameAsync(CancellationToken cancellationToken, long ukprn)
-        {
-            try
-            {
-                using (var context = _organisationContextFactory())
-                {
-                    var orgEntity = await context.OrgDetails.FirstOrDefaultAsync(x => x.Ukprn == ukprn, cancellationToken);
-                    return orgEntity.Name ?? string.Empty
-                }
-            }
-            catch (Exception e)
-            {
-                _logger.LogError($"Failed to get GetOrganisationDetails for ukprn : {ukprn}", e);
-                throw;
-            }
-        }
-
         public async Task<IEnumerable<SummarisedActualDeliveryToDate>> GetDeliveryToDateValuesAsync(
                                                 CancellationToken cancellationToken, 
                                                 long ukprn, 

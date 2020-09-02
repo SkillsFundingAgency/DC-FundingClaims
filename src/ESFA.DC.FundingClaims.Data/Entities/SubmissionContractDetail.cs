@@ -10,8 +10,6 @@ namespace ESFA.DC.FundingClaims.Data.Entities
 
         public decimal ContractValue { get; set; }
 
-        public string ContractAllocationNumber { get; set; }
-
         public Guid SubmissionId { get; set; }
 
         public virtual Submission Submission { get; set; }

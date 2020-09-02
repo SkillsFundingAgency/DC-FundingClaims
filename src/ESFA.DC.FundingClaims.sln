@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ESFA.DC.FundingClaim.Console", "ESFA.DC.FundingClaim.Console\ESFA.DC.FundingClaim.Console.csproj", "{CE2225DE-6A88-46A8-A9C8-51F58D4A9835}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ESFA.DC.FundingClaims.Data", "ESFA.DC.FundingClaims.Data\ESFA.DC.FundingClaims.Data.csproj", "{048146BC-8701-40D0-8B38-CE856E1911E1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ESFA.DC.FundingClaims.Message", "ESFA.DC.FundingClaims.Message\ESFA.DC.FundingClaims.Message.csproj", "{7B575E0F-ED11-461B-96B8-77DDEF69B95A}"
@@ -58,10 +56,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CE2225DE-6A88-46A8-A9C8-51F58D4A9835}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CE2225DE-6A88-46A8-A9C8-51F58D4A9835}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CE2225DE-6A88-46A8-A9C8-51F58D4A9835}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CE2225DE-6A88-46A8-A9C8-51F58D4A9835}.Release|Any CPU.Build.0 = Release|Any CPU
 		{048146BC-8701-40D0-8B38-CE856E1911E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{048146BC-8701-40D0-8B38-CE856E1911E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{048146BC-8701-40D0-8B38-CE856E1911E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -137,7 +131,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{CE2225DE-6A88-46A8-A9C8-51F58D4A9835} = {1BB52596-424B-4344-857A-B493E5243E0B}
 		{5740665E-A69C-4990-B54B-8CC582964B24} = {1BB52596-424B-4344-857A-B493E5243E0B}
 		{F6FBD31D-D559-48E9-AAAD-918676606884} = {68856463-E8A1-48DB-B242-7DC89A01B5FB}
 		{13E199C0-F459-4339-9F01-FFEDB19C4AA2} = {68856463-E8A1-48DB-B242-7DC89A01B5FB}

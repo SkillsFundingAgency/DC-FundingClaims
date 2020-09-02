@@ -7,6 +7,7 @@ namespace ESFA.DC.FundingClaims.Data.Entities
     {
         public Submission()
         {
+            ChangeLog = new HashSet<ChangeLog>();
             SubmissionContractDetail = new HashSet<SubmissionContractDetail>();
             SubmissionValue = new HashSet<SubmissionValue>();
         }
@@ -15,9 +16,7 @@ namespace ESFA.DC.FundingClaims.Data.Entities
 
         public long Ukprn { get; set; }
 
-        public string CollectionName { get; set; }
-
-        public int CollectionYear { get; set; }
+        public int CollectionId { get; set; }
 
         public bool? Declaration { get; set; }
 
@@ -38,6 +37,10 @@ namespace ESFA.DC.FundingClaims.Data.Entities
         public string CreatedBy { get; set; }
 
         public DateTime CreatedDateTimeUtc { get; set; }
+
+        public virtual CollectionDetail Collection { get; set; }
+
+        public virtual ICollection<ChangeLog> ChangeLog { get; set; }
 
         public virtual ICollection<SubmissionContractDetail> SubmissionContractDetail { get; set; }
 

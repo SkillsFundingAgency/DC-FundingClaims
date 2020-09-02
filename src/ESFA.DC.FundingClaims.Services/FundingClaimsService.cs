@@ -97,7 +97,7 @@ namespace ESFA.DC.FundingClaims.Services
                 using (IFundingClaimsDataContext context = _fundingClaimsContextFactory())
                 {
                     var submission = await context.Submission.SingleOrDefaultAsync(
-                        x => x.CollectionName == fundingClaimsData.CollectionName &&
+                        x => x.Collection.CollectionName == fundingClaimsData.CollectionName &&
                              x.Ukprn == fundingClaimsData.Ukprn && x.IsSubmitted == false, cancellationToken);
 
                     if (submission == null)
@@ -106,8 +106,7 @@ namespace ESFA.DC.FundingClaims.Services
                         {
                             SubmissionId = Guid.NewGuid(),
                             Ukprn = fundingClaimsData.Ukprn,
-                            CollectionName = fundingClaimsData.CollectionName,
-                            CollectionYear = fundingClaimsData.CollectionYear,
+                            Collection = await context.CollectionDetail.SingleOrDefaultAsync(x => x.CollectionName == fundingClaimsData.CollectionName, cancellationToken),
                             CreatedBy = fundingClaimsData.UserName,
                             CreatedDateTimeUtc = _dateTimeProvider.GetNowUtc(),
                         };
@@ -123,8 +122,8 @@ namespace ESFA.DC.FundingClaims.Services
                             x.SubmissionId == submission.SubmissionId &&
                             fundingStreamPeriodCodes.Contains(x.FundingStreamPeriodCode)));
 
-                        context.FundingClaimsLog.RemoveRange(
-                            context.FundingClaimsLog.Where(f => f.SubmissionId == submission.SubmissionId));
+                        context.ChangeLog.RemoveRange(
+                            context.ChangeLog.Where(f => f.SubmissionId == submission.SubmissionId));
 
                         ////find and remove contract allocations
                         //context.SubmissionContractDetail.RemoveRange(context.SubmissionContractDetail.Where(x => x.SubmissionId == existingSubmission.SubmissionId && fundingStreamPeriodCodes.Contains(x.FundingStreamPeriodCode)));
@@ -155,8 +154,8 @@ namespace ESFA.DC.FundingClaims.Services
                     }
 
                     var today = _dateTimeProvider.GetNowUtc();
-                    await context.FundingClaimsLog.AddAsync(
-                        new FundingClaimsLog()
+                    await context.ChangeLog.AddAsync(
+                        new ChangeLog()
                         {
                             SubmissionId = submission.SubmissionId,
                             UserEmailAddress = fundingClaimsData.EmailAddress,
@@ -221,7 +220,7 @@ namespace ESFA.DC.FundingClaims.Services
                     await _fundingClaimsReferenceDataService.GetContractAllocationsAsync(
                         cancellationToken,
                         submission.Ukprn,
-                        submission.CollectionYear);
+                        submission.Collection.CollectionYear);
 
                 var fundingStreamPeriodCodes = context.SubmissionValue
                     .Where(x => x.SubmissionId == submission.SubmissionId)
@@ -266,7 +265,7 @@ namespace ESFA.DC.FundingClaims.Services
             {
                 using (var context = _fundingClaimsContextFactory())
                 {
-                    var collections = await _collectionReferenceDataService.GetAllFundingClaimsCollectionsAsync(cancellationToken);
+                    //var collections = await _collectionReferenceDataService.GetAllFundingClaimsCollectionsAsync(cancellationToken);
 
                     var data = await context.Submission.Where(x => x.Ukprn == ukprn && x.IsSubmitted == true)
                         .OrderByDescending(x => x.SubmittedDateTimeUtc)
@@ -278,10 +277,12 @@ namespace ESFA.DC.FundingClaims.Services
                         {
                             Ukprn = ukprn,
                             SubmissionId = item.SubmissionId.ToString(),
-                            CollectionName = item.CollectionName,
+                            CollectionName = item.Collection.CollectionName,
                             SubmittedDateTime = item.SubmittedDateTimeUtc.GetValueOrDefault(),
                             IsSigned = item.IsSigned,
-                            CollectionDisplayName = collections.SingleOrDefault(x => x.CollectionName.Equals(item.CollectionName))?.DisplayName,
+                            //TODO: Look into this
+                            //CollectionDisplayName = collections.SingleOrDefault(x => x.CollectionName.Equals(item.CollectionName))?.DisplayName,
+                            CollectionDisplayName = item.Collection.CollectionName,
                         });
                     }
                 }
@@ -314,7 +315,7 @@ namespace ESFA.DC.FundingClaims.Services
                 var query = context.Submission.Where(x => x.Ukprn == ukprn);
                 if (!string.IsNullOrEmpty(collectionName))
                 {
-                    query = query.Where(x => x.CollectionName == collectionName);
+                    query = query.Where(x => x.Collection.CollectionName == collectionName);
                 }
 
                 if (submissionId != null)
