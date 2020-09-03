@@ -40,6 +40,8 @@ namespace ESFA.DC.FundingClaims.Data.Entities
 
         public string UpdatedBy { get; set; }
 
+        public string DisplayTitle { get; set; }
+
         public virtual ICollection<Submission> Submission { get; set; }
     }
 }

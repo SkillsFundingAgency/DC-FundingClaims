@@ -62,11 +62,11 @@ namespace ESFA.DC.FundingClaims.Services
                         return null;
                     }
 
-                    var data = await context.SubmissionValue.Where(x => x.SubmissionId == submissionId)
+                    items = await context.SubmissionValue.Where(x => x.SubmissionId == submissionId)
                         .Select(x => new FundingClaimsDataItem()
                         {
                             ContractAllocationNumber = x.ContractAllocationNumber,
-                            DeliverableCode = x.DeliverableCodeId,
+                            DeliverableCode = x.DeliverableCode.DeliverableCodeId,
                             DeliverableDescription = x.DeliverableCode.Description,
                             DeliveryToDate = x.DeliveryToDate,
                             ExceptionalAdjustments = x.ExceptionalAdjustments,
@@ -265,26 +265,18 @@ namespace ESFA.DC.FundingClaims.Services
             {
                 using (var context = _fundingClaimsContextFactory())
                 {
-                    //var collections = await _collectionReferenceDataService.GetAllFundingClaimsCollectionsAsync(cancellationToken);
-
-                    var data = await context.Submission.Where(x => x.Ukprn == ukprn && x.IsSubmitted == true)
+                    result = await context.Submission.Where(x => x.Ukprn == ukprn && x.IsSubmitted == true)
                         .OrderByDescending(x => x.SubmittedDateTimeUtc)
-                        .ToListAsync(cancellationToken);
-
-                    foreach (var item in data)
-                    {
-                        result.Add(new FundingClaimsSubmission()
+                        .Select(item => new FundingClaimsSubmission()
                         {
                             Ukprn = ukprn,
                             SubmissionId = item.SubmissionId.ToString(),
                             CollectionName = item.Collection.CollectionName,
                             SubmittedDateTime = item.SubmittedDateTimeUtc.GetValueOrDefault(),
                             IsSigned = item.IsSigned,
-                            //TODO: Look into this
-                            //CollectionDisplayName = collections.SingleOrDefault(x => x.CollectionName.Equals(item.CollectionName))?.DisplayName,
-                            CollectionDisplayName = item.Collection.CollectionName,
-                        });
-                    }
+                            CollectionDisplayName = item.Collection.DisplayTitle,
+                        })
+                        .ToListAsync(cancellationToken);
                 }
 
                 return result.OrderByDescending(x => x.SubmittedDateTime).ToList();

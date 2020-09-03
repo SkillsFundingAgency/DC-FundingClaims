@@ -9,7 +9,7 @@
 	[StudentNumbers] [int] NOT NULL,
 	[FundingStreamPeriodCode] varchar(50) NOT NULL,
 	[ContractAllocationNumber] varchar(100) NOT NULL,
- CONSTRAINT [PK_FundingClaimsSubmissionValues] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_SubmissionValue] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]

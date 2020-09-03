@@ -10,7 +10,6 @@
     <PackageReference Include="ESFA.DC.DateTimeProvider.Interface" Version="0.1.6-beta0001" />
     <PackageReference Include="ESFA.DC.ILR1819.Database.EF" Version="0.1.381" />
     <PackageReference Include="ESFA.DC.ILR1920.Database.EF" Version="0.0.566" />
-    <PackageReference Include="ESFA.DC.JobQueueManager.Data" Version="0.2.75-beta0001" />
     <PackageReference Include="ESFA.DC.Logging.Interfaces" Version="0.1.8-beta0001" />
     <PackageReference Include="ESFA.DC.ReferenceData.FCS.Model" Version="0.2.789" />
     <PackageReference Include="ESFA.DC.Summarisation.Model" Version="0.0.686" />

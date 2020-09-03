@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ESFA.DC.FundingClaims.Data
 {
-    public partial class FundingClaimsDataContext : DbContext
+    public partial class FundingClaimsDataContext : DbContext, IFundingClaimsDataContext
     {
         public FundingClaimsDataContext()
         {
@@ -35,7 +35,7 @@ namespace ESFA.DC.FundingClaims.Data
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=.;Database=FundingClaims_New2;Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer("Server=.;Database=FC_TST_NEW;Trusted_Connection=True;");
             }
         }
 
@@ -76,6 +76,10 @@ namespace ESFA.DC.FundingClaims.Data
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(CONVERT([datetime],'01 JAN 1900'))");
 
+                entity.Property(e => e.DisplayTitle)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
                 entity.Property(e => e.HelpdeskOpenDateUtc)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(CONVERT([datetime],'01 JAN 1900'))");
@@ -99,13 +103,15 @@ namespace ESFA.DC.FundingClaims.Data
 
             modelBuilder.Entity<DeliverableCode>(entity =>
             {
-                entity.Property(e => e.DeliverableCodeId).ValueGeneratedNever();
-
-                entity.Property(e => e.CollectionName).HasMaxLength(50);
+                entity.Property(e => e.DeliverableCodeId).HasColumnName("DeliverableCodeId");
 
                 entity.Property(e => e.Description)
                     .IsRequired()
                     .HasMaxLength(1000);
+
+                entity.Property(e => e.FundingStreamPeriodCode)
+                    .IsRequired()
+                    .HasMaxLength(50);
             });
 
             modelBuilder.Entity<FundingClaimsProviderReferenceData>(entity =>

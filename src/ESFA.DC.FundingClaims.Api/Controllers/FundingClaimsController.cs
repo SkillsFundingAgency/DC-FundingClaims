@@ -293,10 +293,10 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
             return await _collectionReferenceDataService.GetFundingClaimsCollectionAsync(cancellationToken, dateTimeUtc);
         }
 
-        [HttpGet("collection/code/{collectionCode}")]
-        public async Task<FundingClaimsCollection> GetFundingClaimsCollection(CancellationToken cancellationToken, string collectionCode)
+        [HttpGet("collection/name/{collectionName}")]
+        public async Task<FundingClaimsCollection> GetFundingClaimsCollection(CancellationToken cancellationToken, string collectionName)
         {
-            return await _collectionReferenceDataService.GetFundingClaimsCollectionAsync(cancellationToken, collectionCode);
+            return await _collectionReferenceDataService.GetFundingClaimsCollectionAsync(cancellationToken, collectionName);
         }
     }
 }
