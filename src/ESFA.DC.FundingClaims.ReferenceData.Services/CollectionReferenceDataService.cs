@@ -97,7 +97,6 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
             {
                 CollectionId = data.CollectionId,
                 CollectionYear = data.CollectionYear,
-                CollectionCode = data.CollectionCode,
                 RequiresSignature = data.RequiresSignature.GetValueOrDefault(),
                 SignatureCloseDateUtc = data.SignatureCloseDateUtc,
                 SubmissionOpenDateUtc = data.SubmissionOpenDateUtc,

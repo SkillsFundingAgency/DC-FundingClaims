@@ -16,8 +16,6 @@ namespace ESFA.DC.FundingClaims.Model
 
         public bool? RequiresSignature { get; set; }
 
-        public string CollectionCode { get; set; }
-
         public int SummarisedPeriodFrom { get; set; }
 
         public int SummarisedPeriodTo { get; set; }
