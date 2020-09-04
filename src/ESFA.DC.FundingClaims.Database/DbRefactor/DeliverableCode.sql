@@ -7,7 +7,7 @@
 BEGIN
 
     INSERT INTO [dbo].[DeliverableCode]
-		([DeliverableCode]
+		([DeliverableCodeId]
 		,[Description]
       ,[FundingStreamPeriodCode] )
 

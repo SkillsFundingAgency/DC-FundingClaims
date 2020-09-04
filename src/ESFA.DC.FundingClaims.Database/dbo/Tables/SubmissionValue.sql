@@ -7,8 +7,8 @@
 	[ExceptionalAdjustments] [decimal](16, 2) NOT NULL,
 	[TotalDelivery] [decimal](16, 2) NOT NULL,
 	[StudentNumbers] [int] NOT NULL,
-	[FundingStreamPeriodCode] varchar(50) NOT NULL,
-	[ContractAllocationNumber] varchar(100) NOT NULL,
+	[FundingStreamPeriodCode] [varchar](50) NOT NULL,
+	[ContractAllocationNumber] [varchar](100) NOT NULL,
  CONSTRAINT [PK_SubmissionValue] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -29,15 +29,17 @@ ALTER TABLE [dbo].[SubmissionValue] ADD  CONSTRAINT [DF__FundingCl__Stude__4BAC3
 GO
 
 ALTER TABLE [dbo].[SubmissionValue]  WITH CHECK ADD  CONSTRAINT [FK_SubmissionValue_DeliverableCode] FOREIGN KEY([DeliverableCodeId])
-REFERENCES [dbo].[DeliverableCode] ([DeliverableCodeId])
+REFERENCES [dbo].[DeliverableCode] ([Id])
 GO
 
 ALTER TABLE [dbo].[SubmissionValue] CHECK CONSTRAINT [FK_SubmissionValue_DeliverableCode]
 GO
 
-ALTER TABLE [dbo].[SubmissionValue]  WITH CHECK ADD  CONSTRAINT [FK_SubmissionValue_Submission] FOREIGN KEY([SubmissionId])
+ALTER TABLE [dbo].[SubmissionValue]  WITH NOCHECK ADD  CONSTRAINT [FK_SubmissionValue_Submission] FOREIGN KEY([SubmissionId])
 REFERENCES [dbo].[Submission] ([SubmissionId])
 GO
 
 ALTER TABLE [dbo].[SubmissionValue] CHECK CONSTRAINT [FK_SubmissionValue_Submission]
 GO
+
+

@@ -27,7 +27,7 @@ BEGIN
       ,[ContractAllocationNumber]
   FROM 	 [dbo].[FundingClaimsSubmissionValues] sv
   JOIN dbo.[DeliverableCode] c
-  on c.[DeliverableCode] = sv.DeliverableCode
+  on c.[DeliverableCodeId] = sv.DeliverableCode
   And c.[FundingStreamPeriodCode] = sv.[FundingStreamPeriodCode]
   Where contractAllocationNumber is not null
 
