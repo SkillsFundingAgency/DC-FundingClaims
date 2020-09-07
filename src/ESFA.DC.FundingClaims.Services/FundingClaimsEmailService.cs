@@ -32,7 +32,8 @@ namespace ESFA.DC.FundingClaims.Services
             {
                 var submittedProviders = await fundingClaimsContext.Submission.Where(x =>
                         x.Collection.CollectionYear == year &&
-                        x.Collection.CollectionName == collectionName)
+                        x.Collection.CollectionName == collectionName &&
+                        x.IsSubmitted)
                     .Distinct()
                     .Select(x => x.Ukprn)
                     .ToListAsync(cancellationToken);
