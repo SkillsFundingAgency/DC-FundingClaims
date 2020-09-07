@@ -66,8 +66,8 @@ namespace ESFA.DC.FundingClaims.Services
                         .Select(x => new FundingClaimsDataItem()
                         {
                             ContractAllocationNumber = x.ContractAllocationNumber,
-                            DeliverableCode = x.DeliverableCode.DeliverableCodeId,
-                            DeliverableDescription = x.DeliverableCode.Description,
+                            DeliverableCode = x.FundingStreamPeriodDeliverableCode.DeliverableCode,
+                            DeliverableDescription = x.FundingStreamPeriodDeliverableCode.Description,
                             DeliveryToDate = x.DeliveryToDate,
                             ExceptionalAdjustments = x.ExceptionalAdjustments,
                             ForecastedDelivery = x.ForecastedDelivery,
@@ -100,7 +100,7 @@ namespace ESFA.DC.FundingClaims.Services
 
                     var submission = await GetSubmissionAsync(cancellationToken, context, fundingClaimsData.Ukprn, null, fundingClaimsData.CollectionName, false);
 
-                    var deliverableCodes = await context.DeliverableCode.ToListAsync(cancellationToken);
+                    var deliverableCodes = await context.FundingStreamPeriodDeliverableCode.ToListAsync(cancellationToken);
 
                     if (submission == null)
                     {
@@ -140,7 +140,7 @@ namespace ESFA.DC.FundingClaims.Services
 
                     foreach (var value in fundingClaimsData.FundingClaimsDataItems)
                     {
-                        var deliverableCode = deliverableCodes.Single(x => x.DeliverableCodeId == value.DeliverableCode && x.FundingStreamPeriodCode == value.FundingStreamPeriodCode);
+                        var deliverableCode = deliverableCodes.Single(x => x.DeliverableCode == value.DeliverableCode && x.FundingStreamPeriodCode == value.FundingStreamPeriodCode);
 
                         submission.SubmissionValue.Add(new SubmissionValue()
                         {
@@ -152,7 +152,7 @@ namespace ESFA.DC.FundingClaims.Services
                             DeliveryToDate = value.DeliveryToDate.GetValueOrDefault(),
                             StudentNumbers = value.StudentNumbers.GetValueOrDefault(),
                             TotalDelivery = value.TotalDelivery.GetValueOrDefault(),
-                            DeliverableCode = deliverableCode,
+                            FundingStreamPeriodDeliverableCode = deliverableCode,
                         });
                     }
 

@@ -20,7 +20,7 @@ GO
 RAISERROR('		   Ref Data',10,1) WITH NOWAIT;
 	:r .\ReferenceData\CollectionDetail.sql
 	:r .\DbRefactor\Submission.sql
-	:r .\DbRefactor\DeliverableCode.sql
+	:r .\DbRefactor\FundingStreamPeriodDeliverableCode.sql
 	:r .\DbRefactor\SubmissionContractDetail.sql
 	:r .\DbRefactor\SubmissionValue.sql
 GO

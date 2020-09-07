@@ -2,16 +2,16 @@
 
 namespace ESFA.DC.FundingClaims.Data.Entities
 {
-    public partial class DeliverableCode
+    public partial class FundingStreamPeriodDeliverableCode
     {
-        public DeliverableCode()
+        public FundingStreamPeriodDeliverableCode()
         {
             SubmissionValue = new HashSet<SubmissionValue>();
         }
 
         public int Id { get; set; }
 
-        public int DeliverableCodeId { get; set; }
+        public int DeliverableCode { get; set; }
 
         public string Description { get; set; }
 

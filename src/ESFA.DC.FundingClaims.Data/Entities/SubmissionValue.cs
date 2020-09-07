@@ -24,7 +24,7 @@ namespace ESFA.DC.FundingClaims.Data.Entities
 
         public string ContractAllocationNumber { get; set; }
 
-        public virtual DeliverableCode DeliverableCode { get; set; }
+        public virtual FundingStreamPeriodDeliverableCode FundingStreamPeriodDeliverableCode { get; set; }
 
         public virtual Submission Submission { get; set; }
     }

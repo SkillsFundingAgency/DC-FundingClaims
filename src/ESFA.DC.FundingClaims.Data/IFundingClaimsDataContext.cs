@@ -12,7 +12,7 @@ namespace ESFA.DC.FundingClaims.Data
 {
     public interface IFundingClaimsDataContext : IDisposable
     {
-        DbSet<DeliverableCode> DeliverableCode { get; set; }
+        DbSet<FundingStreamPeriodDeliverableCode> FundingStreamPeriodDeliverableCode { get; set; }
 
         DbSet<ChangeLog> ChangeLog { get; set; }
 

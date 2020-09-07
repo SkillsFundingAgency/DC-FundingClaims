@@ -28,11 +28,11 @@ GO
 ALTER TABLE [dbo].[SubmissionValue] ADD  CONSTRAINT [DF__FundingCl__Stude__4BAC3F29]  DEFAULT ((0)) FOR [StudentNumbers]
 GO
 
-ALTER TABLE [dbo].[SubmissionValue]  WITH CHECK ADD  CONSTRAINT [FK_SubmissionValue_DeliverableCode] FOREIGN KEY([DeliverableCodeId])
-REFERENCES [dbo].[DeliverableCode] ([Id])
+ALTER TABLE [dbo].[SubmissionValue]  WITH CHECK ADD  CONSTRAINT [FK_SubmissionValue_FundingStreamPeriodDeliverableCode] FOREIGN KEY([DeliverableCodeId])
+REFERENCES [dbo].[FundingStreamPeriodDeliverableCode] (Id)
 GO
 
-ALTER TABLE [dbo].[SubmissionValue] CHECK CONSTRAINT [FK_SubmissionValue_DeliverableCode]
+ALTER TABLE [dbo].[SubmissionValue] CHECK CONSTRAINT [FK_SubmissionValue_FundingStreamPeriodDeliverableCode]
 GO
 
 ALTER TABLE [dbo].[SubmissionValue]  WITH NOCHECK ADD  CONSTRAINT [FK_SubmissionValue_Submission] FOREIGN KEY([SubmissionId])

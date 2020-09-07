@@ -78,7 +78,7 @@
     <None Include="z.ExtendedProperties.sql" />
     <Build Include="dbo\Stored Procedures\GetLatestFundingClaims.sql" />
     <Build Include="dbo\Tables\SigningNotificationFeed.sql" />
-    <Build Include="dbo\Tables\DeliverableCode.sql" />
+    <Build Include="dbo\Tables\FundingStreamPeriodDeliverableCode.sql" />
     <Build Include="dbo\Tables\ChangeLog.sql" />
     <Build Include="dbo\Tables\Submission.sql" />
     <Build Include="dbo\Tables\SubmissionContractDetail.sql" />
@@ -96,7 +96,7 @@
     <None Include="DbRefactor\SubmissionContractDetail.sql">
       <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>
     </None>
-    <None Include="DbRefactor\DeliverableCode.sql" />
+    <None Include="DbRefactor\FundingStreamPeriodDeliverableCode.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="ESFA.DC.FundingClaims.Database.refactorlog" />

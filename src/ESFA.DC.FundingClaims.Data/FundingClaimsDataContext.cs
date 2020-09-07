@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ESFA.DC.FundingClaims.Data
 {
-    public partial class FundingClaimsDataContext : DbContext, IFundingClaimsDataContext
+    public partial class FundingClaimsDataContext : DbContext
     {
         public FundingClaimsDataContext()
         {
@@ -18,9 +18,9 @@ namespace ESFA.DC.FundingClaims.Data
 
         public virtual DbSet<CollectionDetail> CollectionDetail { get; set; }
 
-        public virtual DbSet<DeliverableCode> DeliverableCode { get; set; }
-
         public virtual DbSet<FundingClaimsProviderReferenceData> FundingClaimsProviderReferenceData { get; set; }
+
+        public virtual DbSet<FundingStreamPeriodDeliverableCode> FundingStreamPeriodDeliverableCode { get; set; }
 
         public virtual DbSet<SigningNotificationFeed> SigningNotificationFeed { get; set; }
 
@@ -35,7 +35,7 @@ namespace ESFA.DC.FundingClaims.Data
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=.;Database=FC_TST_NEW;Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer("Server=.;Database=FC_Clean;Trusted_Connection=True;");
             }
         }
 
@@ -101,19 +101,6 @@ namespace ESFA.DC.FundingClaims.Data
                     .HasDefaultValueSql("('DataMigration')");
             });
 
-            modelBuilder.Entity<DeliverableCode>(entity =>
-            {
-                entity.Property(e => e.DeliverableCodeId).HasColumnName("DeliverableCodeId");
-
-                entity.Property(e => e.Description)
-                    .IsRequired()
-                    .HasMaxLength(1000);
-
-                entity.Property(e => e.FundingStreamPeriodCode)
-                    .IsRequired()
-                    .HasMaxLength(50);
-            });
-
             modelBuilder.Entity<FundingClaimsProviderReferenceData>(entity =>
             {
                 entity.HasKey(e => e.Ukprn);
@@ -127,6 +114,17 @@ namespace ESFA.DC.FundingClaims.Data
                 entity.Property(e => e.AebcClallocation)
                     .HasColumnName("AEBC-CLAllocation")
                     .HasColumnType("decimal(10, 2)");
+            });
+
+            modelBuilder.Entity<FundingStreamPeriodDeliverableCode>(entity =>
+            {
+                entity.Property(e => e.Description)
+                    .IsRequired()
+                    .HasMaxLength(1000);
+
+                entity.Property(e => e.FundingStreamPeriodCode)
+                    .IsRequired()
+                    .HasMaxLength(50);
             });
 
             modelBuilder.Entity<SigningNotificationFeed>(entity =>
@@ -199,11 +197,11 @@ namespace ESFA.DC.FundingClaims.Data
 
                 entity.Property(e => e.TotalDelivery).HasColumnType("decimal(16, 2)");
 
-                entity.HasOne(d => d.DeliverableCode)
+                entity.HasOne(d => d.FundingStreamPeriodDeliverableCode)
                     .WithMany(p => p.SubmissionValue)
                     .HasForeignKey(d => d.DeliverableCodeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_SubmissionValue_DeliverableCode");
+                    .HasConstraintName("FK_SubmissionValue_FundingStreamPeriodDeliverableCode");
 
                 entity.HasOne(d => d.Submission)
                     .WithMany(p => p.SubmissionValue)

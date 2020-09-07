@@ -2,12 +2,12 @@
                  FROM INFORMATION_SCHEMA.TABLES 
                  WHERE TABLE_SCHEMA = 'dbo' 
                  AND  TABLE_NAME = 'FundingClaimsSubmissionValues')
-                AND NOT EXISTS (SELECT TOP 1 * FROM    [DeliverableCode]))
+                AND NOT EXISTS (SELECT TOP 1 * FROM  FundingStreamPeriodDeliverableCode))
 
 BEGIN
 
-    INSERT INTO [dbo].[DeliverableCode]
-		([DeliverableCodeId]
+    INSERT INTO [dbo].[FundingStreamPeriodDeliverableCode]
+		([DeliverableCode]
 		,[Description]
       ,[FundingStreamPeriodCode] )
 
