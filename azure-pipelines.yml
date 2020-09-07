@@ -130,7 +130,7 @@ stages:
         projects: '**/*.FundingClaims.Api.csproj'
         arguments: '--configuration ${{ parameters.BuildConfiguration }} --no-build -p:version="$(Build.BuildNumber)" -p:FileVersion="$(Build.BuildNumber)" --output "$(Build.ArtifactStagingDirectory)\Web\API"'
 
-      - task: DotNetCoreCLI@2
+    - task: DotNetCoreCLI@2
       displayName: 'Build WebJob - FundingClaim.Consol'
       inputs:
         command: publish
