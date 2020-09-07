@@ -130,18 +130,7 @@ stages:
         projects: '**/*.FundingClaims.Api.csproj'
         arguments: '--configuration ${{ parameters.BuildConfiguration }} --no-build -p:version="$(Build.BuildNumber)" -p:FileVersion="$(Build.BuildNumber)" --output "$(Build.ArtifactStagingDirectory)\Web\API"'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Build WebJob - FundingClaim.Consol'
-      inputs:
-        command: publish
-        configuration: '${{ parameters.BuildConfiguration }}'
-        publishWebProjects: false
-        zipAfterPublish: true
-        nobuild: true
-        projects: '**/*.FundingClaim.Console.csproj'
-        arguments: '--configuration ${{ parameters.BuildConfiguration }} --no-build -p:version="$(Build.BuildNumber)" -p:FileVersion="$(Build.BuildNumber)" --output "$(Build.SourcesDirectory)\tmp\app_Data\Jobs\Continuous\ESFA.DC.FundingClaim.Console"'
-        
-    - task: DotNetCoreCLI@2
+      - task: DotNetCoreCLI@2
       displayName: 'Build WebJob - FundingClaim.Consol'
       inputs:
         command: publish
