@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ESFA.DC.FundingClaims.Data
 {
-    public partial class FundingClaimsDataContext : DbContext
+    public partial class FundingClaimsDataContext : DbContext, IFundingClaimsDataContext
     {
         public FundingClaimsDataContext()
         {
