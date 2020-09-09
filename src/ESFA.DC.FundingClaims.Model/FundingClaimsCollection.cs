@@ -29,5 +29,11 @@ namespace ESFA.DC.FundingClaims.Model
         public string DisplayName { get; set; }
 
         public bool IsOpenForSubmission { get; set; }
+
+        public string UpdatedBy { get; set; }
+
+        public DateTime DateTimeUpdatedUtc { get; set; }
+
+        public DateTime HelpdeskOpenDateUtc { get; set; }
     }
 }
