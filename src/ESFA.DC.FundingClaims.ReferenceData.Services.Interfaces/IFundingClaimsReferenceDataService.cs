@@ -12,8 +12,6 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces
 
         Task<List<Ilr16To19FundingClaim>> Get1619FundingClaimDetailsAsync(CancellationToken cancellationToken, long ukprn);
 
-        Task<ProviderDetails> GetOrganisationDetailsAsync(CancellationToken cancellationToken, long ukprn);
-
         Task<ProviderReferenceData> GetProviderReferenceDataAsync(CancellationToken cancellationToken, long ukprn);
 
         Task<ProviderReferenceData> GetProviderReferenceDataAsync(CancellationToken cancellationToken, long ukprn, int collectionYear);

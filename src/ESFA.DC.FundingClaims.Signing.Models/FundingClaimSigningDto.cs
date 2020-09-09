@@ -11,7 +11,7 @@ namespace ESFA.DC.FundingClaims.Signing.Models
             FundingClaimId = fundingClaimId;
         }
 
-        public string Ukprn { get; set; }
+        public long Ukprn { get; set; }
 
         public bool IsSigned { get; set; }
 
@@ -23,7 +23,7 @@ namespace ESFA.DC.FundingClaims.Signing.Models
 
         public DateTime FeedDateTimeUtc { get; set; }
 
-        public string Period { get; set; }
+        public string CollectionName { get; set; }
 
         public int PageNumber { get; set; }
     }

@@ -14,30 +14,28 @@ namespace ESFA.DC.FundingClaims.Data
         {
         }
 
-        public virtual DbSet<FundingClaimDetails> FundingClaimDetails { get; set; }
+        public virtual DbSet<ChangeLog> ChangeLog { get; set; }
 
-        public virtual DbSet<FundingClaimMaxContractValues> FundingClaimMaxContractValues { get; set; }
-
-        public virtual DbSet<FundingClaimsData> FundingClaimsData { get; set; }
+        public virtual DbSet<CollectionDetail> CollectionDetail { get; set; }
 
         public virtual DbSet<FundingClaimsProviderReferenceData> FundingClaimsProviderReferenceData { get; set; }
 
-        public virtual DbSet<FundingClaimsSubmissionFile> FundingClaimsSubmissionFile { get; set; }
-
-        public virtual DbSet<FundingClaimsSubmissionValues> FundingClaimsSubmissionValues { get; set; }
-
-        public virtual DbSet<FundingClaimsSupportingData> FundingClaimsSupportingData { get; set; }
+        public virtual DbSet<FundingStreamPeriodDeliverableCode> FundingStreamPeriodDeliverableCode { get; set; }
 
         public virtual DbSet<SigningNotificationFeed> SigningNotificationFeed { get; set; }
 
-        public virtual DbSet<SubmissionTypes> SubmissionTypes { get; set; }
+        public virtual DbSet<Submission> Submission { get; set; }
+
+        public virtual DbSet<SubmissionContractDetail> SubmissionContractDetail { get; set; }
+
+        public virtual DbSet<SubmissionValue> SubmissionValue { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=.;Database=FundingClaims_Live;Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer("Server=.;Database=FC_Clean;Trusted_Connection=True;");
             }
         }
 
@@ -45,53 +43,62 @@ namespace ESFA.DC.FundingClaims.Data
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
-            modelBuilder.Entity<FundingClaimDetails>(entity =>
+            modelBuilder.Entity<ChangeLog>(entity =>
             {
-                entity.HasKey(e => e.DataCollectionKey);
+                entity.Property(e => e.UpdatedDateTimeUtc).HasColumnType("datetime");
 
-                entity.Property(e => e.DataCollectionKey)
-                    .HasMaxLength(50)
-                    .ValueGeneratedNever();
+                entity.Property(e => e.UserEmailAddress)
+                    .IsRequired()
+                    .HasMaxLength(320);
 
-                entity.Property(e => e.SignatureCloseDate).HasColumnType("datetime");
-
-                entity.Property(e => e.SubmissionCloseDate).HasColumnType("datetime");
-
-                entity.Property(e => e.SubmissionOpenDate).HasColumnType("datetime");
+                entity.HasOne(d => d.Submission)
+                    .WithMany(p => p.ChangeLog)
+                    .HasForeignKey(d => d.SubmissionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ChangeLog_Submission");
             });
 
-            modelBuilder.Entity<FundingClaimMaxContractValues>(entity =>
+            modelBuilder.Entity<CollectionDetail>(entity =>
             {
-                entity.Property(e => e.FundingStreamPeriodCode).HasMaxLength(50);
+                entity.HasIndex(e => e.CollectionId)
+                    .HasName("UQ__Collecti__7DE6BC05C85E8FAD")
+                    .IsUnique();
 
-                entity.Property(e => e.MaximumContractValue).HasColumnType("decimal(16, 2)");
-            });
-
-            modelBuilder.Entity<FundingClaimsData>(entity =>
-            {
-                entity.ToTable("FundingClaimsData", "Draft");
-
-                entity.Property(e => e.CollectionPeriod)
+                entity.Property(e => e.CollectionCode)
                     .IsRequired()
                     .HasMaxLength(50);
 
-                entity.Property(e => e.ContractAllocationNumber)
-                    .HasColumnName("contractAllocationNumber")
+                entity.Property(e => e.CollectionName)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.DateTimeUpdatedUtc)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(CONVERT([datetime],'01 JAN 1900'))");
+
+                entity.Property(e => e.DisplayTitle)
+                    .IsRequired()
                     .HasMaxLength(100);
 
-                entity.Property(e => e.DeliverableDescription)
+                entity.Property(e => e.HelpdeskOpenDateUtc)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(CONVERT([datetime],'01 JAN 1900'))");
+
+                entity.Property(e => e.SignatureCloseDateUtc).HasColumnType("datetime");
+
+                entity.Property(e => e.SubmissionCloseDateUtc).HasColumnType("datetime");
+
+                entity.Property(e => e.SubmissionOpenDateUtc).HasColumnType("datetime");
+
+                entity.Property(e => e.SummarisedReturnPeriod)
                     .IsRequired()
-                    .HasMaxLength(1000);
+                    .HasMaxLength(10);
 
-                entity.Property(e => e.DeliveryToDate).HasColumnType("decimal(10, 2)");
-
-                entity.Property(e => e.ExceptionalAdjustments).HasColumnType("decimal(10, 2)");
-
-                entity.Property(e => e.ForecastedDelivery).HasColumnType("decimal(10, 2)");
-
-                entity.Property(e => e.FundingStreamPeriodCode).HasMaxLength(50);
-
-                entity.Property(e => e.TotalDelivery).HasColumnType("decimal(12, 2)");
+                entity.Property(e => e.UpdatedBy)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasDefaultValueSql("('DataMigration')");
             });
 
             modelBuilder.Entity<FundingClaimsProviderReferenceData>(entity =>
@@ -109,130 +116,98 @@ namespace ESFA.DC.FundingClaims.Data
                     .HasColumnType("decimal(10, 2)");
             });
 
-            modelBuilder.Entity<FundingClaimsSubmissionFile>(entity =>
+            modelBuilder.Entity<FundingStreamPeriodDeliverableCode>(entity =>
             {
-                entity.HasKey(e => new { e.SubmissionId, e.CollectionPeriod, e.SubmissionType })
-                    .HasName("PK_SubmissionID");
-
-                entity.HasIndex(e => new { e.Ukprn, e.CollectionPeriod })
-                    .HasName("IX_Ukprn_CollectionPeriod");
-
-                entity.Property(e => e.CollectionPeriod).HasMaxLength(50);
-
-                entity.Property(e => e.Allb24PlsMaximumContractValue).HasColumnType("decimal(16, 2)");
-
-                entity.Property(e => e.AsbMaximumContractValue).HasColumnType("decimal(16, 2)");
-
-                entity.Property(e => e.ClContractValue).HasColumnType("decimal(16, 2)");
-
-                entity.Property(e => e.DlsMaximumContractValue).HasColumnType("decimal(16, 2)");
-
-                entity.Property(e => e.OrganisationIdentifier)
-                    .HasColumnName("organisationIdentifier")
-                    .HasMaxLength(100);
-
-                entity.Property(e => e.Period)
-                    .HasColumnName("period")
-                    .HasMaxLength(100);
-
-                entity.Property(e => e.PeriodTypeCode)
-                    .HasColumnName("periodTypeCode")
-                    .HasMaxLength(100);
-
-                entity.Property(e => e.ProviderName)
-                    .IsRequired()
-                    .HasMaxLength(250);
-
-                entity.Property(e => e.SignedOn).HasColumnType("datetime");
-
-                entity.Property(e => e.Ukprn)
-                    .IsRequired()
-                    .HasColumnName("UKPRN")
-                    .HasMaxLength(10);
-
-                entity.Property(e => e.UpdatedBy)
-                    .IsRequired()
-                    .HasMaxLength(250);
-
-                entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
-
-                entity.HasOne(d => d.SubmissionTypeNavigation)
-                    .WithMany(p => p.FundingClaimsSubmissionFile)
-                    .HasForeignKey(d => d.SubmissionType)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_SubmissionType");
-            });
-
-            modelBuilder.Entity<FundingClaimsSubmissionValues>(entity =>
-            {
-                entity.Property(e => e.CollectionPeriod)
-                    .IsRequired()
-                    .HasMaxLength(50);
-
-                entity.Property(e => e.ContractAllocationNumber)
-                    .HasColumnName("contractAllocationNumber")
-                    .HasMaxLength(100);
-
-                entity.Property(e => e.DeliverableDescription)
+                entity.Property(e => e.Description)
                     .IsRequired()
                     .HasMaxLength(1000);
 
-                entity.Property(e => e.DeliveryToDate)
-                    .HasColumnType("decimal(10, 2)")
-                    .HasDefaultValueSql("((0))");
-
-                entity.Property(e => e.ExceptionalAdjustments)
-                    .HasColumnType("decimal(10, 2)")
-                    .HasDefaultValueSql("((0))");
-
-                entity.Property(e => e.ForecastedDelivery)
-                    .HasColumnType("decimal(10, 2)")
-                    .HasDefaultValueSql("((0))");
-
-                entity.Property(e => e.FundingStreamPeriodCode).HasMaxLength(50);
-
-                entity.Property(e => e.StudentNumbers).HasDefaultValueSql("((0))");
-
-                entity.Property(e => e.TotalDelivery)
-                    .HasColumnType("decimal(12, 2)")
-                    .HasDefaultValueSql("((0))");
-            });
-
-            modelBuilder.Entity<FundingClaimsSupportingData>(entity =>
-            {
-                entity.HasKey(e => new { e.Ukprn, e.CollectionCode })
-                    .HasName("PK_DraftFundingClaimsSupportingData");
-
-                entity.ToTable("FundingClaimsSupportingData", "Draft");
-
-                entity.Property(e => e.CollectionCode).HasMaxLength(50);
-
-                entity.Property(e => e.LastUpdatedDateTimeUtc)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("(getdate())");
-
-                entity.Property(e => e.UserEmailAddress)
+                entity.Property(e => e.FundingStreamPeriodCode)
                     .IsRequired()
-                    .HasMaxLength(320);
+                    .HasMaxLength(50);
             });
 
             modelBuilder.Entity<SigningNotificationFeed>(entity =>
             {
-                entity.Property(e => e.FeedDateTimeUtc).HasColumnType("datetime");
+                entity.Property(e => e.DateTimeUpdatedUtc).HasColumnType("datetime");
 
-                entity.Property(e => e.SyndicationFeedId).IsRequired();
+                entity.Property(e => e.FeedDateTimeUtc).HasColumnType("datetime");
             });
 
-            modelBuilder.Entity<SubmissionTypes>(entity =>
+            modelBuilder.Entity<Submission>(entity =>
             {
-                entity.ToTable("SubmissionTypes", "Static");
+                entity.Property(e => e.SubmissionId).ValueGeneratedNever();
 
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.CreatedBy)
+                    .IsRequired()
+                    .HasMaxLength(250);
 
-                entity.Property(e => e.Name)
+                entity.Property(e => e.CreatedDateTimeUtc).HasColumnType("datetime");
+
+                entity.Property(e => e.OrganisationIdentifier).HasMaxLength(100);
+
+                entity.Property(e => e.SignedOnDateTimeUtc).HasColumnType("datetime");
+
+                entity.Property(e => e.SubmittedBy).HasMaxLength(250);
+
+                entity.Property(e => e.SubmittedDateTimeUtc).HasColumnType("datetime");
+
+                entity.Property(e => e.Ukprn).HasColumnName("UKPRN");
+
+                entity.HasOne(d => d.Collection)
+                    .WithMany(p => p.Submission)
+                    .HasPrincipalKey(p => p.CollectionId)
+                    .HasForeignKey(d => d.CollectionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Submission_CollectionDetail");
+            });
+
+            modelBuilder.Entity<SubmissionContractDetail>(entity =>
+            {
+                entity.Property(e => e.ContractValue).HasColumnType("decimal(16, 2)");
+
+                entity.Property(e => e.FundingStreamPeriodCode)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.HasOne(d => d.Submission)
+                    .WithMany(p => p.SubmissionContractDetail)
+                    .HasForeignKey(d => d.SubmissionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_SubmissionContractDetail_Submission");
+            });
+
+            modelBuilder.Entity<SubmissionValue>(entity =>
+            {
+                entity.Property(e => e.ContractAllocationNumber)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DeliveryToDate).HasColumnType("decimal(16, 2)");
+
+                entity.Property(e => e.ExceptionalAdjustments).HasColumnType("decimal(16, 2)");
+
+                entity.Property(e => e.ForecastedDelivery).HasColumnType("decimal(16, 2)");
+
+                entity.Property(e => e.FundingStreamPeriodCode)
                     .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.TotalDelivery).HasColumnType("decimal(16, 2)");
+
+                entity.HasOne(d => d.FundingStreamPeriodDeliverableCode)
+                    .WithMany(p => p.SubmissionValue)
+                    .HasForeignKey(d => d.DeliverableCodeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_SubmissionValue_FundingStreamPeriodDeliverableCode");
+
+                entity.HasOne(d => d.Submission)
+                    .WithMany(p => p.SubmissionValue)
+                    .HasForeignKey(d => d.SubmissionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_SubmissionValue_Submission");
             });
         }
     }

@@ -17,7 +17,6 @@ using ESFA.DC.ILR1819.DataStore.EF;
 using ESFA.DC.ILR1819.DataStore.EF.Interface;
 using ESFA.DC.ILR1920.DataStore.EF;
 using ESFA.DC.ILR1920.DataStore.EF.Interface;
-using ESFA.DC.JobQueueManager.Data;
 using ESFA.DC.Queueing;
 using ESFA.DC.Queueing.Interface;
 using ESFA.DC.ReferenceData.FCS.Model;
@@ -47,25 +46,11 @@ namespace ESFA.DC.FundingClaims.Api.Ioc
             builder.RegisterType<JsonSerializationService>().As<ISerializationService>().InstancePerLifetimeScope();
 
             builder.RegisterType<SummarisationContext>().As<ISummarisationContext>().ExternallyOwned();
-            builder.RegisterType<JobQueueDataContext>().As<IJobQueueDataContext>().ExternallyOwned();
             builder.RegisterType<FcsContext>().As<IFcsContext>().ExternallyOwned();
             builder.RegisterType<ILR1819_DataStoreEntities>().As<IIlr1819RulebaseContext>().ExternallyOwned();
             builder.RegisterType<ILR1920_DataStoreEntities>().As<IIlr1920RulebaseContext>().ExternallyOwned();
 
             builder.RegisterType<OrganisationsContext>().As<IOrganisationsContext>().ExternallyOwned();
-
-            builder.Register(context =>
-                {
-                    var connectionStrings = context.Resolve<ConnectionStrings>();
-                    var optionsBuilder = new DbContextOptionsBuilder<JobQueueDataContext>();
-                    optionsBuilder.UseSqlServer(
-                        connectionStrings.KeyValues["JobManagement"],
-                        options => options.EnableRetryOnFailure(3, TimeSpan.FromSeconds(3), new List<int>()));
-
-                    return optionsBuilder.Options;
-                })
-                .As<DbContextOptions<JobQueueDataContext>>()
-                .SingleInstance();
 
             builder.RegisterType<FundingStreamPeriodCodes1819>().Keyed<IFundingStreamPeriodCodes>(1819).InstancePerLifetimeScope();
             builder.RegisterType<FundingStreamPeriodCodes1920>().Keyed<IFundingStreamPeriodCodes>(1920).InstancePerLifetimeScope();

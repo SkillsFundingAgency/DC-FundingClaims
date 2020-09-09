@@ -13,7 +13,6 @@ using FluentAssertions;
 using Moq;
 using Xunit;
 using MockQueryable.Moq;
-using FundingClaimsSupportingData = ESFA.DC.FundingClaims.Data.Entities.FundingClaimsSupportingData;
 
 namespace ESFA.DC.FundingClaims.Tests
 {

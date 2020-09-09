@@ -8,11 +8,13 @@ namespace ESFA.DC.FundingClaims.Model
     {
         public long Ukprn { get; set; }
 
-        public string CollectionCode { get; set; }
+        public string CollectionName { get; set; }
 
         public string EmailAddress { get; set; }
 
-        public int AcademicYear { get; set; }
+        public int CollectionYear { get; set; }
+
+        public string UserName { get; set; }
 
         public List<FundingClaimsDataItem> FundingClaimsDataItems { get; set; }
     }

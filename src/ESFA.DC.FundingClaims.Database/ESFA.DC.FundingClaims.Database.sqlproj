@@ -61,22 +61,14 @@
     <Folder Include="dbo\Tables\" />
     <Folder Include="Reference" />
     <Folder Include="Security" />
-    <Folder Include="Draft" />
-    <Folder Include="Static" />
     <Folder Include="zzDeploymentProfiles\" />
     <Folder Include="ReferenceData" />
     <Folder Include="dbo\Stored Procedures\" />
+    <Folder Include="DbRefactor" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="dbo\Tables\FundingClaimsSubmissionValues.sql" />
-    <Build Include="dbo\Tables\FundingClaimMaxContractValues.sql" />
-    <Build Include="dbo\Tables\FundingClaimDetails.sql" />
     <Build Include="Reference\FundingClaimsProviderReferenceData.sql" />
     <Build Include="Security\Reference.sql" />
-    <Build Include="Security\Draft.sql" />
-    <Build Include="Draft\FundingClaimsData.sql" />
-    <Build Include="Static\SubmissionTypes.sql" />
-    <Build Include="dbo\Tables\FundingClaimsSubmissionFile.sql" />
     <Build Include="Security\Role_DataProcessor.sql" />
     <Build Include="Security\User_DsciUser.sql" />
     <Build Include="Security\RoleMemberships.sql" />
@@ -85,14 +77,29 @@
     <Build Include="Security\Role_DataViewer.sql" />
     <None Include="z.ExtendedProperties.sql" />
     <Build Include="dbo\Stored Procedures\GetLatestFundingClaims.sql" />
-    <Build Include="Draft\FundingClaimsSupportingData.sql" />
     <Build Include="dbo\Tables\SigningNotificationFeed.sql" />
+    <Build Include="dbo\Tables\FundingStreamPeriodDeliverableCode.sql" />
+    <Build Include="dbo\Tables\ChangeLog.sql" />
+    <Build Include="dbo\Tables\Submission.sql" />
+    <Build Include="dbo\Tables\SubmissionContractDetail.sql" />
+    <Build Include="dbo\Tables\SubmissionValue.sql" />
+    <Build Include="dbo\Tables\CollectionDetail.sql" />
+    <None Include="ReferenceData\CollectionDetail.sql">
+      <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>
+    </None>
+    <None Include="DbRefactor\Submission.sql">
+      <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>
+    </None>
+    <None Include="DbRefactor\SubmissionValue.sql">
+      <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>
+    </None>
+    <None Include="DbRefactor\SubmissionContractDetail.sql">
+      <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>
+    </None>
+    <None Include="DbRefactor\FundingStreamPeriodDeliverableCode.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="ESFA.DC.FundingClaims.Database.refactorlog" />
-  </ItemGroup>
-  <ItemGroup>
-    <Build Include="Security\Static.sql" />
   </ItemGroup>
   <ItemGroup>
     <SqlCmdVariable Include="BUILD_BRANCHNAME">
@@ -125,7 +132,6 @@
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="zzz.Script.PostDeployment.sql" />
-    <None Include="ReferenceData\StaticSubmissionTypes.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="zzDeploymentProfiles\zz.Local.Dev.Version.publish.xml" />

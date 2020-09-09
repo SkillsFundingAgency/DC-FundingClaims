@@ -28,4 +28,32 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="FeedDateTimeUtc" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="5b71bb26-9497-4877-be9a-fd6788927178" ChangeDateTime="08/28/2020 10:36:12">
+    <Property Name="ElementName" Value="[dbo].[Submission].[CreatedBY]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Submission]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CreatedBy" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="4bc816b6-9acf-4b4b-98c6-2dd7c3e2ebf9" ChangeDateTime="09/03/2020 09:35:24">
+    <Property Name="ElementName" Value="[dbo].[DeliverableCode].[CollectionName]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DeliverableCode]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CollectionId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="a59b2871-6f41-44b9-9edc-2c3b79e52a18" ChangeDateTime="09/07/2020 12:21:08">
+    <Property Name="ElementName" Value="[dbo].[SubmissionValue].[DeliverableCodeId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SubmissionValue]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DeliverableCode" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="55444640-ee4a-49b0-a489-27c1d9b064e0" ChangeDateTime="09/07/2020 12:51:17">
+    <Property Name="ElementName" Value="[dbo].[SubmissionValue].[DeliverableCode]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SubmissionValue]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DeliverableCodeId" />
+  </Operation>
 </Operations>

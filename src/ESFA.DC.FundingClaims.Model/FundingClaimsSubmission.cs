@@ -14,7 +14,7 @@ namespace ESFA.DC.FundingClaims.Model
 
         public bool IsSigned { get; set; }
 
-        public string CollectionCode { get; set; }
+        public string CollectionName { get; set; }
 
         public string CollectionDisplayName { get; set; }
     }
