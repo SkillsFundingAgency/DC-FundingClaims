@@ -142,7 +142,7 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
                 entity.DateTimeUpdatedUtc = dto.DateTimeUpdatedUtc;
                 entity.UpdatedBy = dto.UpdatedBy;
 
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync(cancellationToken);
                 return true;
             }
         }

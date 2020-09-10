@@ -19,7 +19,6 @@ namespace ESFA.DC.FundingClaims.Signing.Services
         private readonly IFeedItemMappingService _feedItemMappingService;
         private readonly ILogger _logger;
         private readonly IDateTimeProvider _dateTimeProvider;
-        //private const string CollectionPeriodName = "FC03";
 
         public FeedRepository(
             Func<IFundingClaimsDataContext> fundingclaimsDataContextFactory,
