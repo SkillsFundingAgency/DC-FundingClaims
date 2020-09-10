@@ -7,6 +7,6 @@ namespace ESFA.DC.FundingClaims.Services.Interfaces
 {
     public interface IFundingClaimsEmailService
     {
-        Task<ICollection<string>> GetUnsubmittedClaimEmailAddressesAsync(CancellationToken cancellationToken, string collectionCode, string year, DateTime startDateTimeUtc);
+        Task<ICollection<string>> GetUnsubmittedClaimEmailAddressesAsync(CancellationToken cancellationToken, string collectionName, int year, DateTime startDateTimeUtc);
     }
 }

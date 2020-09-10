@@ -19,7 +19,6 @@ namespace ESFA.DC.FundingClaims.Signing.Services
         private readonly IFeedItemMappingService _feedItemMappingService;
         private readonly ILogger _logger;
         private readonly IDateTimeProvider _dateTimeProvider;
-        private const string CollectionPeriodName = "FC03";
 
         public FeedRepository(
             Func<IFundingClaimsDataContext> fundingclaimsDataContextFactory,
@@ -99,15 +98,14 @@ namespace ESFA.DC.FundingClaims.Signing.Services
                     return;
                 }
 
-                var academicYears = feedItems.Select(x => x.Period).Distinct();
+                var collectionNames = feedItems.Select(x => x.CollectionName).Distinct();
                 var ukpns = feedItems.Select(x => x.Ukprn).Distinct();
 
                 using (var context = _fundingclaimsDataContextFactory())
                 {
 
-                    var submissionFiles = context.FundingClaimsSubmissionFile.Where(x => 
-                                                x.CollectionPeriod == CollectionPeriodName &&
-                                                academicYears.Contains(x.Period) &&
+                    var submissionFiles = context.Submission.Where(x => 
+                                                collectionNames.Contains(x.Collection.CollectionName) &&
                                                 ukpns.Contains(x.Ukprn));
 
                     foreach (var feedItem in feedItems)
@@ -115,24 +113,24 @@ namespace ESFA.DC.FundingClaims.Signing.Services
                         var submissionFile = await submissionFiles.SingleOrDefaultAsync(x =>
                             x.Ukprn == feedItem.Ukprn &&
                             x.Version == feedItem.Version &&
-                            x.Period == feedItem.Period, cancellationToken);
+                            x.Collection.CollectionName == feedItem.CollectionName, cancellationToken);
 
                         if (submissionFile == null)
                         {
                             _logger.LogError(
-                                $"Submission Not found - Signing notification received for ukprn : {feedItem.Ukprn}, period : {feedItem.Period} and version : {feedItem.Version}");
+                                $"Submission Not found - Signing notification received for ukprn : {feedItem.Ukprn}, collection : {feedItem.CollectionName} and version : {feedItem.Version}");
                             continue;
                         }
 
-                        if (submissionFile.SignedOn.HasValue)
+                        if (submissionFile.SignedOnDateTimeUtc.HasValue)
                         {
                             _logger.LogInfo(
-                                $"Submission found but already set to signed - Signing notification received for ukprn : {feedItem.Ukprn}, period : {feedItem.Period} and version : {feedItem.Version}");
+                                $"Submission found but already set to signed - Signing notification received for ukprn : {feedItem.Ukprn}, collection : {feedItem.CollectionName} and version : {feedItem.Version}");
                             continue;
                         }
 
                         submissionFile.IsSigned = feedItem.IsSigned;
-                        submissionFile.SignedOn = feedItem.FeedDateTimeUtc;
+                        submissionFile.SignedOnDateTimeUtc = feedItem.FeedDateTimeUtc;
 
                         await context.SaveChangesAsync(cancellationToken);
                     }

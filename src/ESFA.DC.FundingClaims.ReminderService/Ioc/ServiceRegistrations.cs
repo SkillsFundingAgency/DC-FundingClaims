@@ -9,6 +9,7 @@ using ESFA.DC.FundingClaims.ReferenceData.Services;
 using ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces;
 using ESFA.DC.FundingClaims.ReminderService.Configuration;
 using ESFA.DC.FundingClaims.ReminderService.Interfaces;
+using ESFA.DC.FundingClaims.ReminderService.Services;
 using ESFA.DC.FundingClaims.Services;
 using ESFA.DC.JobQueueManager.Data;
 using ESFA.DC.Logging;
@@ -52,6 +53,8 @@ namespace ESFA.DC.FundingClaims.ReminderService.Ioc
 
             builder.RegisterType<ExecutionContext>().As<IExecutionContext>().InstancePerLifetimeScope();
             builder.RegisterType<SerilogLoggerFactory>().As<ISerilogLoggerFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<EmailTemplateService>().As<IEmailTemplateService>().InstancePerLifetimeScope();
+
             builder.RegisterType<SeriLogger>().As<ILogger>().InstancePerLifetimeScope();
 
             builder.RegisterType<FundingClaimsDataContext>().As<IFundingClaimsDataContext>().ExternallyOwned();

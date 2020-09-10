@@ -8,9 +8,9 @@ namespace ESFA.DC.FundingClaims.Data.Entities
 
         public DateTime FeedDateTimeUtc { get; set; }
 
-        public Guid SyndicationFeedId { get; set; }
-
         public int PageNumber { get; set; }
+
+        public Guid SyndicationFeedId { get; set; }
 
         public DateTime DateTimeUpdatedUtc { get; set; }
     }

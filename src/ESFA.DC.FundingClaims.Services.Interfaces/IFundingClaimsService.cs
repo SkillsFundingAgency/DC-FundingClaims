@@ -8,13 +8,11 @@ namespace ESFA.DC.FundingClaims.Services.Interfaces
 {
     public interface IFundingClaimsService
     {
-        Task<bool> SaveDraftAsync(CancellationToken cancellationToken, FundingClaimsData fundingClaimsData);
+        Task<bool> SaveSubmissionAsync(CancellationToken cancellationToken, FundingClaimsData fundingClaimsData);
 
-        Task<List<FundingClaimsDataItem>> GetDraftAsync(CancellationToken cancellationToken, string collectionCode, long ukprn);
+        Task<List<FundingClaimsDataItem>> GetSubmissionDetailsAsync(CancellationToken cancellationToken, long ukprn, Guid? submissionId = null, string collectionName = null);
 
-        Task<List<FundingClaimsDataItem>> GetSubmissionAsync(CancellationToken cancellationToken, Guid submissionId, long ukprn);
-
-        Task<string> ConvertToSubmissionAsync(CancellationToken cancellationToken, long ukprn, int latestSubmissionVersion, string collectionName, int academicYear);
+        Task<string> ConvertToSubmissionAsync(CancellationToken cancellationToken, long ukprn, string collectionName);
 
         Task<List<FundingClaimsSubmission>> GetSubmissionHistoryAsync(CancellationToken cancellationToken, long ukprn);
 

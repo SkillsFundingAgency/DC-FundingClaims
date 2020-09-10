@@ -9,6 +9,7 @@ using ESFA.DC.FundingClaims.Services.Interfaces;
 using ESFA.DC.FundingClaims.EmailNotification.Services;
 using ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces;
 using ESFA.DC.FundingClaims.ReminderService.Interfaces;
+using ESFA.DC.FundingClaims.ReminderService.Services;
 using ESFA.DC.Logging.Interfaces;
 using ESFA.DC.Serialization.Interfaces;
 
@@ -19,16 +20,19 @@ namespace ESFA.DC.FundingClaims.ReminderService
         private readonly ILogger _logger;
         private readonly ICollectionReferenceDataService _collectionReferenceData;
         private readonly IFundingClaimsEmailService _fundingClaimsEmailService;
+        private readonly IEmailTemplateService _emailTemplateService;
         private readonly IEmailNotifier _emailNotifier;
 
         public FundingClaimsReminderService(
             ICollectionReferenceDataService collectionReferenceData,
             IFundingClaimsEmailService fundingClaimsEmailService,
+            IEmailTemplateService emailTemplateService,
             IEmailNotifier emailNotifier,
             ILogger logger)
         {
             _collectionReferenceData = collectionReferenceData;
             _fundingClaimsEmailService = fundingClaimsEmailService;
+            _emailTemplateService = emailTemplateService;
             _emailNotifier = emailNotifier;
             _logger = logger;
         }
@@ -55,7 +59,7 @@ namespace ESFA.DC.FundingClaims.ReminderService
             }
 
 
-            var emailTemplate = await _collectionReferenceData.GetEmailTemplateAsync(cancellationToken, collection.CollectionId); 
+            var emailTemplate = await _emailTemplateService.GetEmailTemplateAsync(cancellationToken, collection.CollectionId); 
 
             if (emailTemplate == null)
             {
@@ -63,7 +67,7 @@ namespace ESFA.DC.FundingClaims.ReminderService
                 return 0;
             }
 
-            var emails = (await _fundingClaimsEmailService.GetUnsubmittedClaimEmailAddressesAsync(cancellationToken, collection.CollectionCode,collection.CollectionYear.ToString(), collection.SubmissionOpenDateUtc)).ToList();
+            var emails = (await _fundingClaimsEmailService.GetUnsubmittedClaimEmailAddressesAsync(cancellationToken, collection.CollectionName,collection.CollectionYear, collection.SubmissionOpenDateUtc)).ToList();
 
             if (!emails.Any())
             {

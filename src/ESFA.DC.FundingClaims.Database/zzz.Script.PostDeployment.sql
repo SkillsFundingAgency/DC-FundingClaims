@@ -18,7 +18,11 @@ GO
 
 
 RAISERROR('		   Ref Data',10,1) WITH NOWAIT;
-	:r .\ReferenceData\StaticSubmissionTypes.sql
+	:r .\ReferenceData\CollectionDetail.sql
+	:r .\DbRefactor\Submission.sql
+	:r .\DbRefactor\FundingStreamPeriodDeliverableCode.sql
+	:r .\DbRefactor\SubmissionContractDetail.sql
+	:r .\DbRefactor\SubmissionValue.sql
 GO
 
 RAISERROR('		   Update User Account Passwords',10,1) WITH NOWAIT;

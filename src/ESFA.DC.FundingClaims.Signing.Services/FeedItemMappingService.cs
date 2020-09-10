@@ -33,17 +33,16 @@ namespace ESFA.DC.FundingClaims.Signing.Services
             }
 
             int.TryParse(idParts[2], out var version);
+            int.TryParse(idParts[1], out var ukprn);
 
-            var collectionNameParts = idParts[0].Split('-');
-            
             var dto = new FundingClaimSigningDto(feedItemDetails.FundingClaimId)
             {
                 IsSigned = feedItemDetails.HasBeenSigned,
                 SyndicationFeedId = feedItem.Id.SyndicationId(),
                 FeedDateTimeUtc = feedItem.LastUpdatedTime.UtcDateTime,
-                Ukprn = idParts[1],
+                Ukprn = ukprn,
                 Version = version,
-                Period = collectionNameParts[0],
+                CollectionName = idParts[0],
                 PageNumber = currentPageNumber
             };
 
