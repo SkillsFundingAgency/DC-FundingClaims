@@ -97,6 +97,9 @@
       <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>
     </None>
     <None Include="DbRefactor\FundingStreamPeriodDeliverableCode.sql" />
+    <None Include="ReferenceData\FundingStreamPeriodDeliverableCode.sql">
+      <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="ESFA.DC.FundingClaims.Database.refactorlog" />
