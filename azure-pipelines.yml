@@ -167,7 +167,7 @@ stages:
         publishWebProjects: false
         zipAfterPublish: true
         nobuild: true
-        projects: '**/*.Signing.Notifications.csproj'
+        projects: '**/*.Signing.Notifications.Console.csproj'
         arguments: '--configuration ${{ parameters.BuildConfiguration }} --no-build -p:version="$(Build.BuildNumber)" -p:FileVersion="$(Build.BuildNumber)" --output "$(Build.SourcesDirectory)\tmp\app_Data\Jobs\Continuous\ESFA.DC.FundingClaims.Signing.Notifications"'
 
     - task: PowerShell@1
