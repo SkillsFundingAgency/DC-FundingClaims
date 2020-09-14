@@ -35,7 +35,6 @@ stages:
       demands:
       #- TestBuildServer
       - IsBuildServer
-      - BuildServer
 
     steps:
 
@@ -45,11 +44,11 @@ stages:
         packageType: sdk
         version: $(DotnetCore.Version)
         
-    - task: NuGetToolInstaller@0
-      displayName: 'Use NuGet : $(Nuget.Version)'
-      inputs:
-        versionSpec: '> $(Nuget.Version)'
-        checkLatest: true
+#    - task: NuGetToolInstaller@0
+#      displayName: 'Use NuGet : $(Nuget.Version)'
+#      inputs:
+#        versionSpec: '> $(Nuget.Version)'
+#        checkLatest: true
 
     - task: UseGitVersion@5
       displayName: use Git Version to generate build number
@@ -231,6 +230,13 @@ stages:
 #********************************************************************************
 # Run Unit Tests
 #********************************************************************************
+    - task: DotNetCoreCLI@2
+      displayName: 'Run xUnit Test - Core Framework'
+      inputs:
+        command: test
+        projects: 'src/*Tests/*.csproj'
+        arguments: '--configuration ${{ parameters.BuildConfiguration }} --collect "Code coverage"'
+
 
     # Run all tests with "/p:CollectCoverage=true /p:CoverletOutputFormat=cobertura" to generate the code coverage file
     - task: DotNetCoreCLI@2
