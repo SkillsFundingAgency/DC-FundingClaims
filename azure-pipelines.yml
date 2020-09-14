@@ -232,7 +232,7 @@ stages:
 #********************************************************************************
     - task: DotNetCoreCLI@2
       displayName: 'Run xUnit Test - Core Framework'
-      enabled: false
+      enabled: true
       inputs:
         command: test
         projects: 'src/*Tests/*.csproj'
