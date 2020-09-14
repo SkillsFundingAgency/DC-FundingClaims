@@ -23,6 +23,8 @@ RAISERROR('		   Ref Data',10,1) WITH NOWAIT;
 	:r .\DbRefactor\FundingStreamPeriodDeliverableCode.sql
 	:r .\DbRefactor\SubmissionContractDetail.sql
 	:r .\DbRefactor\SubmissionValue.sql
+
+	:r .\ReferenceData\FundingStreamPeriodDeliverableCode.sql
 GO
 
 RAISERROR('		   Update User Account Passwords',10,1) WITH NOWAIT;

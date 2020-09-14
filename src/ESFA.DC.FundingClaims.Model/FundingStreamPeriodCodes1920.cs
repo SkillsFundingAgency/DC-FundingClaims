@@ -19,6 +19,6 @@ namespace ESFA.DC.FundingClaims.Model
 
         string IFundingStreamPeriodCodes.AdvanceLoadBursary => "ALLBC1920";
 
-        string IFundingStreamPeriodCodes.Ilr16To19 => "1619LR1819";
+        string IFundingStreamPeriodCodes.Ilr16To19 => "1619ED1920";
     }
 }
