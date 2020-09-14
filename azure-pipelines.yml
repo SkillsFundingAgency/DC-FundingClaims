@@ -114,12 +114,10 @@ stages:
         TargetFolder: '$(build.artifactstagingdirectory)\Nuget\Packages'
         CleanTargetFolder: true
         flattenFolders: true
-
         
 #********************************************************************************
 # Package Web Api
 #********************************************************************************   
-
     - task: DotNetCoreCLI@2
       displayName: 'Package Api Artifact Folder'
       inputs:
@@ -131,7 +129,7 @@ stages:
         arguments: '--configuration ${{ parameters.BuildConfiguration }} --no-build -p:version="$(Build.BuildNumber)" -p:FileVersion="$(Build.BuildNumber)" --output "$(Build.ArtifactStagingDirectory)\Web\API"'
 
     - task: DotNetCoreCLI@2
-      displayName: 'Build WebJob - FundingClaim.Consol'
+      displayName: 'Build WebJob - ReminderService'
       inputs:
         command: publish
         configuration: '${{ parameters.BuildConfiguration }}'
@@ -140,6 +138,46 @@ stages:
         nobuild: true
         projects: '**/*.FundingClaims.ReminderService.csproj'
         arguments: '--configuration ${{ parameters.BuildConfiguration }} --no-build -p:version="$(Build.BuildNumber)" -p:FileVersion="$(Build.BuildNumber)" --output "$(Build.SourcesDirectory)\tmp\app_Data\Jobs\Triggered\ESFA.DC.FundingClaim.ReminderService"'
+
+    - task: PowerShell@1
+      displayName: 'ReminderService - PowerShell Script'
+      inputs:
+        scriptType: inlineScript
+        workingFolder: '"$(Build.SourcesDirectory)\tmp\app_Data\Jobs\Triggered\ESFA.DC.FundingClaim.ReminderService"'
+        inlineScript: |
+         $cmdCommand="dotnet ESFA.DC.JobScheduler.Console.dll"
+         $cmdCommand| Out-File -FilePath run.cmd -Encoding ascii
+
+    
+    - task: PowerShell@1
+      enabled: true
+      displayName: Reminder Service - Create settings.job'
+      inputs:
+        scriptType: inlineScript
+        workingFolder: '"$(build.SourcesDirectory)\tmp\app_Data\Jobs\Triggered\CovidRelief-EmailService" '
+        inlineScript: |
+         $cmdCommand='{"schedule": "0 0 13 * * 1-5"}'
+         $cmdCommand| Out-File -FilePath settings.job -Encoding ascii
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Build WebJob - Signing.Notifications'
+      inputs:
+        command: publish
+        configuration: '${{ parameters.BuildConfiguration }}'
+        publishWebProjects: false
+        zipAfterPublish: true
+        nobuild: true
+        projects: '**/*.Signing.Notifications.csproj'
+        arguments: '--configuration ${{ parameters.BuildConfiguration }} --no-build -p:version="$(Build.BuildNumber)" -p:FileVersion="$(Build.BuildNumber)" --output "$(Build.SourcesDirectory)\tmp\app_Data\Jobs\Continuous\ESFA.DC.FundingClaims.Signing.Notifications"'
+
+    - task: PowerShell@1
+      displayName: 'JobScheduler - PowerShell Script'
+      inputs:
+        scriptType: inlineScript
+        workingFolder: '"$(Build.SourcesDirectory)\tmp\app_Data\Jobs\Continuous\ESFA.DC.FundingClaims.Signing.Notificationse" '
+        inlineScript: |
+         $cmdCommand="dotnet ESFA.DC.JobScheduler.Console.dll"
+         $cmdCommand| Out-File -FilePath run.cmd -Encoding ascii
 
     ## Create Zip File for Deployment     
     - task: ArchiveFiles@2
