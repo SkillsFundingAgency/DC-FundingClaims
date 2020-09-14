@@ -24,21 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ESFA.DC.FundingClaims.Api\ESFA.DC.FundingClaims.Api.csproj" />
-    <ProjectReference Include="..\ESFA.DC.FundingClaims.AtomFeed.Services\ESFA.DC.FundingClaims.AtomFeed.Services.csproj" />
-    <ProjectReference Include="..\ESFA.DC.FundingClaims.Database\ESFA.DC.FundingClaims.Database.sqlproj" />
-    <ProjectReference Include="..\ESFA.DC.FundingClaims.Data\ESFA.DC.FundingClaims.Data.csproj" />
-    <ProjectReference Include="..\ESFA.DC.FundingClaims.EmailNotification.Services\ESFA.DC.FundingClaims.EmailNotification.Services.csproj" />
-    <ProjectReference Include="..\ESFA.DC.FundingClaims.Message\ESFA.DC.FundingClaims.Message.csproj" />
-    <ProjectReference Include="..\ESFA.DC.FundingClaims.Model\ESFA.DC.FundingClaims.Model.csproj" />
-    <ProjectReference Include="..\ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces\ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces.csproj" />
-    <ProjectReference Include="..\ESFA.DC.FundingClaims.ReferenceData.Services\ESFA.DC.FundingClaims.ReferenceData.Services.csproj" />
-    <ProjectReference Include="..\ESFA.DC.FundingClaims.ReminderService\ESFA.DC.FundingClaims.ReminderService.csproj" />
-    <ProjectReference Include="..\ESFA.DC.FundingClaims.Services.Interfaces\ESFA.DC.FundingClaims.Services.Interfaces.csproj" />
     <ProjectReference Include="..\ESFA.DC.FundingClaims.Services\ESFA.DC.FundingClaims.Services.csproj" />
-    <ProjectReference Include="..\ESFA.DC.FundingClaims.Signing.Models\ESFA.DC.FundingClaims.Signing.Models.csproj" />
-    <ProjectReference Include="..\ESFA.DC.FundingClaims.Signing.Notifications.Console\ESFA.DC.FundingClaims.Signing.Notifications.Console.csproj" />
-    <ProjectReference Include="..\ESFA.DC.FundingClaims.Signing.Services\ESFA.DC.FundingClaims.Signing.Services.csproj" />
   </ItemGroup>
 
 </Project>
