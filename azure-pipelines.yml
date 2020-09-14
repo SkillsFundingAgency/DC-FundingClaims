@@ -34,6 +34,7 @@ stages:
       name: DCT
       demands:
       #- TestBuildServer
+      #- BuildServer
       - IsBuildServer
 
     steps:
@@ -44,11 +45,11 @@ stages:
         packageType: sdk
         version: $(DotnetCore.Version)
         
-#    - task: NuGetToolInstaller@0
-#      displayName: 'Use NuGet : $(Nuget.Version)'
-#      inputs:
-#        versionSpec: '> $(Nuget.Version)'
-#        checkLatest: true
+    - task: NuGetToolInstaller@0
+      displayName: 'Use NuGet : $(Nuget.Version)'
+      inputs:
+        versionSpec: '> $(Nuget.Version)'
+        checkLatest: true
 
     - task: UseGitVersion@5
       displayName: use Git Version to generate build number
