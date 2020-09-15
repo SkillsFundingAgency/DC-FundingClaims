@@ -286,17 +286,5 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
             }
         }
 
-        [HttpGet("collection/{dateTimeUtc?}")]
-        public async Task<FundingClaimsCollection> GetFundingClaimsCollection(CancellationToken cancellationToken, DateTime? dateTimeUtc = null)
-        {
-            dateTimeUtc = dateTimeUtc ?? _dateTimeProvider.GetNowUtc();
-            return await _collectionReferenceDataService.GetFundingClaimsCollectionAsync(cancellationToken, dateTimeUtc);
-        }
-
-        [HttpGet("collection/name/{collectionName}")]
-        public async Task<FundingClaimsCollection> GetFundingClaimsCollection(CancellationToken cancellationToken, string collectionName)
-        {
-            return await _collectionReferenceDataService.GetFundingClaimsCollectionAsync(cancellationToken, collectionName);
-        }
     }
 }

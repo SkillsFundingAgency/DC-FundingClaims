@@ -17,10 +17,25 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
     public class CollectionDetailController : ControllerBase
     {
         private readonly ICollectionReferenceDataService _collectionReferenceDataService;
+        private readonly IDateTimeProvider _dateTimeProvider;
 
-        public CollectionDetailController(ICollectionReferenceDataService collectionReferenceDataService)
+        public CollectionDetailController(ICollectionReferenceDataService collectionReferenceDataService, IDateTimeProvider dateTimeProvider)
         {
             _collectionReferenceDataService = collectionReferenceDataService;
+            _dateTimeProvider = dateTimeProvider;
+        }
+
+        [HttpGet("{dateTimeUtc?}/{isHelpDesk?}")]
+        public async Task<FundingClaimsCollection> GetFundingClaimsCollection(CancellationToken cancellationToken, DateTime? dateTimeUtc = null, bool isHelpDesk = false)
+        {
+            dateTimeUtc ??= _dateTimeProvider.GetNowUtc();
+            return await _collectionReferenceDataService.GetFundingClaimsCollectionAsync(cancellationToken, dateTimeUtc, isHelpDesk);
+        }
+
+        [HttpGet("name/{collectionName}")]
+        public async Task<FundingClaimsCollection> GetFundingClaimsCollection(CancellationToken cancellationToken, string collectionName)
+        {
+            return await _collectionReferenceDataService.GetFundingClaimsCollectionAsync(cancellationToken, collectionName);
         }
 
         [HttpGet]
