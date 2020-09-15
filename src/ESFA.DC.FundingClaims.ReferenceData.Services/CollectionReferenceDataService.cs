@@ -55,14 +55,26 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
             }
         }
 
-        public async Task<FundingClaimsCollection> GetFundingClaimsCollectionAsync(CancellationToken cancellationToken, DateTime? dateTimeUtc = null)
+        public async Task<FundingClaimsCollection> GetFundingClaimsCollectionAsync(CancellationToken cancellationToken, DateTime? dateTimeUtc = null, bool isHelpDesk = false)
         {
             dateTimeUtc = dateTimeUtc ?? _dateTimeProvider.GetNowUtc();
 
             using (var context = _fundingClaimsDataContext())
             {
-                var data = await context.CollectionDetail
-                    .SingleOrDefaultAsync(x => dateTimeUtc >= x.SubmissionOpenDateUtc && dateTimeUtc <= x.SubmissionCloseDateUtc, cancellationToken);
+                CollectionDetail data = null;
+
+                var query = context.CollectionDetail.Where(x => dateTimeUtc <= x.SubmissionCloseDateUtc);
+
+                if (isHelpDesk)
+                {
+                    query = query.Where(x => dateTimeUtc >= x.HelpdeskOpenDateUtc);
+                }
+                else
+                {
+                    query = query.Where(x => dateTimeUtc >= x.SubmissionOpenDateUtc);
+                }
+
+                data = await query.SingleOrDefaultAsync(cancellationToken);
 
                 if (data == null)
                 {

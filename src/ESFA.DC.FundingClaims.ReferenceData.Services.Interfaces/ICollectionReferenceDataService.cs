@@ -13,7 +13,7 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces
 
         Task<List<FundingClaimsCollection>> GetAllFundingClaimsCollectionsAsync(CancellationToken cancellationToken);
 
-        Task<FundingClaimsCollection> GetFundingClaimsCollectionAsync(CancellationToken cancellationToken, DateTime? dateTimeUtc = null);
+        Task<FundingClaimsCollection> GetFundingClaimsCollectionAsync(CancellationToken cancellationToken, DateTime? dateTimeUtc = null, bool isHelpDesk = false);
 
         Task<FundingClaimsCollection> GetLatestFundingClaimsCollectionAsync(CancellationToken cancellationToken, bool? requiresSignature = null);
 
