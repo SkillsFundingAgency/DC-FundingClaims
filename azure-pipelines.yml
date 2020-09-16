@@ -34,6 +34,7 @@ stages:
       name: DCT
       demands:
       #- TestBuildServer
+      #- BuildServer
       - IsBuildServer
 
     steps:
@@ -44,11 +45,11 @@ stages:
         packageType: sdk
         version: $(DotnetCore.Version)
         
-#    - task: NuGetToolInstaller@0
-#      displayName: 'Use NuGet : $(Nuget.Version)'
-#      inputs:
-#        versionSpec: '> $(Nuget.Version)'
-#        checkLatest: true
+    - task: NuGetToolInstaller@0
+      displayName: 'Use NuGet : $(Nuget.Version)'
+      inputs:
+        versionSpec: '> $(Nuget.Version)'
+        checkLatest: true
 
     - task: UseGitVersion@5
       displayName: use Git Version to generate build number
@@ -66,11 +67,10 @@ stages:
 
     # Generate the report using ReportGenerator (https://github.com/danielpalme/ReportGenerator)
     # First install the tool on the machine, then run it
-    - script: |
-            dotnet tool update dotnet-reportgenerator-globaltool --version 4.3.6  
+    - script: dotnet tool update --global --version 4.3.6 dotnet-reportgenerator-globaltool
       displayName: Install/update dotnet-reportgenerator-globaltool
-      continueOnError: true  
-      enabled: false
+      continueOnError: true    
+      enabled: false   
 
     - task: DotNetCoreCLI@2
       displayName: 'Restore Nuget packages'
@@ -114,12 +114,10 @@ stages:
         TargetFolder: '$(build.artifactstagingdirectory)\Nuget\Packages'
         CleanTargetFolder: true
         flattenFolders: true
-
         
 #********************************************************************************
 # Package Web Api
 #********************************************************************************   
-
     - task: DotNetCoreCLI@2
       displayName: 'Package Api Artifact Folder'
       inputs:
@@ -131,15 +129,57 @@ stages:
         arguments: '--configuration ${{ parameters.BuildConfiguration }} --no-build -p:version="$(Build.BuildNumber)" -p:FileVersion="$(Build.BuildNumber)" --output "$(Build.ArtifactStagingDirectory)\Web\API"'
 
     - task: DotNetCoreCLI@2
-      displayName: 'Build WebJob - FundingClaim.Consol'
+      displayName: 'Build WebJob - ReminderService'
       inputs:
         command: publish
-        configuration: '${{ parameters.BuildConfiguration }}'
-        publishWebProjects: false
-        zipAfterPublish: true
-        nobuild: true
         projects: '**/*.FundingClaims.ReminderService.csproj'
         arguments: '--configuration ${{ parameters.BuildConfiguration }} --no-build -p:version="$(Build.BuildNumber)" -p:FileVersion="$(Build.BuildNumber)" --output "$(Build.SourcesDirectory)\tmp\app_Data\Jobs\Triggered\ESFA.DC.FundingClaim.ReminderService"'
+        vstsFeed: 'dct-pkg'
+        publishWebProjects: false
+        zipAfterPublish: false
+        modifyOutputPath: false
+        workingDirectory: '$(System.DefaultWorkingDirectory)'
+
+    - task: PowerShell@1
+      displayName: 'ReminderService - PowerShell Script'
+      inputs:
+        scriptType: inlineScript
+        workingFolder: '"$(Build.SourcesDirectory)\tmp\app_Data\Jobs\Triggered\ESFA.DC.FundingClaim.ReminderService"'
+        inlineScript: |
+         $cmdCommand="dotnet ESFA.DC.JobScheduler.Console.dll"
+         $cmdCommand| Out-File -FilePath run.cmd -Encoding ascii
+
+    
+    - task: PowerShell@1
+      enabled: true
+      displayName: Reminder Service - Create settings.job'
+      inputs:
+        scriptType: inlineScript
+        workingFolder: '"$(Build.SourcesDirectory)\tmp\app_Data\Jobs\Triggered\ESFA.DC.FundingClaim.ReminderService"'
+        inlineScript: |
+         $cmdCommand='{"schedule": "0 0 13 * * 1-5"}'
+         $cmdCommand| Out-File -FilePath settings.job -Encoding ascii
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Build WebJob - Signing.Notifications'
+      inputs:
+        command: publish
+        projects: '**/*.Signing.Notifications.Console.csproj'
+        arguments: '--configuration ${{ parameters.BuildConfiguration }} --no-build -p:version="$(Build.BuildNumber)" -p:FileVersion="$(Build.BuildNumber)" --output "$(Build.SourcesDirectory)\tmp\app_Data\Jobs\Continuous\ESFA.DC.FundingClaims.Signing.Notifications"'
+        vstsFeed: 'dct-pkg'
+        publishWebProjects: false
+        zipAfterPublish: false
+        modifyOutputPath: false
+        workingDirectory: '$(System.DefaultWorkingDirectory)'
+
+    - task: PowerShell@1
+      displayName: 'JobScheduler - PowerShell Script'
+      inputs:
+        scriptType: inlineScript
+        workingFolder: '"$(Build.SourcesDirectory)\tmp\app_Data\Jobs\Continuous\ESFA.DC.FundingClaims.Signing.Notifications"'
+        inlineScript: |
+         $cmdCommand="dotnet ESFA.DC.JobScheduler.Console.dll"
+         $cmdCommand| Out-File -FilePath run.cmd -Encoding ascii
 
     ## Create Zip File for Deployment     
     - task: ArchiveFiles@2
@@ -153,7 +193,6 @@ stages:
 # SQL database Project Build and Acopy to  Artifact Directory
 #********************************************************************************   
     - task: MSBuild@1
-      enabled: true
       displayName: 'Build solution'
       inputs:
         solution: '**/ESFA.DC.FundingClaims.Database.sqlproj'
@@ -179,7 +218,6 @@ stages:
 # Count Artifact Files to decide what to Publish
 #********************************************************************************    
     - task: PowerShell@2
-      enabled: true
       displayName: 'Check What to Publish'
       continueOnError: true  
       inputs:
@@ -192,13 +230,15 @@ stages:
 #********************************************************************************
 # Run Unit Tests
 #********************************************************************************
+    # Run all tests with "/p:CollectCoverage=true /p:CoverletOutputFormat=cobertura" to generate the code coverage file
     - task: DotNetCoreCLI@2
-      displayName: 'Run xUnit Test - Core Framework'
-      enabled: false
+      displayName: Run .net Core Unit Tests
       inputs:
         command: test
-        projects: 'src/*Tests/*.csproj'
-        arguments: '--configuration $(Build.Configuration) --collect "Code coverage"'
+        projects: |
+            **/*Tests.csproj
+            !**/*.Automation.Tests.csproj
+        arguments: '--no-build --no-restore --configuration ${{ parameters.BuildConfiguration }} /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
 
         
 #********************************************************************************
@@ -206,20 +246,18 @@ stages:
 #********************************************************************************
 # need to add Nuget PAckage 'coverlet.msbuild' to  Test Projects.
 #
-     ## Generate the report using ReportGenerator (https://github.com/danielpalme/ReportGenerator)
+    ## Generate the report using ReportGenerator (https://github.com/danielpalme/ReportGenerator)
     # First install the tool on the machine, then run it
     - script: |
-          dotnet tool update -g dotnet-reportgenerator-globaltool --version 4.3.6  
-          reportgenerator -reports:$(Build.SourcesDirectory)/**/*Tests/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:Cobertura
+            dotnet tool update --global --version 4.3.6 dotnet-reportgenerator-globaltool
+            reportgenerator -reports:$(Build.SourcesDirectory)/**/*Tests/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:Cobertura
       displayName: Create Code coverage report
-      enabled: false
   
     # Publish the code coverage result (summary and web site)
     # The summary allows to view the coverage percentage in the summary tab
     # The web site allows to view which lines are covered directly in Azure Pipeline
     - task: PublishCodeCoverageResults@1
       displayName: 'Publish code coverage'
-      enabled: false
       inputs:
         codeCoverageTool: Cobertura
         summaryFileLocation: '$(Build.SourcesDirectory)/CodeCoverage/Cobertura.xml'
