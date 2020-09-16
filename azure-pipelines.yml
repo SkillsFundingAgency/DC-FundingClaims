@@ -155,7 +155,7 @@ stages:
       displayName: Reminder Service - Create settings.job'
       inputs:
         scriptType: inlineScript
-        workingFolder: '"$(build.SourcesDirectory)\tmp\app_Data\Jobs\Triggered\CovidRelief-EmailService" '
+        workingFolder: '"$(Build.SourcesDirectory)\tmp\app_Data\Jobs\Triggered\ESFA.DC.FundingClaim.ReminderService"'
         inlineScript: |
          $cmdCommand='{"schedule": "0 0 13 * * 1-5"}'
          $cmdCommand| Out-File -FilePath settings.job -Encoding ascii
@@ -175,7 +175,7 @@ stages:
       displayName: 'JobScheduler - PowerShell Script'
       inputs:
         scriptType: inlineScript
-        workingFolder: '"$(Build.SourcesDirectory)\tmp\app_Data\Jobs\Continuous\ESFA.DC.FundingClaims.Signing.Notificationse" '
+        workingFolder: '"$(Build.SourcesDirectory)\tmp\app_Data\Jobs\Continuous\ESFA.DC.FundingClaims.Signing.Notifications"'
         inlineScript: |
          $cmdCommand="dotnet ESFA.DC.JobScheduler.Console.dll"
          $cmdCommand| Out-File -FilePath run.cmd -Encoding ascii
