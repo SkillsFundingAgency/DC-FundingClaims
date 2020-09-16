@@ -178,7 +178,7 @@ stages:
         scriptType: inlineScript
         workingFolder: '"$(Build.SourcesDirectory)\tmp\app_Data\Jobs\Continuous\ESFA.DC.FundingClaims.Signing.Notifications"'
         inlineScript: |
-         $cmdCommand="dotnet ESFA.DC.FundingClaims.Signing.Notifications.dll"
+         $cmdCommand="dotnet ESFA.DC.FundingClaims.Signing.Noticifications.Console.dll"
          $cmdCommand| Out-File -FilePath run.cmd -Encoding ascii
 
     ## Create Zip File for Deployment     
