@@ -133,12 +133,13 @@ stages:
       displayName: 'Build WebJob - ReminderService'
       inputs:
         command: publish
-        configuration: '${{ parameters.BuildConfiguration }}'
-        publishWebProjects: false
-        zipAfterPublish: false
-        nobuild: true
         projects: '**/*.FundingClaims.ReminderService.csproj'
         arguments: '--configuration ${{ parameters.BuildConfiguration }} --no-build -p:version="$(Build.BuildNumber)" -p:FileVersion="$(Build.BuildNumber)" --output "$(Build.SourcesDirectory)\tmp\app_Data\Jobs\Triggered\ESFA.DC.FundingClaim.ReminderService"'
+        vstsFeed: 'dct-pkg'
+        publishWebProjects: false
+        zipAfterPublish: false
+        modifyOutputPath: false
+        workingDirectory: '$(System.DefaultWorkingDirectory)'
 
     - task: PowerShell@1
       displayName: 'ReminderService - PowerShell Script'
@@ -164,12 +165,13 @@ stages:
       displayName: 'Build WebJob - Signing.Notifications'
       inputs:
         command: publish
-        configuration: '${{ parameters.BuildConfiguration }}'
-        publishWebProjects: false
-        zipAfterPublish: false
-        nobuild: true
         projects: '**/*.Signing.Notifications.Console.csproj'
         arguments: '--configuration ${{ parameters.BuildConfiguration }} --no-build -p:version="$(Build.BuildNumber)" -p:FileVersion="$(Build.BuildNumber)" --output "$(Build.SourcesDirectory)\tmp\app_Data\Jobs\Continuous\ESFA.DC.FundingClaims.Signing.Notifications"'
+        vstsFeed: 'dct-pkg'
+        publishWebProjects: false
+        zipAfterPublish: false
+        modifyOutputPath: false
+        workingDirectory: '$(System.DefaultWorkingDirectory)'
 
     - task: PowerShell@1
       displayName: 'JobScheduler - PowerShell Script'
