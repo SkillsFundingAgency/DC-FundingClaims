@@ -34,8 +34,8 @@ stages:
       name: DCT
       demands:
       #- TestBuildServer
-      - BuildServer
-      #- IsBuildServer
+      #- BuildServer
+      - IsBuildServer
 
     steps:
 
