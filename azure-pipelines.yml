@@ -146,7 +146,7 @@ stages:
         scriptType: inlineScript
         workingFolder: '"$(Build.SourcesDirectory)\tmp\app_Data\Jobs\Triggered\ESFA.DC.FundingClaim.ReminderService"'
         inlineScript: |
-         $cmdCommand="dotnet ESFA.DC.JobScheduler.Console.dll"
+         $cmdCommand="dotnet ESFA.DC.FundingClaim.ReminderService.dll"
          $cmdCommand| Out-File -FilePath run.cmd -Encoding ascii
 
     
