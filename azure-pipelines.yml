@@ -67,10 +67,10 @@ stages:
 
     # Generate the report using ReportGenerator (https://github.com/danielpalme/ReportGenerator)
     # First install the tool on the machine, then run it
-    - script: |
-            dotnet tool update dotnet-reportgenerator-globaltool --version 4.3.6  
+    - script: dotnet tool update --global --version 4.3.6 dotnet-reportgenerator-globaltool
       displayName: Install/update dotnet-reportgenerator-globaltool
-      continueOnError: true        
+      continueOnError: true    
+      enabled: false   
 
     - task: DotNetCoreCLI@2
       displayName: 'Restore Nuget packages'
@@ -193,7 +193,6 @@ stages:
 # SQL database Project Build and Acopy to  Artifact Directory
 #********************************************************************************   
     - task: MSBuild@1
-      enabled: true
       displayName: 'Build solution'
       inputs:
         solution: '**/ESFA.DC.FundingClaims.Database.sqlproj'
@@ -219,7 +218,6 @@ stages:
 # Count Artifact Files to decide what to Publish
 #********************************************************************************    
     - task: PowerShell@2
-      enabled: true
       displayName: 'Check What to Publish'
       continueOnError: true  
       inputs:
