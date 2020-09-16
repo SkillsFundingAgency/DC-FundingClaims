@@ -233,14 +233,6 @@ stages:
 #********************************************************************************
 # Run Unit Tests
 #********************************************************************************
-    - task: DotNetCoreCLI@2
-      displayName: 'Run xUnit Test - Core Framework'
-      inputs:
-        command: test
-        projects: 'src/*Tests/*.csproj'
-        arguments: '--configuration ${{ parameters.BuildConfiguration }} --collect "Code coverage"'
-
-
     # Run all tests with "/p:CollectCoverage=true /p:CoverletOutputFormat=cobertura" to generate the code coverage file
     - task: DotNetCoreCLI@2
       displayName: Run .net Core Unit Tests
