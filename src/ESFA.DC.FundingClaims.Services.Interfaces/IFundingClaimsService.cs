@@ -19,5 +19,7 @@ namespace ESFA.DC.FundingClaims.Services.Interfaces
         Task<List<ContractAllocation>> GetSubmittedMaxContractValuesAsync(CancellationToken cancellationToken, long ukprn, Guid submissionId);
 
         Task<int> GetLatestSubmissionVersionAsync(CancellationToken cancellationToken, long ukprn);
+
+        Task UpdateCovidDeclaration(CancellationToken cancellationToken, long ukprn, string collectionName, bool value);
     }
 }

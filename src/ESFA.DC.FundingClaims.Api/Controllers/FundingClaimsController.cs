@@ -286,5 +286,21 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("covid-declaration/{collectionName}/{ukprn}/{value}")]
+        public async Task<IActionResult> SaveCovidDeclaration(CancellationToken cancellationToken, string collectionName, long ukprn, bool value)
+        {
+            try
+            {
+                await _fundingClaimsService.UpdateCovidDeclaration(cancellationToken, ukprn, collectionName, value);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"error occured to SaveCovidDeclaration data for ukprn : {ukprn}  collection name : {collectionName}, value : {value} ", e);
+                return BadRequest();
+            }
+        }
+
     }
 }

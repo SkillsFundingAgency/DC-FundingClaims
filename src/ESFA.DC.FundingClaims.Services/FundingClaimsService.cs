@@ -296,6 +296,24 @@ namespace ESFA.DC.FundingClaims.Services
             }
         }
 
+        public async Task UpdateCovidDeclaration(CancellationToken cancellationToken, long ukprn, string collectionName, bool value)
+        {
+            using (IFundingClaimsDataContext context = _fundingClaimsContextFactory())
+            {
+                var submission = await GetSubmissionAsync(cancellationToken, context, ukprn, null, collectionName, false);
+
+                if (submission == null)
+                {
+                    throw new ArgumentException(
+                        $"no submission found for submission for ukprn : {ukprn}, collection Name : {collectionName}, can not proceed with submission");
+                }
+
+                submission.CovidDeclaration = value;
+
+                await context.SaveChangesAsync(cancellationToken);
+            }
+        }
+
         private async Task<Submission> GetSubmissionAsync(CancellationToken cancellationToken, IFundingClaimsDataContext context, long ukprn, Guid? submissionId = null, string collectionName = null, bool? isSubmitted = null)
         {
             var query = context.Submission.Include(x => x.Collection)
