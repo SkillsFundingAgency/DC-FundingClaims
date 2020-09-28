@@ -10,7 +10,7 @@ namespace ESFA.DC.FundingClaims.Services.Interfaces
     {
         Task<bool> SaveSubmissionAsync(CancellationToken cancellationToken, FundingClaimsData fundingClaimsData);
 
-        Task<List<FundingClaimsDataItem>> GetSubmissionDetailsAsync(CancellationToken cancellationToken, long ukprn, Guid? submissionId = null, string collectionName = null);
+        Task<FundingClaimsData> GetSubmissionDetailsAsync(CancellationToken cancellationToken, long ukprn, Guid? submissionId = null, string collectionName = null);
 
         Task<string> ConvertToSubmissionAsync(CancellationToken cancellationToken, long ukprn, string collectionName);
 
@@ -19,5 +19,7 @@ namespace ESFA.DC.FundingClaims.Services.Interfaces
         Task<List<ContractAllocation>> GetSubmittedMaxContractValuesAsync(CancellationToken cancellationToken, long ukprn, Guid submissionId);
 
         Task<int> GetLatestSubmissionVersionAsync(CancellationToken cancellationToken, long ukprn);
+
+        Task UpdateCovidDeclaration(CancellationToken cancellationToken, long ukprn, string collectionName, bool value);
     }
 }
