@@ -37,8 +37,9 @@ namespace ESFA.DC.FundingClaims.Services
             _logger = logger;
         }
 
-        public async Task<List<FundingClaimsDataItem>> GetSubmissionDetailsAsync(CancellationToken cancellationToken, long ukprn, Guid? submissionId = null, string collectionName = null)
+        public async Task<FundingClaimsData> GetSubmissionDetailsAsync(CancellationToken cancellationToken, long ukprn, Guid? submissionId = null, string collectionName = null)
         {
+            var result = new FundingClaimsData();
             var items = new List<FundingClaimsDataItem>();
 
             try
@@ -50,8 +51,10 @@ namespace ESFA.DC.FundingClaims.Services
                     if (submission == null)
                     {
                         _logger.LogDebug($"submission not found for submission id : {submissionId} and ukprn : {ukprn}");
-                        return items;
+                        return result;
                     }
+
+                    result.CovidDeclaration = submission.CovidDeclaration.GetValueOrDefault();
 
                     items = await context.SubmissionValue.Where(x => x.SubmissionId == submission.SubmissionId)
                         .Select(x => new FundingClaimsDataItem()
@@ -67,6 +70,8 @@ namespace ESFA.DC.FundingClaims.Services
                             TotalDelivery = x.TotalDelivery,
                         })
                         .ToListAsync(cancellationToken);
+
+                    result.FundingClaimsDataItems = items;
                 }
             }
             catch (Exception e)
@@ -78,7 +83,7 @@ namespace ESFA.DC.FundingClaims.Services
 
             _logger.LogInfo($"return submission detail for ukprn : {ukprn}, submission id : {submissionId}");
 
-            return items;
+            return result;
         }
 
         public async Task<bool> SaveSubmissionAsync(CancellationToken cancellationToken, FundingClaimsData fundingClaimsData)
