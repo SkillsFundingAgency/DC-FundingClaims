@@ -54,7 +54,7 @@ namespace ESFA.DC.FundingClaims.Services
                         return result;
                     }
 
-                    result.CovidDeclaration = submission.CovidDeclaration.GetValueOrDefault();
+                    result.CovidDeclaration = submission.CovidDeclaration;
 
                     items = await context.SubmissionValue.Where(x => x.SubmissionId == submission.SubmissionId)
                         .Select(x => new FundingClaimsDataItem()
