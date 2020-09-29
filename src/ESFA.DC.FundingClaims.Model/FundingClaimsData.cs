@@ -16,7 +16,7 @@ namespace ESFA.DC.FundingClaims.Model
 
         public string UserName { get; set; }
 
-        public bool CovidDeclaration { get; set; }
+        public bool? CovidDeclaration { get; set; }
 
         public List<FundingClaimsDataItem> FundingClaimsDataItems { get; set; } = new List<FundingClaimsDataItem>();
     }
