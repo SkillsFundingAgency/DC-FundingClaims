@@ -48,7 +48,7 @@ namespace ESFA.DC.FundingClaims.Api.Ioc
             builder.RegisterType<SummarisationContext>().As<ISummarisationContext>().ExternallyOwned();
             builder.RegisterType<FcsContext>().As<IFcsContext>().ExternallyOwned();
             builder.RegisterType<ILR1819_DataStoreEntities>().As<IIlr1819RulebaseContext>().ExternallyOwned();
-            builder.RegisterType<ILR1920_DataStoreEntities>().As<IIlr1920RulebaseContext>().ExternallyOwned();
+            builder.RegisterType<ILR1920_DataStoreEntities>().As<IILR1920_DataStoreEntities>().ExternallyOwned();
 
             builder.RegisterType<OrganisationsContext>().As<IOrganisationsContext>().ExternallyOwned();
 
