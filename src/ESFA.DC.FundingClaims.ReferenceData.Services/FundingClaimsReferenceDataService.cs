@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ESFA.DC.FundingClaims.Model.Interfaces;
-using ESFA.DC.ILR1819.DataStore.EF.Interface;
 using ESFA.DC.Logging.Interfaces;
 using ESFA.DC.ReferenceData.FCS.Model.Interface;
 using ESFA.DC.ReferenceData.Organisations.Model.Interface;
@@ -13,15 +12,16 @@ using ESFA.DC.Summarisation.Model.Interface;
 using Microsoft.EntityFrameworkCore;
 using ESFA.DC.FundingClaims.Data;
 using Autofac.Features.Indexed;
-using ESFA.DC.ILR1819.DataStore.EF;
 using ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces;
+using ESFA.DC.ILR1920.DataStore.EF.Interface;
+using ESFA.DC.ILR1920.DataStore.EF;
 
 namespace ESFA.DC.FundingClaims.ReferenceData.Services
 {
     public class FundingClaimsReferenceDataService : IFundingClaimsReferenceDataService
     {
         private readonly Func<IFcsContext> _fcsContextFactory;
-        private readonly Func<IIlr1819RulebaseContext> _ilr1819RulebaseContextFactory;
+        private readonly Func<IILR1920_DataStoreEntities> _ilr1920RulebaseContextFactory;
         private readonly Func<IOrganisationsContext> _organisationContextFactory;
         private readonly Func<IFundingClaimsDataContext> _fundingClaimsContextFactory;
         private readonly IIndex<int, IFundingStreamPeriodCodes> _fundingStreamPeriodCodes;
@@ -41,7 +41,7 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
 
     public FundingClaimsReferenceDataService(
             Func<IFcsContext> fcsContextFactory,
-            Func<IIlr1819RulebaseContext> ilr1819RulebaseContextFactory,
+            Func<IILR1920_DataStoreEntities> ilr1920RulebaseContextFactory,
             Func<IOrganisationsContext> organisationContextFactory,
             Func<IFundingClaimsDataContext> fundingClaimsContextFactory,
             IIndex<int, IFundingStreamPeriodCodes> IFundingStreamPeriodCodes,
@@ -49,7 +49,7 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
             ILogger logger)
         {
             _fcsContextFactory = fcsContextFactory;
-            _ilr1819RulebaseContextFactory = ilr1819RulebaseContextFactory;
+            _ilr1920RulebaseContextFactory = ilr1920RulebaseContextFactory;
             _organisationContextFactory = organisationContextFactory;
             _fundingClaimsContextFactory = fundingClaimsContextFactory;
             _fundingStreamPeriodCodes = IFundingStreamPeriodCodes;
@@ -83,7 +83,7 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
 
             try
             {
-                using (IIlr1819RulebaseContext context = _ilr1819RulebaseContextFactory())
+                using (var context = _ilr1920RulebaseContextFactory())
                 {
                     var mainData = await context.FM25_Learners
                         .Where(x => x.UKPRN == ukprn && x.StartFund.GetValueOrDefault()).ToListAsync(cancellationToken);
