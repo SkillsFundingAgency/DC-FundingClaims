@@ -38,6 +38,8 @@ namespace ESFA.DC.FundingClaims.Data.Entities
 
         public DateTime CreatedDateTimeUtc { get; set; }
 
+        public bool? CovidDeclaration { get; set; }
+
         public virtual CollectionDetail Collection { get; set; }
 
         public virtual ICollection<ChangeLog> ChangeLog { get; set; }

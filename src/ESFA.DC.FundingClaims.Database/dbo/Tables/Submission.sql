@@ -12,6 +12,7 @@
 	[SignedOnDateTimeUtc] [datetime] NULL,
 	[CreatedBy] [nvarchar](250) NOT NULL,
 	[CreatedDateTimeUtc] [datetime] NOT NULL,
+	[CovidDeclaration] bit NULL,
  CONSTRAINT [PK_FundingClaimsSubmissionFile_SubmissionID] PRIMARY KEY CLUSTERED 
 (
 	[SubmissionId] ASC
