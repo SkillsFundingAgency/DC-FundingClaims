@@ -23,17 +23,20 @@ namespace ESFA.DC.FundingClaims.Services
         private readonly Func<IFundingClaimsDataContext> _fundingClaimsContextFactory;
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IFundingClaimsReferenceDataService _fundingClaimsReferenceDataService;
+        private readonly IIndex<int, IFundingStreamPeriodCodes> _fundingStreamPeriodCodes;
         private readonly ILogger _logger;
 
         public FundingClaimsService(
             Func<IFundingClaimsDataContext> fundingClaimsContextFactory,
             IDateTimeProvider dateTimeProvider,
             IFundingClaimsReferenceDataService fundingClaimsReferenceDataService,
+            IIndex<int, IFundingStreamPeriodCodes> fundingStreamPeriodCodes,
             ILogger logger)
         {
             _fundingClaimsContextFactory = fundingClaimsContextFactory;
             _dateTimeProvider = dateTimeProvider;
             _fundingClaimsReferenceDataService = fundingClaimsReferenceDataService;
+            _fundingStreamPeriodCodes = fundingStreamPeriodCodes;
             _logger = logger;
         }
 
@@ -108,6 +111,16 @@ namespace ESFA.DC.FundingClaims.Services
                             CreatedBy = fundingClaimsData.UserName,
                             CreatedDateTimeUtc = today,
                         };
+
+                        var latestSubmission = await GetSubmissionAsync(cancellationToken, context, fundingClaimsData.Ukprn, null, fundingClaimsData.CollectionName, true);
+
+                        if (latestSubmission != null)
+                        {
+                            submission.SubmissionValue = context.SubmissionValue.Where(x => x.SubmissionId == latestSubmission.SubmissionId &&
+                                                                                            x.FundingStreamPeriodCode == _fundingStreamPeriodCodes[fundingClaimsData.CollectionYear].Ilr16To19)
+                                                        .ToList();
+                        }
+
                         context.Submission.Add(submission);
                     }
                     else
@@ -120,7 +133,6 @@ namespace ESFA.DC.FundingClaims.Services
                         context.SubmissionValue.RemoveRange(context.SubmissionValue.Where(x =>
                             x.SubmissionId == submission.SubmissionId &&
                             fundingStreamPeriodCodes.Contains(x.FundingStreamPeriodCode)));
-
                         context.ChangeLog.RemoveRange(
                             context.ChangeLog.Where(f => f.SubmissionId == submission.SubmissionId));
 
