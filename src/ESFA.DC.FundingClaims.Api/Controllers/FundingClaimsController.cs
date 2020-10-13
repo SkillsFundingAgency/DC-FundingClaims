@@ -287,8 +287,8 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
         }
 
         [HttpPost]
-        [Route("covid-declaration/{collectionName}/{ukprn}/{value}")]
-        public async Task<IActionResult> SaveCovidDeclaration(CancellationToken cancellationToken, string collectionName, long ukprn, bool value)
+        [Route("covid-declaration/{collectionName}/{ukprn}/{value?}")]
+        public async Task<IActionResult> SaveCovidDeclaration(CancellationToken cancellationToken, string collectionName, long ukprn, bool? value)
         {
             try
             {

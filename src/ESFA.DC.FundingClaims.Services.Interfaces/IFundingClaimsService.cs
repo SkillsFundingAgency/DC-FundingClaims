@@ -20,6 +20,6 @@ namespace ESFA.DC.FundingClaims.Services.Interfaces
 
         Task<int> GetLatestSubmissionVersionAsync(CancellationToken cancellationToken, long ukprn);
 
-        Task UpdateCovidDeclaration(CancellationToken cancellationToken, long ukprn, string collectionName, bool value);
+        Task UpdateCovidDeclaration(CancellationToken cancellationToken, long ukprn, string collectionName, bool? value);
     }
 }

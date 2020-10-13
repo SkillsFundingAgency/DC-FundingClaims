@@ -313,7 +313,7 @@ namespace ESFA.DC.FundingClaims.Services
             }
         }
 
-        public async Task UpdateCovidDeclaration(CancellationToken cancellationToken, long ukprn, string collectionName, bool value)
+        public async Task UpdateCovidDeclaration(CancellationToken cancellationToken, long ukprn, string collectionName, bool? value)
         {
             using (IFundingClaimsDataContext context = _fundingClaimsContextFactory())
             {
