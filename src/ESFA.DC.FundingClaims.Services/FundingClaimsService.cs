@@ -98,6 +98,9 @@ namespace ESFA.DC.FundingClaims.Services
                     var today = _dateTimeProvider.GetNowUtc();
 
                     var submission = await GetSubmissionAsync(cancellationToken, context, fundingClaimsData.Ukprn, null, fundingClaimsData.CollectionName, false);
+                    //find unique FSPs
+                    var fundingStreamPeriodCodes = fundingClaimsData.FundingClaimsDataItems
+                        .Select(x => x.FundingStreamPeriodCode).Distinct();
 
                     var deliverableCodes = await context.FundingStreamPeriodDeliverableCode.ToListAsync(cancellationToken);
 
@@ -114,7 +117,7 @@ namespace ESFA.DC.FundingClaims.Services
 
                         var latestSubmission = await GetSubmissionAsync(cancellationToken, context, fundingClaimsData.Ukprn, null, fundingClaimsData.CollectionName, true);
 
-                        if (latestSubmission != null)
+                        if (latestSubmission != null & fundingStreamPeriodCodes.All(x => x != _fundingStreamPeriodCodes[fundingClaimsData.CollectionYear].Ilr16To19))
                         {
                             submission.SubmissionValue = context.SubmissionValue.Where(x => x.SubmissionId == latestSubmission.SubmissionId &&
                                                                                             x.FundingStreamPeriodCode == _fundingStreamPeriodCodes[fundingClaimsData.CollectionYear].Ilr16To19)
@@ -125,10 +128,6 @@ namespace ESFA.DC.FundingClaims.Services
                     }
                     else
                     {
-                        //find unique FSPs
-                        var fundingStreamPeriodCodes = fundingClaimsData.FundingClaimsDataItems
-                            .Select(x => x.FundingStreamPeriodCode).Distinct();
-
                         //find and remove values
                         context.SubmissionValue.RemoveRange(context.SubmissionValue.Where(x =>
                             x.SubmissionId == submission.SubmissionId &&
