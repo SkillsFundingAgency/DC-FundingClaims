@@ -59,6 +59,7 @@ namespace ESFA.DC.FundingClaims.Signing.Services
                 if (feedItem == null)
                 {
                     _logger.LogInfo("No new items to save for funding claim feed items");
+                    await UpdateLastPollDateTimeAsync(cancellationToken);
                     return;
                 }
 
@@ -144,6 +145,33 @@ namespace ESFA.DC.FundingClaims.Signing.Services
                 throw;
             }
 
+        }
+
+        private async Task UpdateLastPollDateTimeAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+
+                using (var context = _fundingclaimsDataContextFactory())
+                {
+                    var entry = await context.SigningNotificationFeed.SingleOrDefaultAsync(cancellationToken);
+                    if (entry == null)
+                    {
+                        _logger.LogDebug("No feed item found to update last poll date time");
+                    }
+                    else
+                    {
+                        entry.DateTimeUpdatedUtc = _dateTimeProvider.GetNowUtc();
+                        await context.SaveChangesAsync(cancellationToken);
+                        _logger.LogDebug("Updated last poll date time");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("Error occured while saving latest feed item", e);
+                throw;
+            }
         }
     }
 }

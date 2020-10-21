@@ -46,7 +46,7 @@ namespace ESFA.DC.FundingClaims.Signing.Services
 
             if (currentDateTime > latestCollection.SubmissionCloseDateUtc &&  currentDateTime <= latestCollection.SignatureCloseDateUtc.GetValueOrDefault())
             {
-                _logger.LogInfo("Collection is still closed and we are between submission close and signature close , feed poll will should be called");
+                _logger.LogInfo("Collection is still closed and we are between submission close and signature close , feed poll should be called");
                 return true;
             }
 
