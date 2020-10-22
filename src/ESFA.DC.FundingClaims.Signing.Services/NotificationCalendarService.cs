@@ -52,7 +52,7 @@ namespace ESFA.DC.FundingClaims.Signing.Services
 
             var latestFeedEntry = await _feedRepository.GetLatestSyndicationDataAsync(cancellationToken);
 
-            if (latestFeedEntry != null && latestCollection.SignatureCloseDateUtc.GetValueOrDefault().AddHours(1) <= latestFeedEntry.DateTimeUpdatedUtc)
+            if (latestFeedEntry != null && latestFeedEntry.DateTimeUpdatedUtc < latestCollection.SignatureCloseDateUtc.GetValueOrDefault().AddHours(1))
             {
                 _logger.LogInfo("Collection is closed and signature closed date is passed too, we are in the grace period of one hour, feed poll will be done");
                 return true;
