@@ -83,6 +83,21 @@ namespace ESFA.DC.FundingClaims.Api.Controllers
             }
         }
 
+        [HttpGet("OpenByDateRange/{startDateUtc}/{endDateUtc}")]
+        public async Task<IActionResult> GetFundingClaimsCollectionMetaDataByDateRangeAsync(CancellationToken cancellationToken, DateTime startDateUtc, DateTime endDateUtc)
+        {
+            var data = await _collectionReferenceDataService.GetCollectionsOpenByDateRangeAsync(cancellationToken, startDateUtc, endDateUtc);
+
+            if (data.Any())
+            {
+                return Ok(data);
+            }
+            else
+            {
+                return NoContent();
+            }
+        }
+
         [HttpPost("update")]
         public async Task<IActionResult> UpdateAsync(CancellationToken cancellationToken, [FromBody] FundingClaimsCollection dto)
         {

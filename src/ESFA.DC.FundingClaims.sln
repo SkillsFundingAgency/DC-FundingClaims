@@ -50,6 +50,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ESFA.DC.FundingClaims.Servi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ESFA.DC.FundingClaims.Tests", "ESFA.DC.FundingClaims.Tests\ESFA.DC.FundingClaims.Tests.csproj", "{423338FB-3B91-4684-A4A9-9EE84D485A44}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESFA.DC.FundingClaims.ReferenceData.Services.Tests", "ESFA.DC.FundingClaims.ReferenceData.Services.Tests\ESFA.DC.FundingClaims.ReferenceData.Services.Tests.csproj", "{1934694C-E700-41A8-80B4-D8A1688A67ED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -126,6 +128,10 @@ Global
 		{423338FB-3B91-4684-A4A9-9EE84D485A44}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{423338FB-3B91-4684-A4A9-9EE84D485A44}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{423338FB-3B91-4684-A4A9-9EE84D485A44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1934694C-E700-41A8-80B4-D8A1688A67ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1934694C-E700-41A8-80B4-D8A1688A67ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1934694C-E700-41A8-80B4-D8A1688A67ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1934694C-E700-41A8-80B4-D8A1688A67ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -138,6 +144,7 @@ Global
 		{379E36D5-BEFF-46C0-B8BF-E183963C5FE9} = {7E18A1AA-DD6D-415D-A6D6-C42149A410F8}
 		{AB54A307-CF5C-4F79-BDF9-DC7F120BECD8} = {1BB52596-424B-4344-857A-B493E5243E0B}
 		{C3BF85ED-A093-4953-8333-3D0028CA8546} = {7E18A1AA-DD6D-415D-A6D6-C42149A410F8}
+		{1934694C-E700-41A8-80B4-D8A1688A67ED} = {68856463-E8A1-48DB-B242-7DC89A01B5FB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AC60D59F-F5FA-42CB-91E4-F2564EEF8F0C}

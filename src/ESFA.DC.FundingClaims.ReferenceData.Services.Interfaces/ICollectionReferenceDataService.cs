@@ -20,6 +20,8 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces
         Task<IEnumerable<FundingClaimsCollection>> GetCollectionsAsync(CancellationToken cancellationToken,
             int collectionYear);
 
+        Task<IEnumerable<FundingClaimsCollection>> GetCollectionsOpenByDateRangeAsync(CancellationToken cancellationToken, DateTime startDateUtc, DateTime endDateUTc);
+
         Task<FundingClaimsCollection> GetLastUpdatedCollectionAsync(CancellationToken cancellationToken);
 
         Task<bool> UpdateCollection(CancellationToken cancellationToken, FundingClaimsCollection dto);
