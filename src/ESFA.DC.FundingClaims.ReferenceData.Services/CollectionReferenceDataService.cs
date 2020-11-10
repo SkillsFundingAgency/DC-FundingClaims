@@ -183,5 +183,15 @@ namespace ESFA.DC.FundingClaims.ReferenceData.Services
                 DateTimeUpdatedUtc = data.DateTimeUpdatedUtc
             };
         }
+
+        public async Task<IEnumerable<FundingClaimsCollection>> GetCollectionsOpenByDateRangeAsync(CancellationToken cancellationToken, DateTime startDateUtc, DateTime endDateUtc)
+        {
+            using (var context = _fundingClaimsDataContext())
+            {
+                return await context.CollectionDetail.Where(c => c.SubmissionOpenDateUtc <= startDateUtc && c.SubmissionCloseDateUtc >= endDateUtc)
+                            .Select(x => Convert(x))
+                            .ToListAsync(cancellationToken);
+            }
+        }
     }
 }
