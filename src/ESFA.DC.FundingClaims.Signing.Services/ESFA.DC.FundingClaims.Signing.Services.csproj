@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ESFA.DC.DateTimeProvider" Version="0.1.6-beta0001" />
+    <PackageReference Include="ESFA.DC.DateTimeProvider.Interface" Version="0.1.6-beta0001" />
+    <PackageReference Include="ESFA.DC.Logging.Interfaces" Version="0.1.10-beta0001" />
+    <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.2.7" />
+    <PackageReference Include="Polly" Version="7.2.0" />
+    <PackageReference Include="System.ServiceModel.Syndication" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ESFA.DC.FundingClaims.AtomFeed.Services\ESFA.DC.FundingClaims.AtomFeed.Services.csproj" />
+    <ProjectReference Include="..\ESFA.DC.FundingClaims.Data\ESFA.DC.FundingClaims.Data.csproj" />
+    <ProjectReference Include="..\ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces\ESFA.DC.FundingClaims.ReferenceData.Services.Interfaces.csproj" />
+    <ProjectReference Include="..\ESFA.DC.FundingClaims.Signing.Models\ESFA.DC.FundingClaims.Signing.Models.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ESFA.DC.JobQueueManager.Data" Version="0.2.75-beta0001" />
+    <PackageReference Include="Notify" Version="2.1.0" />
+  </ItemGroup>
+
+</Project>
